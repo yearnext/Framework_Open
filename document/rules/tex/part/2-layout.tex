@@ -1,0 +1,160 @@
+\section{排版规范}
+\subsection{缩进}
+规则 <2-1> (强制)：程序块要采用缩进风格编写，缩进的空格数为4。\\
+
+[说明]\\
+函数或过程的开始、结构的定义及循环、判断等语句中的代码都要采用缩进风格，case语句下的情况处理语句也要遵从语句缩进要求（对于由开发工具自动生成的代码可以有不一致）。\\
+
+\subsection{空格空行}
+规则 <2-2-1> (强制)：进行双目运算、赋值时，操作符之前、之后要加空格；进行非对等操作时，如果是关系密切的立即操作符（如"."），后不应加空格。\\
+
+[示例]\\
+\begin{lstlisting}
+
+//! 反例
+uint8_t func(void)
+{
+	struct
+	{
+		uint8_t a;
+		uint8_t b;
+	}var;
+	
+	var.a=0;
+	var.b=1;
+	
+	var.a=var.a+var.b;
+	
+	return var.a&var.b?1:0;
+}
+
+//! 示范代码
+uint8_t func(void)
+{
+	struct
+	{
+		uint8_t a;
+		uint8_t b;
+	}var;
+	
+	var.a = 0;
+	var.b = 1;
+	
+	var.a = var.a + var.b;
+	
+	return (var.a & var.b) ? (1) : (0);
+}
+\end{lstlisting}
+规则 <2-2-2>（强制）：相对独立的程序块之间、变量声明/定义之后必须加空行。\\
+
+[示例]\\
+\begin{lstlisting}
+//! 反例
+uint8_t func(void)
+{
+	uint8_t a = 0;
+	uint8_t b = 1;
+	a++;b++;
+	return a*b;
+}
+
+//! 示范代码
+uint8_t func(void)
+{
+	uint8_t a = 0;
+	uint8_t b = 0;
+	
+	a++;
+	b++;
+	
+	return (a * b);
+}
+\end{lstlisting}
+
+规则<2-2-3>（强制）：较长的语句(大于80字符)要分成多行书写，长表达式要在低优先级操作符处划分新行，操作符放在新行之首，划分出的新行要进行适当的缩进，使排版整齐，语句可读。\\
+
+[示例]\\
+\begin{lstlisting}
+//! 反例
+if (a && b || a && c || c && d || d || e && f)
+{
+	//! code
+}
+
+//! 示范代码
+if (   a && b 
+	|| a && c 
+	|| c && d 
+	|| d 
+	|| e && f)
+{
+	//! code
+}
+\end{lstlisting}
+
+规则 <2-2-4>（强制）：若函数或过程中的参数较长，则要进行适当的划分换行。\\
+
+[示例]\\
+\begin{lstlisting}
+//! 反例
+func((uint8_t *)&this_func_param1, (uint16_t)this_func_param2, (uint8_t *)&this_func_param3.address, this_func_param4);
+
+//! 示范代码
+func((uint8_t *)&this_func_param1, 
+	 (uint16_t)this_func_param2, 
+	 (uint8_t *)&this_func_param3.address, 
+	 this_func_param4);
+\end{lstlisting}
+
+规则 <2-2-5>（强制）：不允许把多个短语句写在一行中，即一行只写一条语句。\\
+
+[示例]\\
+\begin{lstlisting}
+//! 反例
+uint8_t a, b, c; char str;
+
+//! 示范代码
+uint8_t a, b, c;
+char str;
+\end{lstlisting}
+
+\subsection{对齐}
+规则 <2-3-1>（建议）：多行同类操作时操作符尽量保持对齐。\\
+
+[示例]\\
+\begin{lstlisting}
+int a, aa, aaa;
+
+//! 反例
+a = 0;
+aa = 0;
+aaa = 0;
+
+//! 示范代码
+a   = 0;
+aa  = 0;
+aaa = 0;
+\end{lstlisting}
+
+规则 <2.3-2>（强制）：if、 for、 do、 while、 case、 switch、 default 等语句自占一行，且 if、 for、 do、 while等语句的执行语句部分无论多少都要加括号{}。\\
+
+[示例]\\
+\begin{lstlisting}
+//! 反例
+if(a)
+	a--;
+else
+	a++;
+
+//! 示范代码
+if (a)
+{
+	a--;
+}
+else
+{
+	a++;
+}
+\end{lstlisting}
+
+规则 <2-3-3>（建议）：一行程序以小于80字符为宜，不要写的过长。

@@ -1,0 +1,69 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Application">
+      <UniqueIdentifier>{56703dbb-0f55-40ed-8a41-6230acee7aa7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Board">
+      <UniqueIdentifier>{d3c5a3d8-216d-480f-847f-fc161011ae94}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Kernel">
+      <UniqueIdentifier>{a359646f-d62e-4f28-bbeb-9e23b01e76c4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MSP">
+      <UniqueIdentifier>{95f41f2e-a8c0-4f71-89ad-a639eb488b4a}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="application\application.c">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="paltform\bsp_led.c">
+      <Filter>Board</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\kernel\fw_debug.c">
+      <Filter>Kernel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\kernel\fw_timer.c">
+      <Filter>Kernel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\hal\mcu\simulation\msp_simulation.c">
+      <Filter>MSP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\hal\mcu\simulation\simulation_adc.c">
+      <Filter>MSP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\hal\mcu\simulation\simulation_gpio.c">
+      <Filter>MSP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\hal\mcu\simulation\simulation_timer.c">
+      <Filter>MSP</Filter>
+    </ClCompile>
+    <ClCompile Include="paltform\board.c">
+      <Filter>Board</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\kernel\fw_core.c">
+      <Filter>Kernel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\kernel\fw_server.c">
+      <Filter>Kernel</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="application\fw_conf.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="paltform\bsp.h">
+      <Filter>Board</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\hal\hal_msp.h">
+      <Filter>MSP</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\hal\mcu\simulation\msp_simulation.h">
+      <Filter>MSP</Filter>
+    </ClInclude>
+    <ClInclude Include="paltform\msp_conf.h">
+      <Filter>MSP</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,204 @@
+%-----------------------------------------------------------------------------%
+%-                       Copyright (C) 2018  yearnext                        -%
+%-                                                                           -%
+%-     Licensed under the Apache License, Version 2.0 (the "License");       -%
+%-     you may not use this file except in compliance with the License.      -%
+%-     You may obtain a copy of the License at                               -%
+%-                http://www.apache.org/licenses/LICENSE-2.0                 -%
+%-                                                                           -%
+%-  Unless required by applicable law or agreed to in writing, software      -%
+%-  distributed under the License is distributed on an "AS IS" BASIS,        -%
+%-  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. -%
+%-  See the License for the specific language governing permissions and      -%
+%-  limitations under the License.                                           -%
+%-----------------------------------------------------------------------------%
+% @file       mystyle.sty                                                    -%
+% @author     yearnext                                                       -%
+% @version    1.0.0                                                          -%
+% @date       2018-10-14                                                     -%
+% @brief      code style file                                                -%
+% @par        work platform                                                  -%
+%                 Windows                                                    -%
+% @par        compiler                                                       -%
+%                 XeLaTex                                                    -%
+%-----------------------------------------------------------------------------%
+% @note                                                                       
+% 1.XXXXX                                                                     
+%-----------------------------------------------------------------------------%
+
+%-----------------------------------------------------------------------------%
+%->> Include packet declaration
+%-----------------------------------------------------------------------------%
+\usepackage{fontspec}
+\usepackage{color}
+\usepackage{etoolbox}
+\usepackage{listings}
+\usepackage{fontspec}
+\usepackage{setspace}
+\usepackage[unicode,colorlinks,linkcolor=black,anchorcolor=blue,citecolor=green]{hyperref}
+
+%设置字体
+\setmainfont{KaiTi}
+%中文断行
+\XeTeXlinebreaklocale "zh"
+\XeTeXlinebreakskip = 0pt plus 1pt minus 0.1pt
+%调整文档行距
+\onehalfspacing
+\XeTeXinterchartokenstate=1
+
+%-----------------------------------------------------------------------------%
+%->> define new commands
+%-----------------------------------------------------------------------------%
+\newcommand{\lstfontfamily}{\ttfamily}
+
+%-----------------------------------------------------------------------------%
+%->> define colors
+%-----------------------------------------------------------------------------%
+\definecolor{darkviolet}{rgb}{0.5,0,0.4}
+\definecolor{darkgreen}{rgb}{0,0.4,0.2} 
+\definecolor{darkblue}{rgb}{0.1,0.1,0.9}
+\definecolor{darkgrey}{rgb}{0.5,0.5,0.5}
+\definecolor{lightblue}{rgb}{0.4,0.4,1}
+
+\definecolor{stringColor}{rgb}{0.16,0.00,1.00}
+\definecolor{annotationColor}{rgb}{0.39,0.39,0.39}
+\definecolor{keywordColor}{rgb}{0.50,0.00,0.33}
+\definecolor{commentColor}{rgb}{0.25,0.50,0.37}
+\definecolor{javadocColor}{rgb}{0.25,0.37,0.75}
+\definecolor{jTagColor}{rgb}{0.50,0.62,0.75}
+\definecolor{eTagColor}{rgb}{0.50,0.62,0.75}
+\definecolor{lineNumberColor}{rgb}{0.47,0.47,0.47}
+
+%-----------------------------------------------------------------------------%
+%->> define tags
+%-----------------------------------------------------------------------------%
+\def\cTags{@author, @deprecated, @exception, @param, @return, @see, @serial, @serialData, @serialField, @since, @throws, @version}
+
+% Here is standard annotations as listed here: 
+%
+% http://en.wikipedia.org/wiki/Java_annotation
+% 
+% @Override - Checks that the function is an override. Causes a compile warning if the function is not found in one of the parent classes.
+% @Deprecated - Marks the function as obsolete. Causes a compile warning if the function is used.
+% @SuppressWarnings - Instructs the compiler to suppress the compile time warnings specified in the annotation parameters
+%
+% Annotations applied to other annotations:
+%
+% @Retention - Specifies how the marked annotation is stored -- Whether in code only, compiled into the class, or available at runtime through reflection.
+% @Documented - Marks another annotation for inclusion in the documentation.
+% @Target - Marks another annotation to restrict what kind of java elements the annotation may be applied to
+% @Inherited - Marks another annotation to inherit features from a parent annotation
+
+\def\jAnnotations{
+    classoffset=1,
+    morekeywords={@Override, @Deperecated, @SuppressWarnings, @Retention, @Documented, @Target, @Inherited},
+    keywordstyle=\color{annotationColor},
+    classoffset=0
+}
+
+% Eclipse Task Tags
+\def\eTags{FIXME, TODO, XXX}
+
+
+%
+% Markup Javadoc code. If it's a Tag, bold it.
+%
+\newrobustcmd{\cDoxyGenComment}[1]{%
+\edef\mytok{\the\lst@token}%
+\renewcommand*{\do}[1]{%
+\ifdefstring{\mytok}{##1}%
+{\color{jTagColor}\bfseries\listbreak}%
+{}%
+}%
+{\color{javadocColor}%
+\expandafter\docsvlist\expandafter{\cTags}%
+\renewcommand*{\do}[1]{%
+\ifdefstring{\mytok}{##1}%
+{\color{eTagColor}\bfseries\listbreak}%
+{}%
+}%
+\expandafter\docsvlist\expandafter{\eTags}%
+#1}%
+}%
+
+%
+% Markup regular comment. If it's a Tag, bold it.
+%
+\newrobustcmd{\markupComments}[1]{%
+\edef\mytok{\the\lst@token}%
+\renewcommand*{\do}[1]{%
+\ifdefstring{\mytok}{##1}%
+{\color{eTagColor}\bfseries\listbreak}%
+{}%
+}%
+{\color{commentColor}%
+\expandafter\docsvlist\expandafter{\eTags}#1}%
+}%
+
+
+\lstdefinestyle{eclipse}{
+  basicstyle={\footnotesize},
+  emphstyle=\bfseries,
+  keywordstyle=\color{keywordColor}\bfseries,
+  commentstyle=\markupComments,
+  stringstyle=\color{stringColor},
+  numberstyle=\color{lineNumberColor}\footnotesize,
+  morecomment=[s][\cDoxyGenComment]{/**}{*/}, % For Javadoc comments
+  showstringspaces=false,
+  numbers=left
+%  ,frame=lines%shadowbox%trBL
+}
+
+\lstdefinestyle{black}{
+  basicstyle=\small\lstfontfamily,
+  numbers=left,
+  columns=fullflexible,
+  breaklines=true,
+  mathescape=true,
+  escapechar=\#,
+  tabsize=4,
+  frame=lines,
+  showstringspaces=false
+}
+
+% use proper tt font that supports bold printing, e.g. by
+% \usepackage{courier}
+\lstdefinestyle{seminar}{
+  basicstyle=\small\ttfamily,
+  numbers=left,
+  breaklines=true,
+  mathescape=true,
+  escapechar=\#,
+  tabsize=4,
+  showstringspaces=false
+}
+
+\lstset{
+	language=C,                     % the language of the code
+	style=eclipse,
+	frame=lrtb,
+	stepnumber=1,                   % the step between two line-numbers. If it's 1, each line 
+	% will be numbered
+	numbersep=5pt,                  % how far the line-numbers are from the code
+	backgroundcolor=\color{white},      % choose the background color. You must add \usepackage{color}
+	showspaces=false,               % show spaces adding particular underscores
+	%showstringspaces=false,         % underline spaces within strings
+	showtabs=false,                 % show tabs within strings adding particular underscores
+	%frame=single,                   % adds a frame around the code
+	rulecolor=\color{black},        % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. commens (green here))
+	tabsize=4,                      % sets default tabsize to 2 spaces
+	captionpos=b,                   % sets the caption-position to bottom
+	breaklines=true,                % sets automatic line breaking
+	breakatwhitespace=false,        % sets if automatic breaks should only happen at whitespace
+	title=\lstname,                   % show the filename of files included with \lstinputlisting;
+	escapeinside={\%*}{*)},            % if you want to add LaTeX within your code
+	morekeywords={*,...},              % if you want to add more keywords to the set
+	% From http://tex.stackexchange.com/questions/116534/lstlisting-line-wrapping
+	postbreak=\raisebox{0ex}[0ex][0ex]{\ensuremath{\color{red}\hookrightarrow\space}}
+}
+
+\expandafter\lstset\expandafter{\jAnnotations}
+
+%-----------------------------------------------------------------------------%
+%->> End Of File
+%-----------------------------------------------------------------------------%

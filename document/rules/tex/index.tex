@@ -1,0 +1,101 @@
+%-----------------------------------------------------------------------------%
+%-                       Copyright (C) 2018  yearnext                        -%
+%-                                                                           -%
+%-     Licensed under the Apache License, Version 2.0 (the "License");       -%
+%-     you may not use this file except in compliance with the License.      -%
+%-     You may obtain a copy of the License at                               -%
+%-                http://www.apache.org/licenses/LICENSE-2.0                 -%
+%-                                                                           -%
+%-  Unless required by applicable law or agreed to in writing, software      -%
+%-  distributed under the License is distributed on an "AS IS" BASIS,        -%
+%-  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. -%
+%-  See the License for the specific language governing permissions and      -%
+%-  limitations under the License.                                           -%
+%-----------------------------------------------------------------------------%
+% @file       main.tex                                                       -%
+% @author     yearnext                                                       -%
+% @version    1.0.0                                                          -%
+% @date       2018-01-01                                                     -%
+% @brief      code rules document main tex file                              -%
+% @par        work platform                                                  -%
+%                 Windows                                                    -%
+% @par        compiler                                                       -%
+%                 XeLaTex                                                    -%
+%-----------------------------------------------------------------------------%
+% @note                                                                       
+% 1.XXXXX                                                                     
+%-----------------------------------------------------------------------------%
+
+%-----------------------------------------------------------------------------%
+%->> Document class declaration
+%-----------------------------------------------------------------------------%
+\documentclass[UTF8,a4paper,12pt]{article}
+
+%-----------------------------------------------------------------------------%
+%->> Include packet declaration
+%-----------------------------------------------------------------------------%
+\usepackage{style/mystyle}
+
+%-----------------------------------------------------------------------------%
+%->> 文章
+%-----------------------------------------------------------------------------%
+
+%\title{框架编码规范及设计思路}
+%\author{整理：yearnext}
+%\date{\today}
+
+\begin{document}
+%	\maketitle
+	\begin{center}
+		\large 框架编码规范\\
+		\large Framework coding standards based on C language
+		\newline
+		\newline
+		\newline
+		\newline
+		\newline
+		\newline
+		\newline
+		\newline
+		\newline
+		\newline
+		\newline
+		\newline
+		\newline
+		\newline
+		\newline
+		\newline
+		\newline
+		\newline
+		\newline
+	\end{center}
+
+	\begin{center}
+		\large 整理:Yearnext 
+		\\
+		\large \today
+	\end{center}
+	\newpage
+	
+	\tableofcontents
+	\listoffigures
+	\listoftables% tables catalog
+	\newpage
+	
+	\input{part/1-preface} \newpage
+	\input{part/2-layout} \newpage
+	\input{part/3-commit} \newpage
+	\input{part/4-name} \newpage
+	\input{part/5-test} \newpage
+	\input{part/6-safe} \newpage
+	\input{part/7-design_patterns} \newpage
+	\input{part/8-version} \newpage
+	\input{part/9-tools} \newpage
+	\input{part/10-additional} \newpage
+	\input{part/11-references} \newpage
+	\input{part/12-end} \newpage
+\end{document}
+
+%-----------------------------------------------------------------------------%
+%->> End Of File
+%-----------------------------------------------------------------------------%
