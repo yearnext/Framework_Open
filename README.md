@@ -1,6 +1,6 @@
 ![image](./document/logo/logo.png) 
 
-![GitHub release](https://img.shields.io/badge/version-1.3.3-green.svg) [![AUR](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0) ![AUR](https://img.shields.io/badge/language-c-yellow.svg)  ![AUR](https://img.shields.io/badge/platform-8051-orange.svg) ![AUR](https://img.shields.io/badge/platform-ARM-orange.svg)
+![GitHub release](https://img.shields.io/badge/version-1.3.3-green.svg) [![AUR](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0) ![AUR](https://img.shields.io/badge/platform-ARM-orange.svg)
 
 # 一、相关文档
 * [框架目录介绍](https://gitee.com/accumulatedidea/Framework_Open/blob/master/document/dir/dir.md)
