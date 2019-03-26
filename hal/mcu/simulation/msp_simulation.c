@@ -4,7 +4,7 @@
  * @author     yearnext                                                        *
  * @version    1.0.0                                                           *
  * @date       2018-11-12                                                      *
- * @brief      mcu config component                                            *
+ * @brief      paltform support packet                                         *
  * @par        work platform                                                   *
  *                 Windows                                                     *
  * @par        compiler                                                        *
@@ -16,7 +16,7 @@
  */
  
 /**
- * @defgroup mcu config component
+ * @defgroup paltform support packet
  * @{
  */
 
@@ -79,6 +79,6 @@ void MSP_Disable_Irq(void)
 	timeKillEvent(sysTimerId);
 }
 
-/** @}*/     /** mcu config component */
+/** @}*/     /** paltform support packet */
 
 /**********************************END OF FILE*********************************/

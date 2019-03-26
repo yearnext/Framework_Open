@@ -4,7 +4,7 @@
  * @author     yearnext                                                        *
  * @version    1.0.0                                                           *
  * @date       2018-01-16                                                      *
- * @brief      mcu config component                                            *
+ * @brief      mcu support packet                                              *
  * @par        work platform                                                   *
  *                 Windows                                                     *
  * @par        compiler                                                        *

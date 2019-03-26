@@ -4,7 +4,7 @@
  * @author     yearnext                                                        *
  * @version    1.0.0                                                           *
  * @date       2018-01-16                                                      *
- * @brief      mcu config component                                            *
+ * @brief      mcu support packet                                              *
  * @par        work platform                                                   *
  *                 Windows                                                     *
  * @par        compiler                                                        *
@@ -16,7 +16,7 @@
  */
  
 /**
- * @defgroup mcu config component
+ * @defgroup mcu support packet
  * @{
  */
 
@@ -137,6 +137,6 @@ int MSP_Init(void)
 }
 INIT_HAL_EXPORT(MSP_Init);
 
-/** @}*/     /** mcu config component */
+/** @}*/     /** mcu support packet */
 
 /**********************************END OF FILE*********************************/
