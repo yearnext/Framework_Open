@@ -2104,6 +2104,9 @@
         <group>
             <name>Library</name>
             <file>
+                <name>$PROJ_DIR$\..\..\utility\STM32L4xx_HAL_Driver\Src\iar\startup_stm32l476xx.s</name>
+            </file>
+            <file>
                 <name>$PROJ_DIR$\..\..\utility\STM32L4xx_HAL_Driver\Src\stm32l4xx_ll_adc.c</name>
             </file>
             <file>

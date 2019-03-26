@@ -20,8 +20,8 @@
  * @{
  */
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __STM32L05x_MSP_CONF_H__
-#define __STM32L05x_MSP_CONF_H__
+#ifndef __STM32L4xx_MSP_CONF_H__
+#define __STM32L4xx_MSP_CONF_H__
 
 /* Add c++ compatibility------------------------------------------------------*/
 #ifdef __cplusplus
@@ -38,8 +38,8 @@ extern "C"
 // </c>
 
 // <o>Set Internal high speed RC clock frequency(unit: hz)
-//  <i>Default: 32000000UL  (32MHz)
-#define MCU_CLK_FREQUENCE 32000000UL
+//  <i>Default: 80000000UL  (80MHz)
+#define MCU_CLK_FREQUENCE 80000000UL
 
 // <o>Set SysTick Period
 //  <i>Default: 1000 (Unit:us)

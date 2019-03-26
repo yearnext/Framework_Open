@@ -73,8 +73,11 @@ void SystemClock_Config(void)
     LL_RCC_SetAPB1Prescaler(LL_RCC_APB1_DIV_1);
     LL_RCC_SetAPB2Prescaler(LL_RCC_APB2_DIV_1);
     
-    LL_Init1msTick(MCU_CLK_FREQUENCE);
+    SysTick_Config(MCU_CLK_FREQUENCE/MCU_SYSTICK_FREQUENCE);
     LL_SYSTICK_SetClkSource(LL_SYSTICK_CLKSOURCE_HCLK);
+    NVIC_EnableIRQ(SysTick_IRQn);
+    NVIC_SetPriority(SysTick_IRQn, 0);
+    
     LL_SetSystemCoreClock(MCU_CLK_FREQUENCE);
 }
 

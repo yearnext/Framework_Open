@@ -43,19 +43,22 @@ extern "C"
  * @brief      定义LED引脚
  *******************************************************************************
  */
-#define LED1_PORT HAL_PORT_B
-#define LED1_PIN  HAL_PIN_13
+#define LED1_PORT HAL_PORT_E
+#define LED1_PIN  HAL_PIN_7
 
-#define LED2_PORT HAL_PORT_B
-#define LED2_PIN  HAL_PIN_14
+#define LED2_PORT HAL_PORT_E
+#define LED2_PIN  HAL_PIN_8
 
+#define LED3_PORT HAL_PORT_E
+#define LED3_PIN  HAL_PIN_9
+    
 /**
  *******************************************************************************
  * @brief      定义按键引脚
  *******************************************************************************
  */
 #define KEY_SET_PORT  HAL_PORT_E
-#define KEY_SET_PIN   HAL_PIN_0
+#define KEY_SET_PIN   HAL_PIN_7
 
 #define KEY_MODE_PORT HAL_PORT_C
 #define KEY_MODE_PIN  HAL_PIN_13
