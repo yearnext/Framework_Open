@@ -40,10 +40,10 @@
 #include "mcu/nano103/msp_nano103.h"
 #elif BOARD_PALTFORM == USE_PALTFORM_STM32L05x
 #include "mcu/stm32l05x/msp_stm32l05x.h"
-#elif BOARD_PALTFORM == USE_PALTFORM_STM32L476VE
-#include "mcu/stm32l476/msp_stm32l476.h"
 #elif BOARD_PALTFORM == USE_PALTFORM_STM32F1xx
 #include "mcu/stm32f1xx/msp_stm32f1xx.h"
+#elif BOARD_PALTFORM == USE_PALTFORM_STM32L4xx
+#include "mcu/stm32l4xx/msp_stm32l4xx.h"
 #elif BOARD_PALTFORM == USE_PALTFORM_HC32L13x
 #include "mcu/hc32l13x/msp_hc32l13x.h"
 #elif BOARD_PALTFORM == USE_PALTFORM_MIMXRT1052
