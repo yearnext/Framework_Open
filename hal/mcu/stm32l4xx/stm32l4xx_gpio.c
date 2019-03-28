@@ -181,11 +181,11 @@ static void pin_ops_write(HAL_Device_t *dev, uint32_t pin, uint32_t value)
 
     if (value)
     {
-        WRITE_REG(port->BSRR, pinMask);
+        LL_GPIO_SetOutputPin(port, pinMask);
     }
     else
     {
-        WRITE_REG(port->BRR, pinMask);
+        LL_GPIO_ResetOutputPin(port, pinMask);
     }
 }
 
@@ -204,7 +204,7 @@ static void pin_ops_toggle(HAL_Device_t *dev, uint32_t pin)
     GPIO_TypeDef *port = MSP_GPIO_Base_Get(HAL_PORT(pin));
     uint32_t pinMask = MSP_GPIO_PinMask_Get(HAL_PIN(pin));
 
-    WRITE_REG(port->ODR, READ_REG(port->ODR) ^ pinMask);
+    LL_GPIO_TogglePin(handle, pinMask);
 }
 
 /**

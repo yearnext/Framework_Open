@@ -105,11 +105,22 @@ extern uint32_t MSP_GPIO_Read(GPIO_TypeDef *port);
 
 /**
  *******************************************************************************
+ * @brief      MCU SUPPORT PACKET ADC COMPONENT API
+ *******************************************************************************
+ */
+extern void MSP_ADC_Init(void);
+extern void MSP_ADC_Channel_Init(uint16_t ch);
+extern void MSP_ADC_Start(uint16_t ch);
+extern uint16_t MSP_ADC_GetValue(uint16_t ch);
+extern uint16_t MSP_ADC_Convert(uint16_t ch);
+
+/**
+ *******************************************************************************
  * @brief        WDG Component API
  *******************************************************************************
  */
-extern void MSP_IWDG_Init(void);
-extern void MSP_IWDG_Update(void);
+extern void MSP_WDG_Init(void);
+extern void MSP_WDG_Feed(void);
 
 /**
  *******************************************************************************

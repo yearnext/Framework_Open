@@ -79,6 +79,11 @@ void SystemClock_Config(void)
     NVIC_SetPriority(SysTick_IRQn, 0);
     
     LL_SetSystemCoreClock(MCU_CLK_FREQUENCE);
+    
+#ifdef ENABLE_MSP_ADC_DRIVER
+    //! …Ë÷√ADC ±÷”‘¥
+    LL_RCC_SetADCClockSource(LL_RCC_ADC_CLKSOURCE_PLLSAI1);
+#endif
 }
 
 /* Exported functions --------------------------------------------------------*/
@@ -94,6 +99,14 @@ int MSP_Init(void)
 
 #if defined(ENABLE_HAL_GPIO_DRIVER)
     MSP_GPIO_Init();
+#endif
+
+#if defined(ENABLE_HAL_ADC_DRIVER)    
+    MSP_ADC_Init();
+#endif
+    
+#if defined(ENABLE_MSP_WDG_DRIVER)
+    MSP_WDG_Init();
 #endif
     
     return 0;

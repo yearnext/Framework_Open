@@ -78,7 +78,7 @@
                 </option>
                 <option>
                     <name>OGChipSelectEditMenu</name>
-                    <state>STM32L476VE	ST STM32L476VE</state>
+                    <state>STM32L475VE	ST STM32L475VE</state>
                 </option>
                 <option>
                     <name>GenLowLevelInterface</name>
@@ -138,7 +138,7 @@
                 </option>
                 <option>
                     <name>GFPUDeviceSlave</name>
-                    <state>STM32L476VE	ST STM32L476VE</state>
+                    <state>STM32L475VE	ST STM32L475VE</state>
                 </option>
                 <option>
                     <name>FPU2</name>
@@ -220,7 +220,7 @@
                 <debug>1</debug>
                 <option>
                     <name>CCDefines</name>
-                    <state>STM32L476xx</state>
+                    <state>STM32L475xx</state>
                     <state>USE_FULL_LL_DRIVER</state>
                 </option>
                 <option>
