@@ -72,6 +72,7 @@ extern "C"
 //#pragma clang diagnostic ignored "-Wunused-value"
 //#pragma clang diagnostic ignored "-Wmissing-noreturn"
 //#pragma clang diagnostic ignored "-Wdollar-in-identifier-extension"
+#pragma clang diagnostic ignored "-Wempty-body"
 
 /**
  *******************************************************************************
