@@ -10,13 +10,13 @@
       <TargetName>STM32L4xx-Alpha</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>6120000::V6.12::.\ARMCLANG</pCCUsed>
+      <pCCUsed>6090000::V6.9::.\ARMCLANG</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
           <Device>STM32L475VETx</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32L4xx_DFP.2.0.0</PackID>
+          <PackID>Keil.STM32L4xx_DFP.2.2.0</PackID>
           <PackURL>http://www.keil.com/pack</PackURL>
           <Cpu>IRAM(0x20000000,0x00018000) IRAM2(0x10000000,0x00008000) IROM(0x08000000,0x00080000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -184,7 +184,6 @@
             <hadXRAM>0</hadXRAM>
             <uocXRam>0</uocXRam>
             <RvdsVP>2</RvdsVP>
-            <RvdsMve>0</RvdsMve>
             <hadIRAM2>1</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
@@ -453,6 +452,11 @@
               <FilePath>..\..\hal\mcu\stm32l4xx\msp_stm32l4xx.c</FilePath>
             </File>
             <File>
+              <FileName>stm32l4xx_adc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\mcu\stm32l4xx\stm32l4xx_adc.c</FilePath>
+            </File>
+            <File>
               <FileName>stm32l4xx_gpio.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\hal\mcu\stm32l4xx\stm32l4xx_gpio.c</FilePath>
@@ -461,11 +465,6 @@
               <FileName>stm32l4xx_wdg.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\hal\mcu\stm32l4xx\stm32l4xx_wdg.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32l4xx_adc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\mcu\stm32l4xx\stm32l4xx_adc.c</FilePath>
             </File>
           </Files>
         </Group>
