@@ -47,6 +47,7 @@ extern "C"
  *******************************************************************************
  */
 #include "general/hal_pin.h"
+#include "general/hal_key.h"
 #include "general/hal_timer.h"
 #include "general/hal_pwm.h"
 #include "general/hal_adc.h"

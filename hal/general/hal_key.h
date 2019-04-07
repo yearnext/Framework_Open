@@ -43,8 +43,9 @@ extern "C"
 {
 #endif
 
-
 /* Includes ------------------------------------------------------------------*/
+#include "hal_def.h"
+
 /* Exported macro ------------------------------------------------------------*/
 //! 定义按键扫描周期(周期：1MS)
 #define HAL_KEY_SCAN_PERIOD                             (10/FRAMEWORK_TICK_TIME)
@@ -61,43 +62,40 @@ extern "C"
 //! 定义按键空键值
 #define HAL_KEY_VALUE_NOP                                                    (0)                
 
+//! 定义按键检测状态
+#define KEY_RELEASE_STATE                                                    (0)
+#define KEY_RELEASE_FILTER_STATE                                             (1)
+#define KEY_PRESS_EDGE_STATE                                                 (2)
+#define KEY_PRESS_STATE                                                      (3)
+#define KEY_PRESS_FILTER_STATE                                               (4)
+#define KEY_PRESS_EDGE_FILTER_STATE                                          (5)
+#define KEY_RELEASE_EDGE_STATE                                               (6)
+
 /* Exported types ------------------------------------------------------------*/
-typedef uint16_t (__CODE *HALKeyScan)(void);
+typedef uint16_t (__CODE *HAL_KeyValueGet_f)(void);
 
 //! 按键句柄定义
 typedef struct 
 {
-    HalDevTim_t Timer;
-    
-    HALKeyScan Scan; 
+    HAL_KeyValueGet_f Scan;
 
     uint16_t Tick;
     uint16_t FilterTick;
-    
+
     uint16_t Value;
     uint16_t FilterValue;
-    
-    //! |7     |6     |5     |4     |3                 |2                 |1                 |       0      |
-    //! |未使用|未使用|未使用|未使用|事件机制使能标志位|消息机制使能标志位|长按检测使能标志位|按键有效电平位|
+
+    uint16_t State;
+
+    //! |7     |6     |5     |4     |3                 |2                 |1                 |0   |
+    //! |未使用|未使用|未使用|未使用|事件机制使能标志位|消息机制使能标志位|长按检测使能标志位|保留|
     uint16_t Flag;
-    
-    //! 定义按键状态
-    enum KEY_STATE
-    {
-        KEY_RELEASE_STATE = 0,
-        KEY_RELEASE_FILTER_STATE,
-        KEY_PRESS_EDGE_STATE,
-        KEY_PRESS_STATE,
-        KEY_PRESS_FILTER_STATE,
-        KEY_PRESS_EDGE_FILTER_STATE,
-        KEY_RELEASE_EDGE_STATE,
-    }State;
 }HAL_Key_t;
 
 /* Exported constants --------------------------------------------------------*/
 /* Exported variables --------------------------------------------------------*/
 /* Exported functions --------------------------------------------------------*/
-extern void HAL_Key_Init(HAL_Key_t *key, HALKeyScan scan, uint16_t tick, uint16_t flag);
+extern void HAL_Key_Init(HAL_Key_t *key, HAL_KeyValueGet_f scan, uint16_t tick, uint16_t flag);
 extern void HAL_Key_Fini(HAL_Key_t *key);
 extern void HAL_Key_Scan(void *param);
 

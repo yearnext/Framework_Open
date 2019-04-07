@@ -52,6 +52,16 @@ extern "C"
 #define HAL_PORT(id)                                                ((id) >> 16)
 #define HAL_PIN(id)                                        ((id) & 0x0000FFFFUL)
 
+//! 定义引脚状态
+#define HAL_PIN_INIT                                                        0x00
+#define HAL_PIN_ACTIVE                                                      0x01
+#define HAL_PIN_INACTIVE                                                    0x02
+
+//! 定义引脚配置参数
+#define HAL_PIN_ACTIVE_HIGH                                                 0x01
+#define HAL_PIN_ACTIVE_LOW                                                  0x00
+#define HAL_PIN_IS_HIGH_ACTIVE(x)        (Fw_Flag_Get((x), HAL_PIN_ACTIVE_HIGH))
+
 /* Exported types ------------------------------------------------------------*/
 /**
  *******************************************************************************

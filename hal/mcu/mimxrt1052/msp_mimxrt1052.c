@@ -4,7 +4,7 @@
  * @author     yearnext                                                        *
  * @version    1.0.0                                                           *
  * @date       2018-09-03                                                      *
- * @brief      mcu support packet                                              *
+ * @brief      mcu support packet component                                    *
  * @par        work platform                                                   *
  *                 Windows                                                     *
  * @par        compiler                                                        *
@@ -16,7 +16,7 @@
  */
  
 /**
- * @defgroup mcu support packet
+ * @defgroup mcu support packet component
  * @{
  */
 
@@ -396,6 +396,6 @@ void MSP_Reboot(void)
     while(1);
 }
 
-/** @}*/     /** mcu support packet */
+/** @}*/     /** mcu support packet component */
 
 /**********************************END OF FILE*********************************/
