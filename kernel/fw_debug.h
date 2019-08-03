@@ -13,25 +13,24 @@
  *   See the License for the specific language governing permissions and       *
  *   limitations under the License.                                            *
  *******************************************************************************
- * @file       hal_pin.h                                                       *
+ * @file       fw_debug.h                                                      *
  * @author     Accumulate Team                                                 *
  * @version    1.0.0                                                           *
- * @date       2018-06-28                                                      *
- * @brief      hal gpio driver component head file                             *
+ * @date       2019-03-22                                                      *
+ * @brief      framework server component head file                            *
  * @par        work platform                                                   *
  *                 Windows                                                     *
  * @par        compiler                                                        *
  *                 GCC                                                         *
  *******************************************************************************
  * @note                                                                       *
- * 1. 2018-06-28 ‰ªé‚Äúhal_device.h‚ÄùÂàÜÁ¶ªÂá∫GPIOÈ©±Âä®                                *
- * 2. 2018-07-29 ‰øÆÊîπÊñá‰ª∂Âêç‚Äúhal_gpio.h‚Äù‰∏∫‚Äúhal_pin.h‚Äù                           *
+ * 1. 2019-03-22    Create File                                                *
  *******************************************************************************
  */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __HAL_DRIVER_PIN_H__
-#define __HAL_DRIVER_PIN_H__
+#ifndef __FRAMEWORK_DEBUG_H__
+#define __FRAMEWORK_DEBUG_H__
 
 /* Add c++ compatibility------------------------------------------------------*/
 #ifdef __cplusplus
@@ -40,55 +39,66 @@ extern "C"
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-#include "hal_def.h"
+#include "compiler.h"
 
 /* Exported macro ------------------------------------------------------------*/
 /* Exported types ------------------------------------------------------------*/
-/**
- *******************************************************************************
- * @brief        HAL GPIO PORT
- *******************************************************************************
- */
-typedef struct
-{
-    uint16_t Pin;
-    uint16_t Port;
-    uint16_t Mode;
-    uint16_t Flag;
-}HAL_Port_t;
-
-typedef struct
-{
-    void (*Init)(HAL_Device_t *dev, uint32_t pin, uint16_t mode);
-    void (*Write)(HAL_Device_t *dev, uint32_t pin, uint32_t value);
-    void (*Toggle)(HAL_Device_t *dev, uint32_t pin);
-    uint32_t (*Read)(HAL_Device_t *dev, uint32_t pin);
-}HAL_Port_Interface_t;
-
 /* Exported constants --------------------------------------------------------*/
+/* Exported variables --------------------------------------------------------*/
 /* Exported functions --------------------------------------------------------*/
+//! øÿ÷∆Ã®≥ı ºªØ
+extern void Fw_Console_Init(void);
+
+#ifdef ENABLE_FRAMEWORK_DEBUG
+//! »’÷æ ‰≥ˆ API
+extern void Fw_Console_Put(char *str, ...);
+extern void Fw_Core_Log(char *str, ...);
+extern void Fw_Core_Error(char *str, ...);
+extern void Fw_Log(char *str, ...);
+extern void Fw_Error(char *str, ...);
+extern void Fw_Put_Info(void);
+//!  ±º‰≤‚ ‘ API
+extern void Fw_TimeTest_Begin(void);
+extern void Fw_TimeTest_End(void);
+//! ∂® ±∆˜◊Èº˛≤‚ ‘ API
+extern void Fw_Put_Timer_List(void);
+extern void Fw_Timer_Test(void);
+//! »ŒŒÒ◊Èº˛≤‚ ‘ API
+extern void Fw_Put_Task_List(void);
+//!  ¬º˛◊Èº˛≤‚ ‘ API
+extern void Fw_Event_General(void);
+#else
+#ifndef USE_KEIL_C51_COMPILER
+#define Fw_Console_Put(str, ...)
+#define Fw_Core_Log(str, ...)  
+#define Fw_Core_Error(str, ...)
+#define Fw_Log(str, ...)       
+#define Fw_Error(str, ...)
+#define Fw_Put_Info()
+#define Fw_TimeTest_Begin()
+#define Fw_TimeTest_End()
+#define Fw_Timer_Test()
+#define Fw_Put_Timer_List()
+#define Fw_Timer_Test()
+#define Fw_Put_Task_List()
+#define Fw_Event_General()
+#endif
+#endif
+
 /**
  *******************************************************************************
- * @brief      GPIO COMPONENT API FOR HAL LIBRARY
+ * @brief       µ±«∞ ±º‰◊™◊÷∑˚¥ÆAPI
+ * @param       [in/out]  level    ◊™ªªµ»º∂
+ * @return      [in/out]  void
+ * @note        None
  *******************************************************************************
  */
-extern void     HAL_Pin_Register(HAL_Port_Interface_t *ops, void *userData);
+#define FW_TIME_2_STR_ALL  0
+#define FW_TIME_2_STR_DATE 1
+#define FW_TIME_2_STR_TIME 0x10
 
-extern void     HAL_Pin_Init(uint32_t pin, uint16_t mode);
-extern void     HAL_Pin_Input(uint32_t pin);
-extern void     HAL_Pin_Output(uint32_t pin);
+extern char *Fw_Time_To_Str(uint8_t level);
 
-extern void     HAL_Pin_Set(uint32_t pin);
-extern void     HAL_Pin_Clr(uint32_t pin);
-extern void     HAL_Pin_Toggle(uint32_t pin);
-extern uint32_t HAL_Pin_Get(uint32_t pin);
-
-extern void     HAL_Port_Init(uint32_t port, uint32_t pos, uint32_t len, uint32_t mode);
-extern void     HAL_Port_Write(uint32_t port, uint32_t pos, uint32_t len, uint32_t wr);
-extern void     HAL_Port_Xor(uint32_t port, uint32_t pos, uint32_t len, uint32_t wr);
-extern uint32_t HAL_Port_Read(uint32_t port, uint32_t pos, uint32_t len);
-extern void     HAL_Port_Get(uint32_t port, uint32_t pos, uint32_t len);
-    
 /* Add c++ compatibility------------------------------------------------------*/
 #ifdef __cplusplus
 }

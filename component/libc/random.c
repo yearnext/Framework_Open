@@ -27,27 +27,25 @@
 /* Private typedef -----------------------------------------------------------*/
 /* Private constants ---------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
-static uint16_t RandromSeed = 0xAA55;
+static int next = 1;
 
 /* Exported constants --------------------------------------------------------*/
 /* Exported variables --------------------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
 /* Exported functions --------------------------------------------------------*/
-void RandromSet(uint16_t seed)
+void RandromSet(int seed)
 {
-    RandromSeed ^= seed;
+    next ^= seed;
 }
 
-void RandromReset( void )
+void RandromReset(void)
 {
-    RandromSeed = 0xAA55;
+    next = 1;
 }
 
-uint16_t RandromGet(void)
+int RandromGet(void)
 {
-   RandromSeed = 22695477UL * RandromSeed + 1;
-
-   return RandromSeed;
+   return ( ( next = next * 1103515245L + 12345L ) % RAND_LOCAL_MAX );
 }
 
 /** @}*/     /** randrom library component */

@@ -302,7 +302,7 @@ void BOARD_ConfigMPU(void)
     SCB_EnableICache();
     
 #if defined(USE_RAM_VECTOR_TABLE)
-    /* ÆôÓÃSDRAM°æ±¾µÄÖÐ¶ÏÏòÁ¿±í */
+    /* å¯ç”¨SDRAMç‰ˆæœ¬çš„ä¸­æ–­å‘é‡è¡¨ */
     CopyAndUseRAMVectorTable();    
 #endif
 }
@@ -310,31 +310,31 @@ void BOARD_ConfigMPU(void)
 
 #if defined(USE_RAM_VECTOR_TABLE)
 /**
-  * @brief °ÑÖÐ¶ÏÏòÁ¿±í¸´ÖÆÒ»·Ýµ½SDRAM£¬²¢Ê¹ÓÃ¸ÃÖÐ¶ÏÏòÁ¿±í
-  * @note  ÊÊÓÃÓÚnor_sdram_code°æ±¾µÄ³ÌÐò£¬Ð¾Æ¬ÉÏµçºó°ÑËùÓÐ´úÂë¼ÓÔØÖÁSDRAMÖÐÔËÐÐ£¬
-           Ê¹ÓÃSDRAMµÄÖÐ¶ÏÏòÁ¿±íºó£¬ÖÐ¶Ï²úÉúÊ±CPU²»ÐèÒª·ÃÎÊFLASH
-  * @retval ÎÞ
+  * @brief æŠŠä¸­æ–­å‘é‡è¡¨å¤åˆ¶ä¸€ä»½åˆ°SDRAMï¼Œå¹¶ä½¿ç”¨è¯¥ä¸­æ–­å‘é‡è¡¨
+  * @note  é€‚ç”¨äºŽnor_sdram_codeç‰ˆæœ¬çš„ç¨‹åºï¼ŒèŠ¯ç‰‡ä¸Šç”µåŽæŠŠæ‰€æœ‰ä»£ç åŠ è½½è‡³SDRAMä¸­è¿è¡Œï¼Œ
+           ä½¿ç”¨SDRAMçš„ä¸­æ–­å‘é‡è¡¨åŽï¼Œä¸­æ–­äº§ç”Ÿæ—¶CPUä¸éœ€è¦è®¿é—®FLASH
+  * @retval æ— 
   */
 void CopyAndUseRAMVectorTable(void)
 {
-/* ¸ù¾Ý²»Í¬±àÒëÆ½Ì¨µÄ·ÖÉ¢¼ÓÔØÎÄ¼þµÃµ½VECTOR_TABLE ºÍ VECTOR_RAMµÄµØÖ·*/
+/* æ ¹æ®ä¸åŒç¼–è¯‘å¹³å°çš„åˆ†æ•£åŠ è½½æ–‡ä»¶å¾—åˆ°VECTOR_TABLE å’Œ VECTOR_RAMçš„åœ°å€*/
 #if defined(__CC_ARM)
-    /* ROM¡¢RAMÖÐµÄÖÐ¶ÏÏòÁ¿±í»ùµØÖ·£¨MDK·ÖÉ¢¼ÓÔØÎÄ¼þµÄÓï·¨£© */
+    /* ROMã€RAMä¸­çš„ä¸­æ–­å‘é‡è¡¨åŸºåœ°å€ï¼ˆMDKåˆ†æ•£åŠ è½½æ–‡ä»¶çš„è¯­æ³•ï¼‰ */
     extern uint32_t Image$$VECTOR_ROM$$Base[];
     extern uint32_t Image$$VECTOR_RAM$$Base[];
-    /* SDRAMÖ÷Ìå´úÂëµÄ»ùµØÖ·£¬ÓÃÓÚ¼ÆËãVECTOR_RAMÕ¼ÓÃµÄ¿Õ¼ä */
+    /* SDRAMä¸»ä½“ä»£ç çš„åŸºåœ°å€ï¼Œç”¨äºŽè®¡ç®—VECTOR_RAMå ç”¨çš„ç©ºé—´ */
     extern uint32_t Image$$ER_m_ram_text$$Base[];
 
     #define __VECTOR_TABLE                Image$$VECTOR_ROM$$Base
     #define __VECTOR_RAM                  Image$$VECTOR_RAM$$Base
     #define __RAM_VECTOR_TABLE_SIZE     (((uint32_t)Image$$ER_m_ram_text$$Base - (uint32_t)Image$$VECTOR_RAM$$Base))
 #elif defined(__ICCARM__)
-    /* ROM¡¢RAMÖÐµÄÖÐ¶ÏÏòÁ¿±íµÄ´óÐ¡ºÍ»ùµØÖ·£¨IAR·ÖÉ¢¼ÓÔØÎÄ¼þµÄÓï·¨£© */
+    /* ROMã€RAMä¸­çš„ä¸­æ–­å‘é‡è¡¨çš„å¤§å°å’ŒåŸºåœ°å€ï¼ˆIARåˆ†æ•£åŠ è½½æ–‡ä»¶çš„è¯­æ³•ï¼‰ */
     extern uint32_t __RAM_VECTOR_TABLE_SIZE[];
     extern uint32_t __VECTOR_TABLE[];
     extern uint32_t __VECTOR_RAM[];
 #elif defined(__GNUC__)
-    /* ÔÝÎ´²âÊÔGCC¿ª·¢»·¾³ */
+    /* æš‚æœªæµ‹è¯•GCCå¼€å‘çŽ¯å¢ƒ */
     extern uint32_t __VECTOR_TABLE[];
     extern uint32_t __VECTOR_RAM[];
     extern uint32_t __RAM_VECTOR_TABLE_SIZE_BYTES[];
@@ -346,13 +346,13 @@ void CopyAndUseRAMVectorTable(void)
     irqMaskValue = DisableGlobalIRQ();
     if (SCB->VTOR != (uint32_t)__VECTOR_RAM)
     {
-        /* °ÑÖÐ¶ÏÏòÁ¿±íµÄÄÚÈÝ´ÓROM¸´ÖÆÖÁRAM */
+        /* æŠŠä¸­æ–­å‘é‡è¡¨çš„å†…å®¹ä»ŽROMå¤åˆ¶è‡³RAM */
         for (n = 0; n < ((uint32_t)__RAM_VECTOR_TABLE_SIZE) / sizeof(uint32_t); n++)
         {
             __VECTOR_RAM[n] = __VECTOR_TABLE[n];
         }
-        /* µ÷ÕûCortex-MÄÚºËµÄVTOR¼Ä´æÆ÷Ö¸ÏòRAM°æ±¾µÄÖÐ¶ÏÏòÁ¿±í
-         * ºóÃæ²úÉúÖÐ¶ÏÊ±»á´ÓVTOR¼Ä´æÆ÷Ö¸ÏòµÄµØÖ·¼ÓÔØÖÐ¶Ï 
+        /* è°ƒæ•´Cortex-Må†…æ ¸çš„VTORå¯„å­˜å™¨æŒ‡å‘RAMç‰ˆæœ¬çš„ä¸­æ–­å‘é‡è¡¨
+         * åŽé¢äº§ç”Ÿä¸­æ–­æ—¶ä¼šä»ŽVTORå¯„å­˜å™¨æŒ‡å‘çš„åœ°å€åŠ è½½ä¸­æ–­ 
         */
         SCB->VTOR = (uint32_t)__VECTOR_RAM;
     }

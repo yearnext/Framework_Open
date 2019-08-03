@@ -24,8 +24,8 @@
  *                 GCC                                                         *
  *******************************************************************************
  * @note                                                                       *
- * 1. 20170828    ´´½¨ÎÄ¼ş"hal_device.c"                                       *
- * 2. 20180127    ĞŞ¸ÄHAL²ã¼Ü¹¹                                                *
+ * 1. 20170828    åˆ›å»ºæ–‡ä»¶"hal_device.c"                                       *
+ * 2. 20180127    ä¿®æ”¹HALå±‚æ¶æ„                                                *
  *******************************************************************************
  */
  
@@ -36,7 +36,6 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "hal_device.h"
-#include "fw_core.h"
 #include <string.h>
 
 /* Private define ------------------------------------------------------------*/
@@ -51,7 +50,7 @@
 /* Exported variables --------------------------------------------------------*/
 /**
  *******************************************************************************
- * @brief      HAL DEVICE ×¨ÓÃ±äÁ¿
+ * @brief      HAL DEVICE ä¸“ç”¨å˜é‡
  *******************************************************************************
  */
 #ifdef ENABLE_HAL_DRIVER_COMPONENT
@@ -67,17 +66,17 @@ struct
 #ifdef ENABLE_HAL_DRIVER_COMPONENT
 /**
  *******************************************************************************
- * @brief       Éè±¸×é¼ş³õÊ¼»¯º¯Êı
+ * @brief       è®¾å¤‡ç»„ä»¶åˆå§‹åŒ–å‡½æ•°
  * @param       [in/out]  void
  * @return      [in/out]  0
- * @note        ÓÉÄÚºËµ÷ÓÃ
+ * @note        ç”±å†…æ ¸è°ƒç”¨
  *******************************************************************************
  */
-//! ³õÊ¼»¯HAL²ãÇı¶¯
+//! åˆå§‹åŒ–HALå±‚é©±åŠ¨
 int HAL_Component_Init(void)
 {
-    //! ³õÊ¼»¯Éè±¸ÁĞ±í
-    FwList_Init(&DeviceList.List);
+    //! åˆå§‹åŒ–è®¾å¤‡åˆ—è¡¨
+    FwListInit(&DeviceList.List);
     DeviceList.Num = 0;
 
     return 0;
@@ -86,14 +85,14 @@ INIT_COMPONENT_EXPORT(HAL_Component_Init);
 
 /**
  *******************************************************************************
- * @brief       Éè±¸×¢²áº¯Êı
- * @param       [in/out]  *dev     Éè±¸¾ä±ú
- * @param       [in/out]  *name    Éè±¸ÃèÊö·û
- * @param       [in/out]  *ops     Éè±¸²Ù×÷½Ó¿Ú
- * @param       [in/out]  flag     Çı¶¯ÅäÖÃ
- * @return      [in/out]  0        ×¢²á³É¹¦
- * @return      [in/out]  1        ×¢²áÊ§°Ü
- * @note        ÓÉÄÚºËµ÷ÓÃ
+ * @brief       è®¾å¤‡æ³¨å†Œå‡½æ•°
+ * @param       [in/out]  *dev     è®¾å¤‡å¥æŸ„
+ * @param       [in/out]  *name    è®¾å¤‡æè¿°ç¬¦
+ * @param       [in/out]  *ops     è®¾å¤‡æ“ä½œæ¥å£
+ * @param       [in/out]  flag     é©±åŠ¨é…ç½®
+ * @return      [in/out]  0        æ³¨å†ŒæˆåŠŸ
+ * @return      [in/out]  1        æ³¨å†Œå¤±è´¥
+ * @note        ç”±å†…æ ¸è°ƒç”¨
  *******************************************************************************
  */
 uint16_t HAL_Device_Register(HAL_Device_t *dev, char *name, HAL_Interface_t *ops, uint32_t flag)
@@ -114,26 +113,26 @@ uint16_t HAL_Device_Register(HAL_Device_t *dev, char *name, HAL_Interface_t *ops
     dev->State = 1;
     DeviceList.Num ++;
     
-    FwList_Init(&dev->List);
-    FwList_InsertAfter(&DeviceList.List, &dev->List);
+    FwListInit(&dev->List);
+    FwListInsertAfter(&DeviceList.List, &dev->List);
 
     return 0;
 }
 
 /**
  *******************************************************************************
- * @brief       Éè±¸×¢Ïúº¯Êı
- * @param       [in/out]  *dev     Éè±¸¾ä±ú
- * @return      [in/out]  0        ×¢²á³É¹¦
- * @return      [in/out]  1        ×¢²áÊ§°Ü
- * @note        ÓÉÄÚºËµ÷ÓÃ
+ * @brief       è®¾å¤‡æ³¨é”€å‡½æ•°
+ * @param       [in/out]  *dev     è®¾å¤‡å¥æŸ„
+ * @return      [in/out]  0        æ³¨å†ŒæˆåŠŸ
+ * @return      [in/out]  1        æ³¨å†Œå¤±è´¥
+ * @note        ç”±å†…æ ¸è°ƒç”¨
  *******************************************************************************
  */
 uint16_t HAL_Device_Unregister(HAL_Device_t *dev)
 {
     if (dev->State)
     {
-        FwList_Remove(&dev->List);
+        FwListRemove(&dev->List);
         
         dev->State = 0;
         
@@ -145,10 +144,10 @@ uint16_t HAL_Device_Unregister(HAL_Device_t *dev)
 
 /**
  *******************************************************************************
- * @brief       Éè±¸²éÕÒº¯Êı
- * @param       [in/out]  type             Éè±¸ÀàĞÍ
- * @return      [in/out]  HAL_Device_t *   Éè±¸¾ä±ú
- * @note        ÓÉÄÚºËµ÷ÓÃ
+ * @brief       è®¾å¤‡æŸ¥æ‰¾å‡½æ•°
+ * @param       [in/out]  type             è®¾å¤‡ç±»å‹
+ * @return      [in/out]  HAL_Device_t *   è®¾å¤‡å¥æŸ„
+ * @note        ç”±å†…æ ¸è°ƒç”¨
  *******************************************************************************
  */
 HAL_Device_t *HAL_Device_Find(uint16_t type)
@@ -174,11 +173,11 @@ HAL_Device_t *HAL_Device_Find(uint16_t type)
 
 /**
  *******************************************************************************
- * @brief       Éè±¸³õÊ¼»¯º¯Êı
- * @param       [in/out]  *dev             Éè±¸ÀàĞÍ
- * @param       [in/out]  param            Éè±¸²ÎÊı
- * @return      [in/out]  state            ×´Ì¬
- * @note        ÓÉÄÚºËµ÷ÓÃ
+ * @brief       è®¾å¤‡åˆå§‹åŒ–å‡½æ•°
+ * @param       [in/out]  *dev             è®¾å¤‡ç±»å‹
+ * @param       [in/out]  param            è®¾å¤‡å‚æ•°
+ * @return      [in/out]  state            çŠ¶æ€
+ * @note        ç”±å†…æ ¸è°ƒç”¨
  *******************************************************************************
  */
 __INLINE
@@ -194,10 +193,10 @@ uint16_t HAL_Device_Init(struct HAL_DEVICE *dev, size_t param)
 
 /**
  *******************************************************************************
- * @brief       Éè±¸·´³õÊ¼»¯º¯Êı
- * @param       [in/out]  *dev             Éè±¸ÀàĞÍ
- * @return      [in/out]  state            ×´Ì¬
- * @note        ÓÉÄÚºËµ÷ÓÃ
+ * @brief       è®¾å¤‡ååˆå§‹åŒ–å‡½æ•°
+ * @param       [in/out]  *dev             è®¾å¤‡ç±»å‹
+ * @return      [in/out]  state            çŠ¶æ€
+ * @note        ç”±å†…æ ¸è°ƒç”¨
  *******************************************************************************
  */
 __INLINE
@@ -213,10 +212,10 @@ uint16_t HAL_Device_Fini(struct HAL_DEVICE *dev)
 
 /**
  *******************************************************************************
- * @brief       Éè±¸´ò¿ªº¯Êı
- * @param       [in/out]  *dev             Éè±¸¾ä±ú
- * @return      [in/out]  state            Éè±¸×´Ì¬
- * @note        ÓÉÄÚºËµ÷ÓÃ
+ * @brief       è®¾å¤‡æ‰“å¼€å‡½æ•°
+ * @param       [in/out]  *dev             è®¾å¤‡å¥æŸ„
+ * @return      [in/out]  state            è®¾å¤‡çŠ¶æ€
+ * @note        ç”±å†…æ ¸è°ƒç”¨
  *******************************************************************************
  */
 __INLINE
@@ -232,10 +231,10 @@ uint16_t HAL_Device_Open(struct HAL_DEVICE *dev, uint16_t flag)
 
 /**
  *******************************************************************************
- * @brief       Éè±¸¹Ø±Õº¯Êı
- * @param       [in/out]  *dev             Éè±¸¾ä±ú
- * @return      [in/out]  state            Éè±¸×´Ì¬
- * @note        ÓÉÄÚºËµ÷ÓÃ
+ * @brief       è®¾å¤‡å…³é—­å‡½æ•°
+ * @param       [in/out]  *dev             è®¾å¤‡å¥æŸ„
+ * @return      [in/out]  state            è®¾å¤‡çŠ¶æ€
+ * @note        ç”±å†…æ ¸è°ƒç”¨
  *******************************************************************************
  */
 __INLINE
@@ -251,13 +250,13 @@ uint16_t HAL_Device_Close(struct HAL_DEVICE *dev)
 
 /**
  *******************************************************************************
- * @brief       Éè±¸Êı¾İĞ´Èëº¯Êı
- * @param       [in/out]  *dev             Éè±¸¾ä±ú
- * @param       [in/out]  pos              »º³åÇøÆ«ÒÆÁ¿
- * @param       [in/out]  *buf             »º³åÇø
- * @param       [in/out]  len              Ğ´Èë³¤¶È
- * @return      [in/out]  num              Êµ¼ÊĞ´ÈëÊıÁ¿
- * @note        ÓÉÄÚºËµ÷ÓÃ
+ * @brief       è®¾å¤‡æ•°æ®å†™å…¥å‡½æ•°
+ * @param       [in/out]  *dev             è®¾å¤‡å¥æŸ„
+ * @param       [in/out]  pos              ç¼“å†²åŒºåç§»é‡
+ * @param       [in/out]  *buf             ç¼“å†²åŒº
+ * @param       [in/out]  len              å†™å…¥é•¿åº¦
+ * @return      [in/out]  num              å®é™…å†™å…¥æ•°é‡
+ * @note        ç”±å†…æ ¸è°ƒç”¨
  *******************************************************************************
  */
 __INLINE
@@ -273,13 +272,13 @@ uint16_t HAL_Device_Write(struct HAL_DEVICE *dev, uint16_t pos, uint8_t *buf, ui
 
 /**
  *******************************************************************************
- * @brief       Éè±¸Êı¾İ¶ÁÈ¡º¯Êı
- * @param       [in/out]  *dev             Éè±¸¾ä±ú
- * @param       [in/out]  pos              »º³åÇøÆ«ÒÆÁ¿
- * @param       [in/out]  *buf             »º³åÇø
- * @param       [in/out]  len              ¶ÁÈ¡³¤¶È
- * @return      [in/out]  num              Êµ¼Ê¶ÁÈ¡ÊıÁ¿
- * @note        ÓÉÄÚºËµ÷ÓÃ
+ * @brief       è®¾å¤‡æ•°æ®è¯»å–å‡½æ•°
+ * @param       [in/out]  *dev             è®¾å¤‡å¥æŸ„
+ * @param       [in/out]  pos              ç¼“å†²åŒºåç§»é‡
+ * @param       [in/out]  *buf             ç¼“å†²åŒº
+ * @param       [in/out]  len              è¯»å–é•¿åº¦
+ * @return      [in/out]  num              å®é™…è¯»å–æ•°é‡
+ * @note        ç”±å†…æ ¸è°ƒç”¨
  *******************************************************************************
  */
 __INLINE
@@ -295,12 +294,12 @@ uint16_t HAL_Device_Read(struct HAL_DEVICE *dev, uint16_t pos, uint8_t *buf, uin
 
 /**
  *******************************************************************************
- * @brief       Éè±¸¿ØÖÆº¯Êı
- * @param       [in/out]  *dev             Éè±¸¾ä±ú
- * @param       [in/out]  cmd              ¿ØÖÆÃüÁî
- * @param       [in/out]  *args            ¿ØÖÆ²ÎÊı
- * @return      [in/out]  state            ×´Ì¬
- * @note        ÓÉÄÚºËµ÷ÓÃ
+ * @brief       è®¾å¤‡æ§åˆ¶å‡½æ•°
+ * @param       [in/out]  *dev             è®¾å¤‡å¥æŸ„
+ * @param       [in/out]  cmd              æ§åˆ¶å‘½ä»¤
+ * @param       [in/out]  *args            æ§åˆ¶å‚æ•°
+ * @return      [in/out]  state            çŠ¶æ€
+ * @note        ç”±å†…æ ¸è°ƒç”¨
  *******************************************************************************
  */
 __INLINE
@@ -314,34 +313,6 @@ uint16_t HAL_Device_Control(struct HAL_DEVICE *dev, uint8_t cmd, void *args)
     return 0xFFFF;
 }
 #endif
-
-/**
- *******************************************************************************
- * @brief       ½øÈëÔ­×Ó²Ù×÷
- * @param       [in/out]  void
- * @return      [in/out]  void
- * @note        ÓÉÓÃ»§µ÷ÓÃ
- *******************************************************************************
- */
-__INLINE
-void HAL_Atom_Begin(void)
-{
-    Fw_Enter_Critical();
-}
-
-/**
- *******************************************************************************
- * @brief       ÍË³öÔ­×Ó²Ù×÷
- * @param       [in/out]  void
- * @return      [in/out]  void
- * @note        ÓÉÓÃ»§µ÷ÓÃ
- *******************************************************************************
- */
-__INLINE
-void HAL_Atom_End(void)
-{
-    Fw_Exit_Critical();
-}
 
 /** @}*/     /** hal device component */
 

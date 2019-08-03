@@ -24,7 +24,7 @@
  *                 GCC                                                         *
  *******************************************************************************
  * @note                                                                       *
- * 1. 2018-06-28 从“hal_device.h”分离出ADC驱动                                 *
+ * 1. 2018-06-28 浠庘�渉al_device.h鈥濆垎绂诲嚭ADC椹卞姩                                 *
  *******************************************************************************
  */
 /* Define to prevent recursive inclusion -------------------------------------*/
@@ -39,49 +39,6 @@ extern "C"
 
 /* Includes ------------------------------------------------------------------*/
 /* Exported macro ------------------------------------------------------------*/
-/**
- *******************************************************************************
- * @brief        HAL ADC PORT
- *******************************************************************************
- */
-enum HAL_ADC_PORT
-{
-    HAL_ADC_CH0,  HAL_ADC_CH1,  HAL_ADC_CH2,  HAL_ADC_CH3,
-    HAL_ADC_CH4,  HAL_ADC_CH5,  HAL_ADC_CH6,  HAL_ADC_CH7,
-    HAL_ADC_CH8,  HAL_ADC_CH9,  HAL_ADC_CH10, HAL_ADC_CH11,
-    HAL_ADC_CH12, HAL_ADC_CH13, HAL_ADC_CH14, HAL_ADC_CH15,
-    HAL_ADC_CH16, HAL_ADC_CH17, HAL_ADC_CH18, HAL_ADC_CH19,
-    HAL_ADC_CH20, HAL_ADC_CH21, HAL_ADC_CH22, HAL_ADC_CH23,
-    HAL_ADC_CH24, HAL_ADC_CH25, HAL_ADC_CH26, HAL_ADC_CH27,
-    HAL_ADC_CH28, HAL_ADC_CH29, HAL_ADC_CH30, HAL_ADC_CH31,
-    HAL_ADC_CH_MAX,
-};
-
-/**
- *******************************************************************************
- * @brief        HAL ADC CONVERT MODE
- *******************************************************************************
- */
-//! ADC转换失能
-#define HAL_ADC_DISABLE_CONVERT           0x00
-//! ADC单次转换模式
-#define HAL_ADC_SINGLE_CONVERT            0x01
-//! ADC单次周期转换模式
-#define HAL_ADC_SINGLE_PERIOD_CONVERT     0x02
-//! ADC循环转换模式
-#define HAL_ADC_CONTINUE_CONVERT          0x03
-
-/**
- *******************************************************************************
- * @brief        HAL ADC CONVERT STATE
- *******************************************************************************
- */
-#define HAL_ADC_SCAN_INIT                 0
-#define HAL_ADC_SCAN_DOING                1
-#define HAL_ADC_SCAN_WAIT                 2
-#define HAL_ADC_SCAN_HANDLE               3
-#define HAL_ADC_SCAN_END                  4
-
 /* Exported types ------------------------------------------------------------*/
 typedef struct
 {

@@ -32,15 +32,19 @@
 
 #if BOARD_PALTFORM == USE_PALTFORM_SIMULATION
 #include "mcu/simulation/msp_simulation.h"
+#elif BOARD_PALTFORM == USE_PALTFORM_QT
+#include "mcu/qt/msp_qt.h"
 #elif BOARD_PALTFORM == USE_PALTFORM_N76E003
 #include "mcu/n76e003/msp_n76e003.h"
 #elif BOARD_PALTFORM == USE_PALTFORM_NUC029LAN
 #include "mcu/nuc029lan/msp_nuc029lan.h"
 #elif BOARD_PALTFORM == USE_PALTFORM_NANO103
 #include "mcu/nano103/msp_nano103.h"
+#elif BOARD_PALTFORM == USE_PALTFORM_STM8L05x
+#include "mcu/stm8l05x/msp_stm8l05x.h"
 #elif BOARD_PALTFORM == USE_PALTFORM_STM32L05x
 #include "mcu/stm32l05x/msp_stm32l05x.h"
-#elif BOARD_PALTFORM == USE_PALTFORM_STM32L476VE
+#elif BOARD_PALTFORM == USE_PALTFORM_STM32L4xx
 #include "mcu/stm32l476/msp_stm32l476.h"
 #elif BOARD_PALTFORM == USE_PALTFORM_STM32F1xx
 #include "mcu/stm32f1xx/msp_stm32f1xx.h"

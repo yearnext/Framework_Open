@@ -24,7 +24,7 @@
  *                 GCC                                                         *
  *******************************************************************************
  * @note                                                                       *
- * 1.20170816    ´´½¨ÎÄ¼ş                                                      *
+ * 1.20170816    åˆ›å»ºæ–‡ä»¶                                                      *
  *******************************************************************************
  */
  
@@ -84,7 +84,7 @@ void HAL_Timer_Init(HAL_Timer_t *timer, HAL_Timer_Config_t *config)
     
     Timer_Callback callback = {.Callback = config->Callback, .Param = (void *)config->Param};
     
-    //! ÉèÖÃ¶Ë¿ÚĞÅÏ¢
+    //! è®¾ç½®ç«¯å£ä¿¡æ¯
     timer->Attribute.Flag  = *((uint16_t *)&config->Flag);
     timer->Attribute.Port  = config->Attribute.Port;
     timer->Attribute.State = 0;
@@ -94,7 +94,7 @@ void HAL_Timer_Init(HAL_Timer_t *timer, HAL_Timer_Config_t *config)
 
     timer->Dev             = &DeviceTimer.Parent;
     
-    //! ³õÊ¼»¯Éè±¸
+    //! åˆå§‹åŒ–è®¾å¤‡
     if (!IS_PTR_NULL(DeviceTimer.Ops.Config))
     {
         DeviceTimer.Ops.Config(timer, config);

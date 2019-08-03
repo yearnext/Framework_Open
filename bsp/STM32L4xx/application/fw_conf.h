@@ -33,27 +33,31 @@ extern "C"
 /* Define and config ---------------------------------------------------------*/
 // <<< Use Configuration Wizard in Context Menu >>>
 #define USE_PALTFORM_SIMULATION     0x0000
-#define USE_PALTFORM_N76E003        0x0001
-#define USE_PALTFORM_NUC029LAN      0x0002
-#define USE_PALTFORM_NANO103        0x0003
-#define USE_PALTFORM_STM32L05x      0x0010
-#define USE_PALTFORM_STM32F1xx      0x0011
-#define USE_PALTFORM_STM32L4xx      0x0012
-#define USE_PALTFORM_HC32L13x       0x0020
-#define USE_PALTFORM_MIMXRT1052     0x0030
+#define USE_PALTFORM_QT             0x0001
+#define USE_PALTFORM_N76E003        0x0010
+#define USE_PALTFORM_NUC029LAN      0x0020
+#define USE_PALTFORM_NANO103        0x0030
+#define USE_PALTFORM_STM8L05x       0x0040
+#define USE_PALTFORM_STM32L05x      0x0050
+#define USE_PALTFORM_STM32F1xx      0x0060
+#define USE_PALTFORM_STM32L4xx      0x0070
+#define USE_PALTFORM_HC32L13x       0x0080
+#define USE_PALTFORM_MIMXRT1052     0x0090
 
 // <o>Select Board Support Packet
-//  <0x0000=> Simulation
-//  <0x0001=> N76E003   <0x0002=> NUC029    <0x0003=> NANO103
-//  <0x0010=> STM32L05x <0x0011=> STM32F1xx <0x0012=> STM32L4xx
-//  <0x0020=> HC32L13x
-//  <0x0030=> MIMXRT1052
-//  <i> 0x0000:Simulation
-//  <i> 0x0001:N76E003   0x0002: NUC029    0x0003: NANO103
-//  <i> 0x0010:STM32L05x 0x0011: STM32F1xx 0x0012: STM32L4xx
-//  <i> 0x0020:HC32L13x
-//  <i> 0x0030:MIMXRT1052
-#define BOARD_PALTFORM              0x12
+//  <0x0000=> Simulation <0x0001=> QT
+//  <0x0010=> N76E003    <0x0020=> NUC029    <0x0030=> NANO103
+//  <0x0040=> STM8L05x
+//  <0x0050=> STM32L05x  <0x0060=> STM32F1xx <0x0070=> STM32L4xx
+//  <0x0080=> HC32L13x
+//  <0x0090=> MIMXRT1052
+//  <i> 0x0000:Simulation 0x0001:QT
+//  <i> 0x0010:N76E003    0x0020: NUC029    0x0030: NANO103
+//  <i> 0x0040:STM8L05x
+//  <i> 0x0050:STM32L05x  0x0060: STM32F1xx 0x0070: STM32L4xx
+//  <i> 0x0080:HC32L13x
+//  <i> 0x0090:MIMXRT1052
+#define BOARD_PALTFORM              0x70
 
 #ifdef SIMULATION_DEBUG
 #undef  BOARD_PALTFORM

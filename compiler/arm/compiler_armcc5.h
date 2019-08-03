@@ -146,20 +146,20 @@ extern "C"
  * @brief      define atom opera
  *******************************************************************************
  */
+#ifndef __GET_ISR_FLAG
+#define __GET_ISR_FLAG()                                         __get_PRIMASK()
+#endif
+
+#ifndef __SET_ISR_FLAG
+#define __SET_ISR_FLAG(n)                                       __set_PRIMASK(n)
+#endif
+
 #ifndef __DISABLE_ALL_ISR
-#define __DISABLE_ALL_ISR()                                _st(__disable_irq();)
+#define __DISABLE_ALL_ISR()                                      __disable_irq()
 #endif
 
 #ifndef __ENABLE_ALL_ISR
-#define __ENABLE_ALL_ISR()                                 _st(__enable_irq();)
-#endif
- 
-#ifndef __ATOM_ACTIVE_BEGIN
-#define __ATOM_ACTIVE_BEGIN(n)   _st(register uint32_t __regPriMask __ASM("primask"); (n) = __regPriMask; __ASM("CPSID i");)
-#endif
-
-#ifndef __ATOM_ACTIVE_END
-#define __ATOM_ACTIVE_END(n)     _st(register uint32_t __regPriMask __ASM("primask"); __regPriMask = (n);)
+#define __ENABLE_ALL_ISR()                                        __enable_irq()
 #endif
 
 ///**

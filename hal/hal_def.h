@@ -24,7 +24,7 @@
  *                 GCC                                                         *
  *******************************************************************************
  * @note                                                                       *
- * 1. 20190309    ¥¥Ω®Œƒº˛"hal_def.h"                                          *
+ * 1. 20190309    ÂàõÂª∫Êñá‰ª∂"hal_def.h"                                          *
  *******************************************************************************
  */
 /* Define to prevent recursive inclusion -------------------------------------*/
@@ -44,10 +44,10 @@ extern "C"
 /* Exported macro ------------------------------------------------------------*/
 /**
  *******************************************************************************
- * @brief        HAL …Ë±∏¿‡–Õ
+ * @brief        HAL ËÆæÂ§áÁ±ªÂûã
  *******************************************************************************
  */
-//! ∂®“Â…Ë±∏¿‡–Õ
+//! ÂÆö‰πâËÆæÂ§áÁ±ªÂûã
 enum HAL_DEVICE_TYPE
 {
     HAL_DEVICE_MCU = 0,
@@ -66,10 +66,10 @@ enum HAL_DEVICE_TYPE
 
 /**
  *******************************************************************************
- * @brief        HAL …Ë±∏√Ë ˆ∑˚
+ * @brief        HAL ËÆæÂ§áÊèèËø∞Á¨¶
  *******************************************************************************
  */
-//! ∂®“Â…Ë±∏√Ë ˆ◊÷∑˚¥Æ
+//! ÂÆö‰πâËÆæÂ§áÊèèËø∞Â≠óÁ¨¶‰∏≤
 #define HAL_PIN_STR                                                       "GPIO"
 #define HAL_ADC_STR                                                        "ADC"
 #define HAL_TIMER_STR                                                    "TIMER"
@@ -83,7 +83,7 @@ enum HAL_DEVICE_TYPE
 
 /**
  *******************************************************************************
- * @brief        HAL …Ë±∏◊¥Ã¨
+ * @brief        HAL ËÆæÂ§áÁä∂ÊÄÅ
  *******************************************************************************
  */
 enum __HAL_DEVICE_STATE
@@ -97,7 +97,7 @@ enum __HAL_DEVICE_STATE
 
 /**
  *******************************************************************************
- * @brief        HAL IRQ¥¶¿Ìœ‡πÿ ˝æ›
+ * @brief        HAL IRQÂ§ÑÁêÜÁõ∏ÂÖ≥Êï∞ÊçÆ
  *******************************************************************************
  */
 typedef void (*HAL_IrqHandle)(void *param);
@@ -109,7 +109,7 @@ typedef struct
 
 /**
  *******************************************************************************
- * @brief        HAL Õ®”√…Ë±∏≤Ÿ◊˜Ω”ø⁄
+ * @brief        HAL ÈÄöÁî®ËÆæÂ§áÊìç‰ΩúÊé•Âè£
  *******************************************************************************
  */
 struct HAL_DEVICE;
@@ -129,24 +129,24 @@ typedef struct
 
 /**
  *******************************************************************************
- * @brief        HAL …Ë±∏æ‰±˙
+ * @brief        HAL ËÆæÂ§áÂè•ÊüÑ
  *******************************************************************************
  */
 typedef struct HAL_DEVICE
 {
-    //! …Ë±∏¿‡–Õ
+    //! ËÆæÂ§áÁ±ªÂûã
     uint8_t Type;
-    //! …Ë±∏◊¥Ã¨
+    //! ËÆæÂ§áÁä∂ÊÄÅ
     uint8_t State;
-    //! …Ë±∏±Í ∂
+    //! ËÆæÂ§áÊ†áËØÜ
     uint16_t Flag;
-    //! …Ë±∏¡¥±Ì
+    //! ËÆæÂ§áÈìæË°®
     FwList_t List;
-    //! …Ë±∏≤Ÿ◊˜Ω”ø⁄
+    //! ËÆæÂ§áÊìç‰ΩúÊé•Âè£
     HAL_Interface_t Ops;
-    //! …Ë±∏√˚≥∆
+    //! ËÆæÂ§áÂêçÁß∞
     char *Name;
-    //! ”√ªß ˝æ›
+    //! Áî®Êà∑Êï∞ÊçÆ
     void *UserData;
 }HAL_Device_t;
 
@@ -159,24 +159,24 @@ typedef struct HAL_DEVICE
 
 /**
  *******************************************************************************
- * @brief        HAL …Ë±∏ Ù–‘
+ * @brief        HAL ËÆæÂ§áÂ±ûÊÄß
  *******************************************************************************
  */
 typedef struct
 {
-    //! …Ë±∏∂Àø⁄
+    //! ËÆæÂ§áÁ´ØÂè£
     uint16_t Port;
-    //! …Ë±∏◊¥Ã¨
+    //! ËÆæÂ§áÁä∂ÊÄÅ
     uint16_t State;
-    //! …Ë±∏±Í÷æ
+    //! ËÆæÂ§áÊ†áÂøó
     uint16_t Flag;
-    //! …Ë±∏ ¬º˛
+    //! ËÆæÂ§á‰∫ã‰ª∂
     uint16_t Event;
 }HAL_Atrribute_t;
 
 /**
  *******************************************************************************
- * @brief      HAL ”––ßŒª…Ë÷√
+ * @brief      HAL ÊúâÊïà‰ΩçËÆæÁΩÆ
  *******************************************************************************
  */
 #define HAL_DEVICE_MSB                                                       (0)
@@ -184,7 +184,7 @@ typedef struct
 
 /**
  *******************************************************************************
- * @brief      HAL …Ë±∏≤Ÿ◊˜±Í ∂
+ * @brief      HAL ËÆæÂ§áÊìç‰ΩúÊ†áËØÜ
  *******************************************************************************
  */
 #define HAL_READ_FLAG                                                     _bv(0)
@@ -192,7 +192,7 @@ typedef struct
 
 /**
  *******************************************************************************
- * @brief      HAL …Ë±∏≤Ÿ◊˜√¸¡Ó
+ * @brief      HAL ËÆæÂ§áÊìç‰ΩúÂëΩ‰ª§
  *******************************************************************************
  */
 enum HAL_DEVICE_CMDS
@@ -207,7 +207,7 @@ enum HAL_DEVICE_CMDS
 
 /**
  *******************************************************************************
- * @brief      HAL …Ë±∏÷–∂œ ¬º˛
+ * @brief      HAL ËÆæÂ§á‰∏≠Êñ≠‰∫ã‰ª∂
  *******************************************************************************
  */
 enum HAL_DEVICE_EVENT
@@ -229,10 +229,521 @@ enum HAL_DEVICE_EVENT
     HAL_EVENT_TX_DMADONE,
 };
 
+/**
+ *******************************************************************************
+ * @brief        HAL PORT DEFINE
+ *******************************************************************************
+ */
+enum HAL_GPIO_PORT
+{
+    HAL_PORT_A = 0,
+    HAL_PORT_B,
+    HAL_PORT_C,
+    HAL_PORT_D,
+    HAL_PORT_E,
+    HAL_PORT_F,
+    HAL_PORT_G,
+    HAL_PORT_H,
+    HAL_PORT_I,
+    HAL_PORT_J,
+    HAL_PORT_K,
+    HAL_PORT_L,
+    HAL_PORT_M,
+    HAL_PORT_N,
+                            
+    HAL_PORT_MAX,
+};
+
+enum HAL_GPIO_PIN
+{
+    HAL_PIN_0 = 0,
+    HAL_PIN_1,
+    HAL_PIN_2,
+    HAL_PIN_3,
+    HAL_PIN_4,
+    HAL_PIN_5,
+    HAL_PIN_6,
+    HAL_PIN_7,
+    HAL_PIN_8,
+    HAL_PIN_9,
+    HAL_PIN_10,
+    HAL_PIN_11,
+    HAL_PIN_12,
+    HAL_PIN_13,
+    HAL_PIN_14,
+    HAL_PIN_15,
+    HAL_PIN_16,
+    HAL_PIN_17,
+    HAL_PIN_18,
+    HAL_PIN_19,
+    HAL_PIN_20,
+    HAL_PIN_21,    
+    HAL_PIN_22,
+    HAL_PIN_23,
+    HAL_PIN_24,
+    HAL_PIN_25,
+    HAL_PIN_26,
+    HAL_PIN_27,   
+    HAL_PIN_28,
+    HAL_PIN_29,
+    HAL_PIN_30,
+    HAL_PIN_31,
+
+    HAL_PIN_MAX,
+};
+
+enum HAL_PIN_MODE
+{
+    HAL_PIN_INPUT = 0,
+    HAL_PIN_OUTPUT,
+    HAL_PIN_FLOAT,
+    HAL_PIN_QUASI,
+    HAL_PIN_ANALOG,
+
+    HAL_PIN_MODE_MAX,
+};
+
+enum HAL_PORT_CMD
+{
+    GPIO_SET_CMD = HAL_SPECIAL_CMD,
+    GPIO_CLR_CMD,
+    GPIO_TOGGLE_CMD,
+    GPIO_INPUT_MODE_CMD,
+    GPIO_OUTPUT_MODE_CMD,
+    GPIO_GET_OUTPUT_CMD,
+    GPIO_GET_INPUT_CMD,
+};
+
+/**
+ *******************************************************************************
+ * @brief        HAL GPIO PORT ID Conversion
+ *******************************************************************************
+ */
+#define HAL_PIN_ID(port, pin)                             ((port) << 16 | (pin))
+#define HAL_PORT(id)                                                ((id) >> 16)
+#define HAL_PIN(id)                                        ((id) & 0x0000FFFFUL)
+
+//! ÂÆö‰πâÂºïËÑöÁä∂ÊÄÅ
+#define HAL_PIN_INIT                                                        0x00
+#define HAL_PIN_ACTIVE                                                      0x01
+#define HAL_PIN_INACTIVE                                                    0x02
+
+//! ÂÆö‰πâÂºïËÑöÈÖçÁΩÆÂèÇÊï∞
+#define HAL_PIN_ACTIVE_HIGH                                                 0x01
+#define HAL_PIN_ACTIVE_LOW                                                  0x00
+#define HAL_PIN_IS_HIGH_ACTIVE(x)        (Fw_Flag_Get((x), HAL_PIN_ACTIVE_HIGH))
+
+/**
+ *******************************************************************************
+ * @brief        HAL BLINK DEFINE
+ *******************************************************************************
+ */
+//! BLINK Áä∂ÊÄÅÂÆö‰πâ
+#define HAL_BLINK_INIT_STATE  0
+#define HAL_BLINK_ON_STATE    1
+#define HAL_BLINK_OFF_STATE   2
+#define HAL_BLINK_DOING_STATE 3
+
+//! BLINK ÂëΩ‰ª§ÂÆö‰πâ
+#define HAL_BLINK_INIT_CMD    0
+#define HAL_BLINK_ON_CMD      1
+#define HAL_BLINK_OFF_CMD     2
+
+/**
+ *******************************************************************************
+ * @brief        HAL ADC PORT
+ *******************************************************************************
+ */
+enum HAL_ADC_PORT
+{
+    HAL_ADC_CH0,  HAL_ADC_CH1,  HAL_ADC_CH2,  HAL_ADC_CH3,
+    HAL_ADC_CH4,  HAL_ADC_CH5,  HAL_ADC_CH6,  HAL_ADC_CH7,
+    HAL_ADC_CH8,  HAL_ADC_CH9,  HAL_ADC_CH10, HAL_ADC_CH11,
+    HAL_ADC_CH12, HAL_ADC_CH13, HAL_ADC_CH14, HAL_ADC_CH15,
+    HAL_ADC_CH16, HAL_ADC_CH17, HAL_ADC_CH18, HAL_ADC_CH19,
+    HAL_ADC_CH20, HAL_ADC_CH21, HAL_ADC_CH22, HAL_ADC_CH23,
+    HAL_ADC_CH24, HAL_ADC_CH25, HAL_ADC_CH26, HAL_ADC_CH27,
+    HAL_ADC_CH28, HAL_ADC_CH29, HAL_ADC_CH30, HAL_ADC_CH31,
+    HAL_ADC_CH_MAX,
+};
+
+/**
+ *******************************************************************************
+ * @brief        HAL ADC CONVERT MODE
+ *******************************************************************************
+ */
+//! ADCËΩ¨Êç¢Â§±ËÉΩ
+#define HAL_ADC_DISABLE_CONVERT           0x00
+//! ADCÂçïÊ¨°ËΩ¨Êç¢Ê®°Âºè
+#define HAL_ADC_SINGLE_CONVERT            0x01
+//! ADCÂçïÊ¨°Âë®ÊúüËΩ¨Êç¢Ê®°Âºè
+#define HAL_ADC_SINGLE_PERIOD_CONVERT     0x02
+//! ADCÂæ™ÁéØËΩ¨Êç¢Ê®°Âºè
+#define HAL_ADC_CONTINUE_CONVERT          0x03
+
+/**
+ *******************************************************************************
+ * @brief        HAL ADC CONVERT STATE
+ *******************************************************************************
+ */
+#define HAL_ADC_SCAN_INIT                 0
+#define HAL_ADC_SCAN_DOING                1
+#define HAL_ADC_SCAN_WAIT                 2
+#define HAL_ADC_SCAN_HANDLE               3
+#define HAL_ADC_SCAN_END                  4
+
+/**
+ *******************************************************************************
+ * @brief        HAL TIMER PORT
+ *******************************************************************************
+ */
+enum HAL_TIMER_PORT
+{
+    HAL_TIMER_0,  HAL_TIMER_1,  HAL_TIMER_2,  HAL_TIMER_3,  HAL_TIMER_4,
+    HAL_TIMER_5,  HAL_TIMER_6,  HAL_TIMER_7,  HAL_TIMER_8,  HAL_TIMER_9,
+    HAL_TIMER_10, HAL_TIMER_11, HAL_TIMER_12, HAL_TIMER_13, HAL_TIMER_14,
+    HAL_TIMER_15, HAL_TIMER_16, HAL_TIMER_17, HAL_TIMER_18, HAL_TIMER_19,
+    HAL_TIMER_20, HAL_TIMER_21, HAL_TIMER_22, HAL_TIMER_23, HAL_TIMER_24,
+    HAL_TIMER_25, HAL_TIMER_26, HAL_TIMER_27, HAL_TIMER_28, HAL_TIMER_29,
+    HAL_TIMER_30, HAL_TIMER_31, HAL_TIMER_32, HAL_TIMER_33, HAL_TIMER_34,
+    HAL_TIMER_35, HAL_TIMER_36, HAL_TIMER_37, HAL_TIMER_38, HAL_TIMER_39,
+    HAL_TIMER_40, HAL_TIMER_41, HAL_TIMER_42, HAL_TIMER_43, HAL_TIMER_44,
+    HAL_TIMER_45, HAL_TIMER_46, HAL_TIMER_47, HAL_TIMER_48, HAL_TIMER_49,
+    HAL_TIMER_MAX,
+};
+
+/**
+ *******************************************************************************
+ * @brief        HAL TIMER RUN MODE
+ *******************************************************************************
+ */
+#define HAL_TIMER_ONE_SHOT_MODE                                                0
+#define HAL_TIMER_PERIOD_MODE                                                  1
+
+/**
+ *******************************************************************************
+ * @brief        HAL TIMER TICK MODE
+ *******************************************************************************
+ */
+#define HAL_TIMER_CNT_UP                                                       0
+#define HAL_TIMER_CNT_DOWN                                                     1
+
+/**
+ *******************************************************************************
+ * @brief        HAL TIMER TICK UNIT
+ *******************************************************************************
+ */
+#define HAL_TIMER_UNIT_US                                                      0
+#define HAL_TIMER_UNIT_MS                                                      1
+#define HAL_TIMER_UNIT_100MS                                                   2
+#define HAL_TIMER_UNIT_SEC                                                     3
+
+/**
+ *******************************************************************************
+ * @brief        HAL PWM PORT
+ *******************************************************************************
+ */
+enum HAL_PWM_PORT
+{
+    HAL_PWM_CH0,  HAL_PWM_CH1,  HAL_PWM_CH2,  HAL_PWM_CH3,
+    HAL_PWM_CH4,  HAL_PWM_CH5,  HAL_PWM_CH6,  HAL_PWM_CH7,
+    HAL_PWM_CH8,  HAL_PWM_CH9,  HAL_PWM_CH10, HAL_PWM_CH11,
+    HAL_PWM_CH12, HAL_PWM_CH13, HAL_PWM_CH14, HAL_PWM_CH15,
+    HAL_PWM_CH16, HAL_PWM_CH17, HAL_PWM_CH18, HAL_PWM_CH19,
+    HAL_PWM_CH20, HAL_PWM_CH21, HAL_PWM_CH22, HAL_PWM_CH23,
+    HAL_PWM_CH24, HAL_PWM_CH25, HAL_PWM_CH26, HAL_PWM_CH27,
+    HAL_PWM_CH28, HAL_PWM_CH29, HAL_PWM_CH30, HAL_PWM_CH31,
+    
+    HAL_PWM_CH_MAX,
+};
+
+enum HAL_PWM_CMD
+{
+    HAL_PWM_CHANNEL_NORMAL = HAL_SPECIAL_CMD,
+    HAL_PWM_CHANNEL_NEGATION,
+};
+
+/**
+ *******************************************************************************
+ * @brief        HAL PWM OPTION
+ *******************************************************************************
+ */
+#define HAL_PWM_READ                                                           0
+#define HAL_PWM_WRITE                                                          1
+
+/**
+ *******************************************************************************
+ * @brief        HAL SPI PORT
+ *******************************************************************************
+ */
+enum HAL_SPI_PORT
+{
+    HAL_SPI_0 = 0,
+    HAL_SPI_1,
+    HAL_SPI_2,
+    HAL_SPI_3,
+    HAL_SPI_4,
+    HAL_SPI_5,
+    
+    HAL_SPI_END,
+};
+
+/**
+ *******************************************************************************
+ * @brief      ÂÆö‰πâ SPI Ê®°Âºè
+ *******************************************************************************
+ */
+//! CPOL = 0, CPHA = 0
+#define HAL_SPI_MODE_0        0
+//! CPOL = 0, CPHA = 1
+#define HAL_SPI_MODE_1        1
+//! CPOL = 1, CPHA = 0
+#define HAL_SPI_MODE_2        2
+//! CPOL = 1, CPHA = 1
+#define HAL_SPI_MODE_3        3
+
+/**
+ *******************************************************************************
+ * @brief      ÂÆö‰πâ SPI Êï∞ÊçÆÈïøÂ∫¶
+ *******************************************************************************
+ */
+#define HAL_SPI_DATA_LEN_8    8
+#define HAL_SPI_DATA_LEN_16  16
+#define HAL_SPI_DATA_LEN_32  32
+
+/**
+ *******************************************************************************
+ * @brief      ÂÆö‰πâ SPI ‰º†ËæìÈÄüÂ∫¶
+ *******************************************************************************
+ */
+#define HAL_SPI_SPEED_10K     10000UL
+#define HAL_SPI_SPEED_20K     20000UL
+#define HAL_SPI_SPEED_50K     50000UL
+#define HAL_SPI_SPEED_100K    100000UL
+#define HAL_SPI_SPEED_200K    200000UL
+#define HAL_SPI_SPEED_500K    500000UL
+#define HAL_SPI_SPEED_1M      1000000UL
+#define HAL_SPI_SPEED_2M      2000000UL
+#define HAL_SPI_SPEED_5M      5000000UL
+#define HAL_SPI_SPEED_10M     10000000UL
+#define HAL_SPI_SPEED_20M     20000000UL
+
+/**
+ *******************************************************************************
+ * @brief      SPI ÈÖçÁΩÆÈÄâÈ°π
+ *******************************************************************************
+ */
+#define HAL_SPI_EN_TX                 0x0001
+#define HAL_SPI_EN_TX_ISR             0x0002
+#define HAL_SPI_EN_TX_DMA             0x0004
+#define HAL_SPI_EN_TX_FIFO            0x0008
+#define HAL_SPI_EN_TX_MSG             0x0010
+#define HAL_SPI_EN_TX_CALLBACK        0x0020
+
+#define HAL_SPI_EN_RX                 0x0100
+#define HAL_SPI_EN_RX_ISR             0x0200
+#define HAL_SPI_EN_RX_DMA             0x0400
+#define HAL_SPI_EN_RX_FIFO            0x0800
+#define HAL_SPI_EN_RX_MSG             0x1000
+#define HAL_SPI_EN_RX_CALLBACK        0x2000
+
+/**
+ *******************************************************************************
+ * @brief      SPI Ê†áËØÜÂÆö‰πâ
+ *******************************************************************************
+ */
+#define HAL_SPI_TAKE_FLAG             0x0001
+
+
+/**
+ *******************************************************************************
+ * @brief        HAL SERIAL PORT
+ *******************************************************************************
+ */
+enum HAL_SERIAL_PORT
+{
+    HAL_SERIAL_0,
+    HAL_SERIAL_1,
+    HAL_SERIAL_2,
+    HAL_SERIAL_3,
+    HAL_SERIAL_4,
+    HAL_SERIAL_5,
+    HAL_SERIAL_6,
+    HAL_SERIAL_7,
+    HAL_SERIAL_8,
+    
+    HAL_SERIAL_MAX,
+};
+
+/**
+ *******************************************************************************
+ * @brief      ÂÆö‰πâ SERIAL Ê≥¢ÁâπÁéáÈÖçÁΩÆÂèÇÊï∞
+ *******************************************************************************
+ */
+#define HAL_SERIAL_BAUD_2400              2400
+#define HAL_SERIAL_BAUD_4800              4800
+#define HAL_SERIAL_BAUD_9600              9600
+#define HAL_SERIAL_BAUD_19200             19200
+#define HAL_SERIAL_BAUD_38400             38400
+#define HAL_SERIAL_BAUD_57600             57600
+#define HAL_SERIAL_BAUD_115200            115200
+#define HAL_SERIAL_BAUD_230400            230400
+#define HAL_SERIAL_BAUD_460800            460800
+#define HAL_SERIAL_BAUD_921600            921600
+#define HAL_SERIAL_BAUD_2000000           2000000
+#define HAL_SERIAL_BAUD_3000000           3000000
+
+/**
+ *******************************************************************************
+ * @brief      ÂÆö‰πâ SERIAL Êï∞ÊçÆ‰ΩçÈÖçÁΩÆÂèÇÊï∞
+ *******************************************************************************
+ */
+#define HAL_SERIAL_DATA_BITS_5            5
+#define HAL_SERIAL_DATA_BITS_6            6
+#define HAL_SERIAL_DATA_BITS_7            7
+#define HAL_SERIAL_DATA_BITS_8            8
+#define HAL_SERIAL_DATA_BITS_9            9
+
+/**
+ *******************************************************************************
+ * @brief      ÂÆö‰πâ SERIAL ÂÅúÊ≠¢‰ΩçÈÖçÁΩÆÂèÇÊï∞
+ *******************************************************************************
+ */
+#define HAL_SERIAL_STOP_BITS_1            1
+#define HAL_SERIAL_STOP_BITS_2            2
+#define HAL_SERIAL_STOP_BITS_3            3
+#define HAL_SERIAL_STOP_BITS_4            4
+
+/**
+ *******************************************************************************
+ * @brief      ÂÆö‰πâ SERIAL Ê†°È™å‰ΩçÈÖçÁΩÆÂèÇÊï∞
+ *******************************************************************************
+ */
+#define HAL_SERIAL_PARITY_NONE            0
+#define HAL_SERIAL_PARITY_ODD             1                           //! Â•áÊ†°È™å
+#define HAL_SERIAL_PARITY_EVEN            2                           //! ÂÅ∂Ê†°È™å
+
+/**
+ *******************************************************************************
+ * @brief      ÂÆö‰πâ SERIAL ÁºñÁ†ÅÊñπÂºèÈÖçÁΩÆÂèÇÊï∞
+ *******************************************************************************
+ */
+#define HAL_SERIAL_NRZ_NORMAL             0       /* Non Return to Zero : normal mode */
+#define HAL_SERIAL_NRZ_INVERTED           1       /* Non Return to Zero : inverted mode */
+
+/**
+ *******************************************************************************
+ * @brief      SERIAL ÂèëÈÄÅÁºìÂ≠òÂå∫ÈïøÂ∫¶
+ *******************************************************************************
+ */
+#define HAL_SERIAL_CACHE_SIZE            64
+
+/**
+ *******************************************************************************
+ * @brief      SERIAL ‰∫ã‰ª∂ÂÆö‰πâ
+ *******************************************************************************
+ */
+//! Á°¨‰ª∂‰∫ã‰ª∂
+#define HAL_SERIAL_EVENT_RX_IND          0x01       /* Rx indication */
+#define HAL_SERIAL_EVENT_TX_DONE         0x02       /* Tx complete   */
+#define HAL_SERIAL_EVENT_RX_FIFO_DONE    0x03       /* Rx fifo transfer done */
+#define HAL_SERIAL_EVENT_TX_FIFO_DONE    0x04       /* Tx fifo transfer complete */
+#define HAL_SERIAL_EVENT_RX_DMADONE      0x05       /* Rx DMA transfer done */
+#define HAL_SERIAL_EVENT_TX_DMADONE      0x06       /* Tx DMA transfer done */
+#define HAL_SERIAL_EVENT_RX_TIMEOUT      0x07       /* Rx timeout    */
+
+//! ÁªÑ‰ª∂‰∫ã‰ª∂
+#define HAL_SERIAL_TX_DONE               0x08
+#define HAL_SERIAL_TX_START              0x09
+#define HAL_SERIAL_TX_TIMEOUT            0x0A
+#define HAL_SERIAL_RX_ONCE               0x0B
+#define HAL_SERIAL_RX_DONE               0x0C
+#define HAL_SERIAL_RX_TIMEOUT            0x0D
+#define HAL_SERIAL_RX_OVERFLOW           0x0E
+
+/**
+ *******************************************************************************
+ * @brief      SERIAL ‰º†ËæìÊñπÂêëÂÆö‰πâ
+ *******************************************************************************
+ */
+#define HAL_SERIAL_DIR_TX                0x00
+#define HAL_SERIAL_DIR_RX                0x01
+    
+/**
+ *******************************************************************************
+ * @brief      SERIAL Êó∂Èó¥ÂèÇÊï∞
+ *******************************************************************************
+ */
+#define HAL_SERIAL_RX_TICK              10
+
+/**
+ *******************************************************************************
+ * @brief      SERIAL Â∑•‰ΩúÊ†áÂøó‰Ωç
+ *******************************************************************************
+ */
+#define HAL_SERIAL_TRANSFER_ISR                                           0x0001
+#define HAL_SERIAL_TRANSFER_FIFO                                          0x0002
+#define HAL_SERIAL_TRANSFER_DMA                                           0x0004
+
+/**
+ *******************************************************************************
+ * @brief        HAL DMA PORT
+ *******************************************************************************
+ */
+enum HAL_DMA_PORT
+{
+    HAL_DMA_CH0,  HAL_DMA_CH1,  HAL_DMA_CH2,  HAL_DMA_CH3,
+    HAL_DMA_CH4,  HAL_DMA_CH5,  HAL_DMA_CH6,  HAL_DMA_CH7,
+    HAL_DMA_CH8,  HAL_DMA_CH9,  HAL_DMA_CH10, HAL_DMA_CH11,
+    HAL_DMA_CH12, HAL_DMA_CH13, HAL_DMA_CH14, HAL_DMA_CH15,
+    HAL_DMA_CH16, HAL_DMA_CH17, HAL_DMA_CH18, HAL_DMA_CH19,
+    HAL_DMA_CH20, HAL_DMA_CH21, HAL_DMA_CH22, HAL_DMA_CH23,
+    HAL_DMA_CH24, HAL_DMA_CH25, HAL_DMA_CH26, HAL_DMA_CH27,
+    HAL_DMA_CH28, HAL_DMA_CH29, HAL_DMA_CH30, HAL_DMA_CH31,
+    
+    HAL_DMA_CH_MAX,
+};
+
+enum HAL_DMA_CMD
+{
+    HAL_DMA_CHANNEL_NORMAL = HAL_SPECIAL_CMD,
+    HAL_DMA_CHANNEL_NEGATION,
+};
+
+/**
+ *******************************************************************************
+ * @brief        HAL IIC PORT
+ *******************************************************************************
+ */
+enum HAL_IIC_PORT
+{
+    HAL_IIC_0,
+    HAL_IIC_1,
+    HAL_IIC_2,
+    
+    HAL_IIC_MAX,
+};
+
+/**
+ *******************************************************************************
+ * @brief        HAL DMA OPTION
+ *******************************************************************************
+ */
+#define HAL_DMA_READ                                                           0
+#define HAL_DMA_WRITE                                                          1
+
+/**
+ *******************************************************************************
+ * @brief        HAL DMA EVENT
+ *******************************************************************************
+ */
+#define HAL_DMA_EVENT_TX_DONE                                                  2
+#define HAL_DMA_EVENT_RX_DONE                                                  3
+
 /* Exported types ------------------------------------------------------------*/
 /**
  *******************************************************************************
- * @brief      HAL …Ë±∏œ˚œ¢
+ * @brief      HAL ËÆæÂ§áÊ∂àÊÅØ
  *******************************************************************************
  */
 #define HAL_DEVICE_NORMAL_MSG 0
@@ -242,7 +753,7 @@ enum HAL_DEVICE_EVENT
 
 typedef union
 {
-    //! ª˘±æœ˚œ¢
+    //! Âü∫Êú¨Ê∂àÊÅØ
     struct
     {
         uint16_t MsgType;
@@ -255,7 +766,7 @@ typedef union
         };
     };
     
-    //! ∞¥º¸œ˚œ¢
+    //! ÊåâÈîÆÊ∂àÊÅØ
     struct
     {
         uint16_t : 16;
@@ -270,15 +781,15 @@ typedef union
 /* Exported functions --------------------------------------------------------*/
 /**
  *******************************************************************************
- * @brief        HAL∂® ±∆˜≤Ÿ◊˜API
+ * @brief        HALÂÆöÊó∂Âô®Êìç‰ΩúAPI
  *******************************************************************************
  */
 #define HAL_CMD_Nop(t)
 #define HAL_Delay_Us(t)
 #define HAL_Delay_Ms(t)
 
-//! HAL ∂® ±∆˜≤Ÿ◊˜Ω”ø⁄
-//! «˝∂Øµ◊≤„ π”√¥ÀΩ”ø⁄
+//! HAL ÂÆöÊó∂Âô®Êìç‰ΩúÊé•Âè£
+//! È©±Âä®Â∫ïÂ±Ç‰ΩøÁî®Ê≠§Êé•Âè£
 #define HAL_GenTimer_Start(tim, tick) _st((tim) = (tick);)
 #define HAL_GenTimer_Stop(tim)        _st((tim) = 0;)
 #define HAL_GenTimer_Handle(tim)      _st(if(tim > 0)        \
@@ -292,7 +803,7 @@ typedef union
 
 /**
  *******************************************************************************
- * @brief        HAL ¬º˛≤Ÿ◊˜API
+ * @brief        HAL‰∫ã‰ª∂Êìç‰ΩúAPI
  *******************************************************************************
  */
 #define HAL_Evt_Set(p, e)                         _set_bit((p), (e))
@@ -301,7 +812,7 @@ typedef union
  
 /**
  *******************************************************************************
- * @brief        HAL Flag≤Ÿ◊˜API
+ * @brief        HAL FlagÊìç‰ΩúAPI
  *******************************************************************************
  */
 #define HAL_Flag_Set(p, e)                        _set_reg((p), (e))

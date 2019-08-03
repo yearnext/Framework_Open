@@ -20,8 +20,8 @@
  * @{
  */
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __STM32L4xx_MSP_CONF_H__
-#define __STM32L4xx_MSP_CONF_H__
+#ifndef __STM32L05x_MSP_CONF_H__
+#define __STM32L05x_MSP_CONF_H__
 
 /* Add c++ compatibility------------------------------------------------------*/
 #ifdef __cplusplus
@@ -38,8 +38,8 @@ extern "C"
 // </c>
 
 // <o>Set Internal high speed RC clock frequency(unit: hz)
-//  <i>Default: 80000000UL  (80MHz)
-#define MCU_CLK_FREQUENCE 80000000UL
+//  <i>Default: 32000000UL  (32MHz)
+#define MCU_CLK_FREQUENCE 32000000UL
 
 // <o>Set SysTick Period
 //  <i>Default: 1000 (Unit:us)
@@ -277,13 +277,6 @@ extern "C"
 //! end of the MCU TIM8 Param Config
 // </h>
 
-#if defined(ENABLE_MSP_TIMER1_DRIVER) || defined(ENABLE_MSP_TIMER2_DRIVER)
-    || defined(ENABLE_MSP_TIMER3_DRIVER) || defined(ENABLE_MSP_TIMER4_DRIVER)
-    || defined(ENABLE_MSP_TIMER5_DRIVER) || defined(ENABLE_MSP_TIMER6_DRIVER)
-    || defined(ENABLE_MSP_TIMER7_DRIVER) || defined(ENABLE_MSP_TIMER8_DRIVER)
-#define ENABLE_MSP_TIMER_DRIVER
-#endif
-
 //! end of the MCU Timer Param Config
 // </h>
 
@@ -487,13 +480,6 @@ extern "C"
 //! end of the MCU PWM CH7 Param Config
 // </h>
 
-#if defined(ENABLE_MSP_PWM_CH1_DRIVER) || defined(ENABLE_MSP_PWM_CH2_DRIVER)
-    || defined(ENABLE_MSP_PWM_CH3_DRIVER) || defined(ENABLE_MSP_PWM_CH4_DRIVER)
-    || defined(ENABLE_MSP_PWM_CH5_DRIVER) || defined(ENABLE_MSP_PWM_CH6_DRIVER)
-    || defined(ENABLE_MSP_PWM_CH7_DRIVER) || defined(ENABLE_MSP_PWM_CH6_DRIVER)
-#define ENABLE_MSP_PWM_DRIVER
-#endif
-
 //! end of the MCU PWM Param Config
 // </h>
 
@@ -504,7 +490,7 @@ extern "C"
 //  <i>MCU ADC CH0 Param Config
 
 // <o>Set MCU ADC CH0 Port
-//  <0=>PC0
+//  <i>default: 0 (Normal)
 #define MCU_ADC_CH0_AF_PORT 0
 
 // <c1>Enable MSP ADC CH0 Driver
@@ -519,7 +505,7 @@ extern "C"
 //  <i>MCU ADC CH1 Param Config
 
 // <o>Set MCU ADC CH1 Port
-//  <0=>PC1
+//  <i>default: 0 (Normal)
 #define MCU_ADC_CH1_AF_PORT 0
 
 // <c1>Enable MSP ADC CH1 Driver
@@ -534,7 +520,7 @@ extern "C"
 //  <i>MCU ADC CH2 Param Config
 
 // <o>Set MCU ADC CH2 Port
-//  <0=>PC2
+//  <i>default: 0 (Normal)
 #define MCU_ADC_CH2_AF_PORT 0
 
 // <c1>Enable MSP ADC CH2 Driver
@@ -549,7 +535,7 @@ extern "C"
 //  <i>MCU ADC CH3 Param Config
 
 // <o>Set MCU ADC CH3 Port
-//  <0=>PC3
+//  <i>default: 0 (Normal)
 #define MCU_ADC_CH3_AF_PORT 0
 
 // <c1>Enable MSP ADC CH3 Driver
@@ -564,7 +550,7 @@ extern "C"
 //  <i>MCU ADC CH4 Param Config
 
 // <o>Set MCU ADC CH4 Port
-//  <0=>PA0
+//  <i>default: 0 (Normal)
 #define MCU_ADC_CH4_AF_PORT 0
 
 // <c1>Enable MSP ADC CH4 Driver
@@ -579,7 +565,7 @@ extern "C"
 //  <i>MCU ADC CH5 Param Config
 
 // <o>Set MCU ADC CH5 Port
-//  <0=>PA1
+//  <i>default: 0 (Normal)
 #define MCU_ADC_CH5_AF_PORT 0
 
 // <c1>Enable MSP ADC CH5 Driver
@@ -594,7 +580,7 @@ extern "C"
 //  <i>MCU ADC CH6 Param Config
 
 // <o>Set MCU ADC CH6 Port
-//  <0=>PA2
+//  <i>default: 0 (Normal)
 #define MCU_ADC_CH6_AF_PORT 0
 
 // <c1>Enable MSP ADC CH6 Driver
@@ -609,7 +595,7 @@ extern "C"
 //  <i>MCU ADC CH7 Param Config
 
 // <o>Set MCU ADC CH7 Port
-//  <0=>PA3
+//  <i>default: 0 (Normal)
 #define MCU_ADC_CH7_AF_PORT 0
 
 // <c1>Enable MSP ADC CH7 Driver
@@ -624,7 +610,7 @@ extern "C"
 //  <i>MCU ADC CH8 Param Config
 
 // <o>Set MCU ADC CH8 Port
-//  <0=>PA4
+//  <i>default: 0 (Normal)
 #define MCU_ADC_CH8_AF_PORT 0
 
 // <c1>Enable MSP ADC CH8 Driver
@@ -639,7 +625,7 @@ extern "C"
 //  <i>MCU ADC CH9 Param Config
 
 // <o>Set MCU ADC CH9 Port
-//  <0=>PA5
+//  <i>default: 0 (Normal)
 #define MCU_ADC_CH9_AF_PORT 0
 
 // <c1>Enable MSP ADC CH9 Driver
@@ -649,107 +635,6 @@ extern "C"
 
 //! end of the MCU ADC CH9 Param Config
 // </h>
-
-// <h>MCU ADC CH10 Param Config
-//  <i>MCU ADC CH10 Param Config
-
-// <o>Set MCU ADC CH10 Port
-//  <0=>PA6
-#define MCU_ADC_CH10_AF_PORT 0
-
-// <c1>Enable MSP ADC CH10 Driver
-//  <i>Enable MSP ADC CH10 Driver
-//#define ENABLE_MSP_ADC_CH10_DRIVER
-// </c>
-
-//! end of the MCU ADC CH10 Param Config
-// </h>
-
-// <h>MCU ADC CH11 Param Config
-//  <i>MCU ADC CH11 Param Config
-
-// <o>Set MCU ADC CH11 Port
-//  <0=>PA7
-#define MCU_ADC_CH11_AF_PORT 0
-
-// <c1>Enable MSP ADC CH11 Driver
-//  <i>Enable MSP ADC CH11 Driver
-//#define ENABLE_MSP_ADC_CH11_DRIVER
-// </c>
-
-//! end of the MCU ADC CH11 Param Config
-// </h>
-
-// <h>MCU ADC CH12 Param Config
-//  <i>MCU ADC CH12 Param Config
-
-// <o>Set MCU ADC CH12 Port
-//  <0=>PC4
-#define MCU_ADC_CH12_AF_PORT 0
-
-// <c1>Enable MSP ADC CH12 Driver
-//  <i>Enable MSP ADC CH12 Driver
-//#define ENABLE_MSP_ADC_CH12_DRIVER
-// </c>
-
-//! end of the MCU ADC CH12 Param Config
-// </h>
-
-// <h>MCU ADC CH13 Param Config
-//  <i>MCU ADC CH13 Param Config
-
-// <o>Set MCU ADC CH13 Port
-//  <0=>PC5
-#define MCU_ADC_CH13_AF_PORT 0
-
-// <c1>Enable MSP ADC CH13 Driver
-//  <i>Enable MSP ADC CH13 Driver
-//#define ENABLE_MSP_ADC_CH13_DRIVER
-// </c>
-
-//! end of the MCU ADC CH13 Param Config
-// </h>
-
-// <h>MCU ADC CH13 Param Config
-//  <i>MCU ADC CH13 Param Config
-
-// <o>Set MCU ADC CH14 Port
-//  <0=>PB0
-#define MCU_ADC_CH14_AF_PORT 0
-
-// <c1>Enable MSP ADC CH14 Driver
-//  <i>Enable MSP ADC CH14 Driver
-//#define ENABLE_MSP_ADC_CH14_DRIVER
-// </c>
-
-//! end of the MCU ADC CH14 Param Config
-// </h>
-
-// <h>MCU ADC CH15 Param Config
-//  <i>MCU ADC CH15 Param Config
-
-// <o>Set MCU ADC CH15 Port
-//  <0=>PB1
-#define MCU_ADC_CH15_AF_PORT 0
-
-// <c1>Enable MSP ADC CH15 Driver
-//  <i>Enable MSP ADC CH15 Driver
-//#define ENABLE_MSP_ADC_CH15_DRIVER
-// </c>
-
-//! end of the MCU ADC CH15 Param Config
-// </h>
-
-#if defined(ENABLE_MSP_ADC_CH1_DRIVER)     || defined(ENABLE_MSP_ADC_CH2_DRIVER)
-    || defined(ENABLE_MSP_ADC_CH3_DRIVER)  || defined(ENABLE_MSP_ADC_CH4_DRIVER)
-    || defined(ENABLE_MSP_ADC_CH5_DRIVER)  || defined(ENABLE_MSP_ADC_CH6_DRIVER)
-    || defined(ENABLE_MSP_ADC_CH7_DRIVER)  || defined(ENABLE_MSP_ADC_CH8_DRIVER)
-    || defined(ENABLE_MSP_ADC_CH9_DRIVER)  || defined(ENABLE_MSP_ADC_CH10_DRIVER)
-    || defined(ENABLE_MSP_ADC_CH11_DRIVER) || defined(ENABLE_MSP_ADC_CH12_DRIVER)
-    || defined(ENABLE_MSP_ADC_CH13_DRIVER) || defined(ENABLE_MSP_ADC_CH14_DRIVER)
-    || defined(ENABLE_MSP_ADC_CH15_DRIVER)
-#define ENABLE_MSP_ADC_DRIVER
-#endif
 
 //! end of the MCU ADC Param Config
 // </h>
@@ -855,10 +740,6 @@ extern "C"
 
 //! end of the MCU UART2 Param Config
 // </h>
-
-#if defined(ENABLE_MSP_UART1_DRIVER) || defined(ENABLE_MSP_UART2_DRIVER)
-#define ENABLE_MSP_UART_DRIVER
-#endif
 
 //! end of the MCU UART Param Config
 // </h>
@@ -1033,11 +914,6 @@ extern "C"
 
 //! end of the MCU SPI3 Param Config
 // </h>
-
-#if defined(ENABLE_MSP_SPI1_DRIVER) || defined(ENABLE_MSP_SPI2_DRIVER)
-    || defined(ENABLE_MSP_SPI3_DRIVER)
-#define ENABLE_MSP_SPI_DRIVER
-#endif
 
 //! end of the MCU SPI Param Config
 // </h>

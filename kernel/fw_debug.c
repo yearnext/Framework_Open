@@ -41,33 +41,191 @@
 /* Exported macro ------------------------------------------------------------*/
 /* Exported types ------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
-//! 日志缓存
-static char LogCache[256];
-
-static char *__paltform[] = { "Simulation", "N76E003", "NUC029", "Nano103", "STM32L05x", "STM32F1xx", "HC32L13x", "MIMXRT1052" };
+#ifdef ENABLE_FRAMEWORK_DEBUG
 static char *__version[] = { "Disable", "Nano", "Full" };
+#endif
 
 /* Exported variables --------------------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
 /* Exported functions --------------------------------------------------------*/
 /**
  *******************************************************************************
- * @brief       调试组件初始化函数
+ * @brief       控制台初始化函数
  * @param       [in/out]  void
  * @return      [in/out]  void
  * @note        由Fw_Core_Start调用
  *******************************************************************************
  */
-int Fwdbg_Component_Init(void)
+void Fw_Console_Init(void)
 {
 #ifdef __EVENT_RECORDER_H
     EventRecorderInitialize(EventRecordAll, 1);
     EventRecorderStart();
 #endif
-    
-    return 0;
+
+	//! 输出系统信息
+	Fw_Put_Info();
 }
-INIT_COMPONENT_EXPORT(Fwdbg_Component_Init);
+
+#ifdef ENABLE_FRAMEWORK_DEBUG
+/**
+ *******************************************************************************
+ * @brief       控制台输出函数
+ * @param       [in/out]  str     字符串
+ * @param       [in/out]  ...     拓展参数 
+ * @return      [in/out]  void
+ * @note        None
+ *******************************************************************************
+ */
+void Fw_Console_Put(char *str, ...)
+{
+    va_list ap;
+    
+    va_start(ap, str);
+    vprintf(str, ap);
+    va_end(ap);
+}
+
+/**
+ *******************************************************************************
+ * @brief       输出内核调试信息
+ * @param       [in/out]  str     输入字符串
+ * @param       [in/out]  ...     输入参数
+ * @return      [in/out]  void
+ * @note        None
+ *******************************************************************************
+ */
+void Fw_Core_Log(char *str, ...)
+{
+    char buf[128];
+    
+    va_list ap;
+    
+    va_start(ap, str);
+    vsprintf(buf, str, ap);
+    va_end(ap);
+    
+    Fw_Console_Put("[%d][CORE][LOG]%s\r\n", Fw_Tick_Get(), (char *)buf);
+}
+
+/**
+ *******************************************************************************
+ * @brief       输出内核调试信息
+ * @param       [in/out]  str     输入字符串
+ * @param       [in/out]  ...     输入参数
+ * @return      [in/out]  void
+ * @note        None
+ *******************************************************************************
+ */
+void Fw_Core_Error(char *str, ...)
+{
+    char buf[128];
+    
+    va_list ap;
+    
+    va_start(ap, str);
+    vsprintf(buf, str, ap);
+    va_end(ap);
+    
+    Fw_Console_Put("[%d][CORE][ERROR]%s\r\n", Fw_Tick_Get(), (char *)buf);
+}
+
+/**
+ *******************************************************************************
+ * @brief       输出内核调试信息
+ * @param       [in/out]  str     输入字符串
+ * @param       [in/out]  ...     输入参数
+ * @return      [in/out]  void
+ * @note        None
+ *******************************************************************************
+ */
+void Fw_Log(char *str, ...)
+{
+    char buf[128];
+    
+    va_list ap;
+    
+    va_start(ap, str);
+    vsprintf(buf, str, ap);
+    va_end(ap);
+    
+    Fw_Console_Put("[%d][LOG]%s\r\n", Fw_Tick_Get(), (char *)buf);
+}
+
+/**
+ *******************************************************************************
+ * @brief       输出内核调试信息
+ * @param       [in/out]  str     输入字符串
+ * @param       [in/out]  ...     输入参数
+ * @return      [in/out]  void
+ * @note        None
+ *******************************************************************************
+ */
+void Fw_Error(char *str, ...)
+{
+    char buf[128];
+    
+    va_list ap;
+    
+    va_start(ap, str);
+    vsprintf(buf, str, ap);
+    va_end(ap);
+    
+    Fw_Console_Put("[%d][ERROR]%s\r\n", Fw_Tick_Get(), (char *)buf);
+}
+#endif
+
+/**
+ *******************************************************************************
+ * @brief       获取MCU平台描述符
+ * @param       [in/out]  void
+ * @return      [in/out]  char*    描述字符串
+ * @note        None
+ *******************************************************************************
+ */
+char *Fw_Paltform_String(void)
+{
+    char *str;
+
+    switch (BOARD_PALTFORM)
+    {
+        case USE_PALTFORM_SIMULATION:
+            str = (char *)("Simulation");
+            break;
+        case USE_PALTFORM_N76E003:
+            str = (char *)("N76E003");
+            break;
+        case USE_PALTFORM_NUC029LAN:
+            str = (char *)("NUC029");
+            break;
+        case USE_PALTFORM_NANO103:
+            str = (char *)("Nano103");
+            break;
+        case USE_PALTFORM_STM8L05x:
+            str = (char *)("STM8L05x");
+            break;
+        case USE_PALTFORM_STM32L05x:
+            str = (char *)("STM32L05x");
+            break;
+        case USE_PALTFORM_STM32F1xx:
+            str = (char *)("STM32F1xx");
+            break;
+        case USE_PALTFORM_STM32L4xx:
+            str = (char *)("STM32L4xx");
+            break;
+        case USE_PALTFORM_HC32L13x:
+            str = (char *)("HC32L13x");
+            break;
+        case USE_PALTFORM_MIMXRT1052:
+            str = (char *)("MIMXRT1052");
+            break;        
+        default:
+            str = (char *)("Not Support Paltform");
+            break;
+    }
+    
+    return str;
+}
 
 #ifdef ENABLE_FRAMEWORK_DEBUG
 /**
@@ -104,102 +262,6 @@ void Fw_TimeTest_End(void)
 
 /**
  *******************************************************************************
- * @brief       内核输出日志API
- * @param       [in/out]  str     日志信息
- * @param       [in/out]  ...     日志参数
- * @return      [in/out]  void
- * @note        None
- *******************************************************************************
- */
-void Fw_Core_Log(char *str, ...)
-{
-	int len;
-
-	va_list ap;
-
-	va_start(ap, str);
-
-	len = sprintf((char *)&LogCache[0], "[%d][core][log]", Fw_Tick_Get());
-	len += vsprintf((char *)&LogCache[len], str, ap);
-	len += sprintf((char *)&LogCache[len], " \r\n");
-
-	va_end(ap);
-
-	printf("%s", LogCache);
-}
-
-/**
- *******************************************************************************
- * @brief       内核输出错误API
- * @param       [in/out]  str     日志信息
- * @param       [in/out]  ...     日志参数
- * @return      [in/out]  void
- * @note        None
- *******************************************************************************
- */
-void Fw_Core_Error(char *str, ...)
-{
-	int len;
-
-	va_list ap;
-
-	va_start(ap, str);
-
-	len = sprintf((char *)&LogCache[0], "[%d][core][error]", Fw_Tick_Get());
-	len += vsprintf((char *)&LogCache[len], str, ap);
-	len += sprintf((char *)&LogCache[len], " \r\n");
-
-	va_end(ap);
-
-	printf("%s", LogCache);
-}
-
-/**
- *******************************************************************************
- * @brief       日志输出API
- * @param       [in/out]  str     日志信息
- * @param       [in/out]  ...     日志参数
- * @return      [in/out]  void
- * @note        None
- *******************************************************************************
- */
-void Fw_Log(char *str, ...)
-{
-	int len;
-
-	va_list ap;
-
-	va_start(ap, str);
-	len = vsprintf((char *)&LogCache[0], str, ap);
-	va_end(ap);
-
-	printf("%s", LogCache);
-}
-
-/**
- *******************************************************************************
- * @brief       错误输出API
- * @param       [in/out]  str     日志信息
- * @param       [in/out]  ...     日志参数
- * @return      [in/out]  void
- * @note        None
- *******************************************************************************
- */
-void Fw_Error(char *str, ...)
-{
-	int len;
-
-	va_list ap;
-
-	va_start(ap, str);
-	len = vsprintf((char *)&LogCache[0], str, ap);
-	va_end(ap);
-
-	printf("%s", LogCache);
-}
-
-/**
- *******************************************************************************
  * @brief       当前时间转字符串API
  * @param       [in/out]  void
  * @return      [in/out]  void
@@ -232,7 +294,7 @@ char *Fw_Time_To_Str(uint8_t level)
 	
 	return &localTime[0];
 #else
-	return "0000-00-00 00:00:00.000"
+	return "0000-00-00 00:00:00.000";
 #endif
 }
 
@@ -246,14 +308,15 @@ char *Fw_Time_To_Str(uint8_t level)
  */
 void Fw_Put_Info(void)
 {
-	Fw_Log("\n* Framework(%s Version)\r\n", __version[USE_FRAMEWORK_VERSION]);
-	Fw_Log("* Author: Accumulate Team\r\n");
-	Fw_Log("* Version: %s\r\n", FRAMEWORK_SOFT_VERSION);
-	Fw_Log("* Build Time: %s\r\n", FRAMEWORK_BUILD_DATE);
-	Fw_Log("* Paltform: %s\r\n", __paltform[BOARD_PALTFORM]);
-	Fw_Log("* Start Time: %s\r\n\r\n", Fw_Time_To_Str(FW_TIME_2_STR_ALL));
+	Fw_Console_Put("\n* Framework(%s Version)\r\n", __version[USE_FRAMEWORK_VERSION]);
+	Fw_Console_Put("* Author: Accumulate Team\r\n");
+	Fw_Console_Put("* Version: %s\r\n", FRAMEWORK_SOFT_VERSION);
+	Fw_Console_Put("* Build Time: %s\r\n", FRAMEWORK_BUILD_DATE);
+	Fw_Console_Put("* Paltform: %s\r\n", Fw_Paltform_String());
+	Fw_Console_Put("* Start Time: %s\r\n", Fw_Time_To_Str(FW_TIME_2_STR_ALL));
 }
 
+#ifdef FRAMEWORK_VERSION_FULL
 /**
  *******************************************************************************
  * @brief       输出任务列表API
@@ -271,25 +334,25 @@ void Fw_Put_Task_List(void)
 	for (i = 0; i < _dimof(FwCore.ActiveTable); i++)
 	{
 		p = FwCore.ActiveTable[i].Next;
-		Fw_Log("FwCore Task List(Priority %d): \r\n", i);	
+		Fw_Console_Put("FwCore Task List(Priority %d): \r\n", i);	
 
 		if (p == &FwCore.ActiveTable[i])
 		{
-			Fw_Log("FwCore Task List(Priority %d) Is Empty \r\n\r\n", i);
+			Fw_Console_Put("FwCore Task List(Priority %d) Is Empty \r\n\r\n", i);
 
 			continue ;
 		}
 
-		Fw_Log("[Head] -> ");
+		Fw_Console_Put("[Head] -> ");
 
 		for (; p != &FwCore.ActiveTable[i]; p = p->Next)
 		{
 			task = FwListEntry(p, FwTask_t, List);
 
-			Fw_Log("%s -> ", task->Name);
+			Fw_Console_Put("%s -> ", task->Name);
 		}
 
-		Fw_Log("[End] \r\n\r\n");
+		Fw_Console_Put("[End] \r\n\r\n");
 	}
 }
 
@@ -306,26 +369,27 @@ void Fw_Put_Timer_List(void)
 	FwTimer_t *timer;
 	FwList_t *p = FwTimer.List.Next;
 
-	Fw_Log("[%d]Framework Put Timer List: \r\n", Fw_Tick_Get());
+	Fw_Console_Put("[%d]Framework Put Timer List: \r\n", Fw_Tick_Get());
 
 	if (p == &FwTimer.List)
 	{
-		Fw_Log("Framework Timer List Is Empty \r\n");
+		Fw_Console_Put("Framework Timer List Is Empty \r\n");
 
 		return;
 	}
 
-	Fw_Log("[Head] -> ");
+	Fw_Console_Put("[Head] -> ");
 
 	for (; p != &FwTimer.List; p = p->Next)
 	{
 		timer = FwListEntry(p, FwTimer_t, List);
 
-		Fw_Log("%s(%d Ticks) -> ", timer->Name, timer->Tick);
+		Fw_Console_Put("%s(%d Ticks) -> ", timer->Name, timer->Tick);
 	}
 
-	Fw_Log("[End] \r\n\r\n");
+	Fw_Console_Put("[End] \r\n\r\n");
 }
+#endif
 
 /**
  *******************************************************************************
@@ -365,7 +429,7 @@ void Fw_Event_General(void)
  */
 void Fw_Timer_Test(void)
 {
-#if defined(ENABLE_FRAMEWORK_TIMER_DEBUG)
+#ifdef ENABLE_FRAMEWORK_TIMER_DEBUG
     //! 定时器句柄
     //! 压力测试用
     static Fw_Timer_t DemoTimer[20];

@@ -44,7 +44,70 @@
 /* Private variables ---------------------------------------------------------*/
 /* Exported variables --------------------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
+static uint32_t FwIsrLock = 0;
+
 /* Exported functions --------------------------------------------------------*/
+/**
+ *******************************************************************************
+ * @brief       Server组件初始化
+ * @param       [in/out]  void
+ * @return      [in/out]  void
+ * @note        由用户调用
+ *******************************************************************************
+ */
+void Fw_Server_Init(void)
+{
+    FwIsrLock = 0;   
+}
+
+/**
+ *******************************************************************************
+ * @brief       进入临界点函数
+ * @param       [in/out]  void
+ * @return      [in/out]  void
+ * @note        由用户调用
+ *******************************************************************************
+ */
+__INLINE
+void Fw_Enter_Critical(void)
+{
+    if (FwIsrLock == 0)
+    {
+        __DISABLE_ALL_ISR();
+
+        FwIsrLock++;
+    }
+    else 
+    {
+        if (FwIsrLock < 0xFFFF)
+        {
+            FwIsrLock++;
+        }
+    }
+}
+
+/**
+ *******************************************************************************
+ * @brief       退出临界点函数
+ * @param       [in/out]  void
+ * @return      [in/out]  void
+ * @note        由用户调用
+ *******************************************************************************
+ */
+__INLINE
+void Fw_Exit_Critical(void)
+{
+    if (FwIsrLock)
+    {
+        FwIsrLock --;
+        
+        if (FwIsrLock == 0)
+        {
+            __ENABLE_ALL_ISR();
+        }
+    }
+}
+
 /**
  *******************************************************************************
  * @brief        Framework Buffer Component
@@ -61,7 +124,7 @@
  *******************************************************************************
  */
 __INLINE
-void FwBuf_Init(FwBuf_t *fifo, void *buf, uint16_t len)
+void FwBufInit(FwBuf_t *fifo, void *buf, uint16_t len)
 {
     fifo->Buffer = (uint8_t *)buf;
     fifo->Len    = len;
@@ -80,7 +143,7 @@ void FwBuf_Init(FwBuf_t *fifo, void *buf, uint16_t len)
  *******************************************************************************
  */
 __INLINE
-void FwBuf_Fini(FwBuf_t *fifo)
+void FwBufFini(FwBuf_t *fifo)
 {
     fifo->Buffer = NULL;
     fifo->Size   = 0;
@@ -98,7 +161,7 @@ void FwBuf_Fini(FwBuf_t *fifo)
  *******************************************************************************
  */
 __INLINE
-void FwBuf_SetEmpty(FwBuf_t *fifo)
+void FwBufSetEmpty(FwBuf_t *fifo)
 {
     fifo->Head   = 0;
     fifo->Tail   = 0;
@@ -115,7 +178,7 @@ void FwBuf_SetEmpty(FwBuf_t *fifo)
  *******************************************************************************
  */
 __INLINE
-uint16_t FwBuf_Len(FwBuf_t *fifo)
+uint16_t FwBufLen(FwBuf_t *fifo)
 {
     return fifo->Len;
 }
@@ -131,7 +194,7 @@ uint16_t FwBuf_Len(FwBuf_t *fifo)
 #define BUFFER_USED(b) ((b)->Size)
 
 __INLINE 
-uint16_t FwBuf_Used(FwBuf_t *fifo)
+uint16_t FwBufUsed(FwBuf_t *fifo)
 {
     return BUFFER_USED(fifo);
 }
@@ -147,7 +210,7 @@ uint16_t FwBuf_Used(FwBuf_t *fifo)
 #define BUFFER_FREE(b) ((b)->Len - (b)->Size - 1)
 
 __INLINE 
-uint16_t FwBuf_Free(FwBuf_t *fifo)
+uint16_t FwBufFree(FwBuf_t *fifo)
 {
     return BUFFER_FREE(fifo);
 }
@@ -163,7 +226,7 @@ uint16_t FwBuf_Free(FwBuf_t *fifo)
  *******************************************************************************
  */
 __INLINE
-uint16_t FwBuf_Write(FwBuf_t *fifo, uint8_t *buf, uint16_t len)
+uint16_t FwBufWrite(FwBuf_t *fifo, uint8_t *buf, uint16_t len)
 {
     uint16_t free = 0;
     uint16_t i = 0;
@@ -220,7 +283,7 @@ uint16_t FwBuf_Write(FwBuf_t *fifo, uint8_t *buf, uint16_t len)
  *******************************************************************************
  */
 __INLINE 
-uint16_t FwBuf_WriteByte(FwBuf_t *fifo, uint8_t wrByte)
+uint16_t FwBufWriteByte(FwBuf_t *fifo, uint8_t wrByte)
 {
     if (IS_PTR_NULL(fifo) || IS_PTR_NULL(fifo->Buffer))
     {
@@ -257,7 +320,7 @@ uint16_t FwBuf_WriteByte(FwBuf_t *fifo, uint8_t wrByte)
  *******************************************************************************
  */
 __INLINE
-uint16_t FwBuf_Read(FwBuf_t *fifo, uint8_t *buf, uint16_t len)
+uint16_t FwBufRead(FwBuf_t *fifo, uint8_t *buf, uint16_t len)
 {
     uint16_t free;
     uint16_t i;
@@ -314,7 +377,7 @@ uint16_t FwBuf_Read(FwBuf_t *fifo, uint8_t *buf, uint16_t len)
  *******************************************************************************
  */
 __INLINE 
-uint16_t FwBuf_ReadByte(FwBuf_t *fifo)
+uint16_t FwBufReadByte(FwBuf_t *fifo)
 {
     uint8_t retData;
     
@@ -348,7 +411,7 @@ uint16_t FwBuf_ReadByte(FwBuf_t *fifo)
  *******************************************************************************
  */
 __INLINE 
-uint16_t FwBuf_ReadMirror(FwBuf_t *fifo, uint8_t *buf, uint16_t len)
+uint16_t FwBufReadMirror(FwBuf_t *fifo, uint8_t *buf, uint16_t len)
 {
     uint16_t free = 0;
     uint16_t i = 0;
@@ -404,7 +467,7 @@ uint16_t FwBuf_ReadMirror(FwBuf_t *fifo, uint8_t *buf, uint16_t len)
  *******************************************************************************
  */
 __INLINE
-uint16_t FwBuf_ReadMirrorByte(FwBuf_t *fifo, uint16_t cursor)
+uint16_t FwBufReadMirrorByte(FwBuf_t *fifo, uint16_t cursor)
 {
     uint16_t max = BUFFER_USED(fifo);
     uint16_t pos = fifo->Head + cursor;
@@ -443,7 +506,7 @@ uint16_t FwBuf_ReadMirrorByte(FwBuf_t *fifo, uint16_t cursor)
  *******************************************************************************
  */
 __INLINE 
-void FwQueue_Init(FwQueue_t *queue, uint8_t *buf, uint16_t len)
+void FwQueueInit(FwQueue_t *queue, uint8_t *buf, uint16_t len)
 {
     queue->Buffer = buf;
 	queue->Len    = len;
@@ -460,7 +523,7 @@ void FwQueue_Init(FwQueue_t *queue, uint8_t *buf, uint16_t len)
  *******************************************************************************
  */
 __INLINE 
-void FwQueue_Fini(FwQueue_t *queue)
+void FwQueueFini(FwQueue_t *queue)
 {
     queue->Buffer = NULL;
 	queue->Len    = 0;
@@ -479,7 +542,7 @@ void FwQueue_Fini(FwQueue_t *queue)
  *******************************************************************************
  */
 __INLINE 
-uint16_t FwQueue_Write(FwQueue_t *queue, uint8_t *buf, uint16_t len)
+uint16_t FwQueueWrite(FwQueue_t *queue, uint8_t *buf, uint16_t len)
 {
 	uint16_t freeSize = queue->Len - queue->Tail - 1;
 
@@ -506,7 +569,7 @@ uint16_t FwQueue_Write(FwQueue_t *queue, uint8_t *buf, uint16_t len)
  *******************************************************************************
  */
 __INLINE 
-uint16_t FwQueue_Read(FwQueue_t *queue, uint8_t *buf, uint16_t len)
+uint16_t FwQueueRead(FwQueue_t *queue, uint8_t *buf, uint16_t len)
 {
 	uint16_t useSize = queue->Tail - queue->Head;
 
@@ -530,7 +593,7 @@ uint16_t FwQueue_Read(FwQueue_t *queue, uint8_t *buf, uint16_t len)
  * @note        None
  *******************************************************************************
  */
-__INLINE uint16_t FwQueue_Free(FwQueue_t *queue)
+__INLINE uint16_t FwQueueFree(FwQueue_t *queue)
 {
 	return queue->Len - queue->Tail - 1;
 }
@@ -544,7 +607,7 @@ __INLINE uint16_t FwQueue_Free(FwQueue_t *queue)
  *******************************************************************************
  */
 __INLINE
-uint16_t FwQueue_Used(FwQueue_t *queue)
+uint16_t FwQueueUsed(FwQueue_t *queue)
 {
 	return queue->Tail - queue->Head;
 }
@@ -564,7 +627,7 @@ uint16_t FwQueue_Used(FwQueue_t *queue)
  *******************************************************************************
  */
 __INLINE
-void FwSList_Init(FwSList_t *list)
+void FwSListInit(FwSList_t *list)
 {
     list->Next = NULL;
 }
@@ -579,7 +642,7 @@ void FwSList_Init(FwSList_t *list)
  *******************************************************************************
  */
 __INLINE
-void FwSList_Append(FwSList_t *list, FwSList_t *node)
+void FwSListAppend(FwSList_t *list, FwSList_t *node)
 {
 	FwSList_t *cur = list;
 
@@ -602,7 +665,7 @@ void FwSList_Append(FwSList_t *list, FwSList_t *node)
  *******************************************************************************
  */
 __INLINE
-void FwSList_Insert(FwSList_t *list, FwSList_t *node)
+void FwSListInsert(FwSList_t *list, FwSList_t *node)
 {
 	node->Next = list->Next;
 	list->Next = node;
@@ -618,7 +681,7 @@ void FwSList_Insert(FwSList_t *list, FwSList_t *node)
  *******************************************************************************
  */
 __INLINE
-void FwSList_Remove(FwSList_t *list, FwSList_t *node)
+void FwSListRemove(FwSList_t *list, FwSList_t *node)
 {
     FwSList_t *cur = list;
 
@@ -643,7 +706,7 @@ void FwSList_Remove(FwSList_t *list, FwSList_t *node)
  *******************************************************************************
  */
 __INLINE
-FwSList_t *FwSList_Tail(FwSList_t *list)
+FwSList_t *FwSListTail(FwSList_t *list)
 {
 	for (; list->Next != NULL; list = list->Next);
 
@@ -660,7 +723,7 @@ FwSList_t *FwSList_Tail(FwSList_t *list)
  *******************************************************************************
  */
 __INLINE
-uint8_t FwSList_IsEmpty(FwSList_t *list)
+uint8_t FwSListIsEmpty(FwSList_t *list)
 {
 	return (list->Next == NULL);
 }
@@ -674,11 +737,11 @@ uint8_t FwSList_IsEmpty(FwSList_t *list)
  *******************************************************************************
  */
 __INLINE
-int FwSList_Len(FwSList_t *list)
+int FwSListLen(FwSList_t *list)
 {
-    int len = 0;
+    int len;
 
-	for (; list->Next != NULL; list = list->Next, len ++);
+	for (len = 0; list->Next != NULL; list = list->Next, len ++);
 
     return len;
 }
@@ -697,7 +760,7 @@ int FwSList_Len(FwSList_t *list)
  *******************************************************************************
  */
 __INLINE
-void FwList_Init(FwList_t *list)
+void FwListInit(FwList_t *list)
 {
 	list->Next = list;
 	list->Prev = list;
@@ -713,7 +776,7 @@ void FwList_Init(FwList_t *list)
  *******************************************************************************
  */
 __INLINE
-void FwList_InsertAfter(FwList_t *list, FwList_t *node)
+void FwListInsertAfter(FwList_t *list, FwList_t *node)
 {
 	//! N插入在L之后
 	list->Next->Prev = node;
@@ -733,7 +796,7 @@ void FwList_InsertAfter(FwList_t *list, FwList_t *node)
  *******************************************************************************
  */
 __INLINE
-void FwList_InsertBefore(FwList_t *list, FwList_t *node)
+void FwListInsertBefore(FwList_t *list, FwList_t *node)
 {
 	//! N插入在L之前
 	list->Prev->Next = node;
@@ -752,7 +815,7 @@ void FwList_InsertBefore(FwList_t *list, FwList_t *node)
  *******************************************************************************
  */
 __INLINE
-void FwList_Remove(FwList_t *list)
+void FwListRemove(FwList_t *list)
 {
 	list->Next->Prev = list->Prev;
 	list->Prev->Next = list->Next;
@@ -770,11 +833,11 @@ void FwList_Remove(FwList_t *list)
  *******************************************************************************
  */
 __INLINE
-FwList_t *FwList_DeleteAfter(FwList_t *list)
+FwList_t *FwListDeleteAfter(FwList_t *list)
 {
 	FwList_t *result = list->Next;
 
-	FwList_Remove(result);
+	FwListRemove(result);
 
 	return (result == list) ? (NULL) : (result);
 }
@@ -789,7 +852,7 @@ FwList_t *FwList_DeleteAfter(FwList_t *list)
  *******************************************************************************
  */
 __INLINE
-uint8_t FwList_IsEmpty(FwList_t *list)
+uint8_t FwListIsEmpty(FwList_t *list)
 {
 	return (list->Next == list);
 }
@@ -805,7 +868,7 @@ uint8_t FwList_IsEmpty(FwList_t *list)
  *******************************************************************************
  */
 __INLINE
-uint8_t FwList_IsLife(FwList_t *list, FwList_t *node)
+uint8_t FwListIsLife(FwList_t *list, FwList_t *node)
 {
     FwList_t *p = list;
     
@@ -831,7 +894,7 @@ uint8_t FwList_IsLife(FwList_t *list, FwList_t *node)
  *******************************************************************************
  */
 __INLINE
-int FwList_Len(FwList_t *list)
+int FwListLen(FwList_t *list)
 {
 	int len = 0;
 	FwList_t *p = list;

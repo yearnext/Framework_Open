@@ -73,17 +73,9 @@ void SystemClock_Config(void)
     LL_RCC_SetAPB1Prescaler(LL_RCC_APB1_DIV_1);
     LL_RCC_SetAPB2Prescaler(LL_RCC_APB2_DIV_1);
     
-    SysTick_Config(MCU_CLK_FREQUENCE/MCU_SYSTICK_FREQUENCE);
+    LL_Init1msTick(MCU_CLK_FREQUENCE);
     LL_SYSTICK_SetClkSource(LL_SYSTICK_CLKSOURCE_HCLK);
-    NVIC_EnableIRQ(SysTick_IRQn);
-    NVIC_SetPriority(SysTick_IRQn, 0);
-    
     LL_SetSystemCoreClock(MCU_CLK_FREQUENCE);
-    
-#ifdef ENABLE_MSP_ADC_DRIVER
-    //! …Ë÷√ADC ±÷”‘¥
-    LL_RCC_SetADCClockSource(LL_RCC_ADC_CLKSOURCE_PLLSAI1);
-#endif
 }
 
 /* Exported functions --------------------------------------------------------*/
@@ -99,14 +91,6 @@ int MSP_Init(void)
 
 #if defined(ENABLE_HAL_GPIO_DRIVER)
     MSP_GPIO_Init();
-#endif
-
-#if defined(ENABLE_HAL_ADC_DRIVER)    
-    MSP_ADC_Init();
-#endif
-    
-#if defined(ENABLE_MSP_WDG_DRIVER)
-    MSP_WDG_Init();
 #endif
     
     return 0;

@@ -24,13 +24,13 @@
  *                 GCC                                                         *
  *******************************************************************************
  * @note                                                                       *
- * 1.20170110 ´´½¨ÎÄ¼þ ÎÄ¼þÃû:fw_debug.c                                       *
- * 2.20171106 ºÏ²¢fw_stream.c×é¼þÄÚÈÝ£¬ÊµÏÖ´®¿ÚÁ÷¿Ø£¬¿çÆ½Ì¨¿ØÖÆ                *
- *            ¸üÃûÎªHAL_SERIAL.c                                               *
- * 3.20180423 Í³Ò»Ó²¼þ³éÏó²ã£¬ÐÞ¸ÄÓ²¼þµ×²ãÇý¶¯(²Î¿¼RT-THREAD)                  *
- *            Ö§³Ö¶àÖÖUARTÄ£Ê½                                                 *
- * 4.20180804 ÐÞ¸ÄÎÄ¼þÃû£¬½«HAL_SERIAL.cÐÞ¸ÄÎªHAL_SERIAL.c                     *
- * 5.20180815 ²¨ÌØÂÊ115200ÏÂÍ¨¹ýÑ¹Á¦²âÊÔ(Ã¿¸ô10MS·¢ËÍ"Hello World!")           *
+ * 1.20170110 åˆ›å»ºæ–‡ä»¶ æ–‡ä»¶å:fw_debug.c                                       *
+ * 2.20171106 åˆå¹¶fw_stream.cç»„ä»¶å†…å®¹ï¼Œå®žçŽ°ä¸²å£æµæŽ§ï¼Œè·¨å¹³å°æŽ§åˆ¶                *
+ *            æ›´åä¸ºHAL_SERIAL.c                                               *
+ * 3.20180423 ç»Ÿä¸€ç¡¬ä»¶æŠ½è±¡å±‚ï¼Œä¿®æ”¹ç¡¬ä»¶åº•å±‚é©±åŠ¨(å‚è€ƒRT-THREAD)                  *
+ *            æ”¯æŒå¤šç§UARTæ¨¡å¼                                                 *
+ * 4.20180804 ä¿®æ”¹æ–‡ä»¶åï¼Œå°†HAL_SERIAL.cä¿®æ”¹ä¸ºHAL_SERIAL.c                     *
+ * 5.20180815 æ³¢ç‰¹çŽ‡115200ä¸‹é€šè¿‡åŽ‹åŠ›æµ‹è¯•(æ¯éš”10MSå‘é€"Hello World!")           *
  *******************************************************************************
  */
  
@@ -46,7 +46,7 @@
 /* Private define ------------------------------------------------------------*/
 /**
  *******************************************************************************
- * @brief       serial×é¼þÏà¹Ø²Ù×÷ºê
+ * @brief       serialç»„ä»¶ç›¸å…³æ“ä½œå®
  *******************************************************************************
  */
 #if 0
@@ -77,43 +77,52 @@ struct HAL_DRIVER_SERIAL
 #ifdef ENABLE_HAL_SERIAL_DRIVER
 /**
  *******************************************************************************
- * @brief       SERIAL ·¢ËÍ´¦Àíº¯Êý
- * @param       [in/out]  serial    Éè±¸¾ä±ú
+ * @brief       SERIAL å‘é€å¤„ç†å‡½æ•°
+ * @param       [in/out]  serial    è®¾å¤‡å¥æŸ„
  * @param       [in/out]  void
- * @return      [in/out]  ¼ÆËã½á¹û
+ * @return      [in/out]  è®¡ç®—ç»“æžœ
  * @note        None
  *******************************************************************************
  */
 __STATIC_INLINE
-void Serial_Send_Handle(HAL_Serial_t *serial)
+uint8_t Serial_Send_Handle(HAL_Serial_t *serial)
 {
+    if (serial->Tx.State != HAL_SERIAL_IDLE)
+    {
+        return 0;
+    }
+    
     HAL_Atom_Begin();
 
     FwBuf_t *fifo = &serial->Tx.Fifo;
-    uint16_t ch;
 
-    //! Ê¹ÄÜ·¢ËÍ»úÖÆ
-    if (serial->Tx.State == HAL_SERIAL_TX_IDLE)
+    if (fifo->Head != fifo->Tail)
     {
-        ch = FwBuf_ReadByte(fifo);
+        char ch = fifo->Buffer[fifo->Head++];
 
-        if (ch != 0xFFFF)
+        fifo->Size --;
+
+        if (fifo->Head >= fifo->Len)
         {
-            Serial_PutChar(serial, ch);
+            fifo->Head = 0;
         }
+
+        Serial_PutChar(serial, ch);
     }
 
     HAL_Atom_End();
+    
+    return 1;
 }
 
 /**
  *******************************************************************************
- * @brief       SERIAL Éè±¸×¢²áº¯Êý
- * @param       [in/out]  name       Éè±¸Ãû³Æ
- * @param       [in/out]  ops        Éè±¸µ×²ã²Ù×÷½Ó¿Ú
- * @param       [in/out]  flag       Éè±¸ÅäÖÃ²ÎÊý
- * @param       [in/out]  userData   ÓÃ»§Êý¾Ý
- * @return      [in/out]  ÅäÖÃ½á¹û
+ * @brief       SERIAL è®¾å¤‡æ³¨å†Œå‡½æ•°
+ * @param       [in/out]  name       è®¾å¤‡åç§°
+ * @param       [in/out]  ops        è®¾å¤‡åº•å±‚æ“ä½œæŽ¥å£
+ * @param       [in/out]  flag       è®¾å¤‡é…ç½®å‚æ•°
+ * @param       [in/out]  userData   ç”¨æˆ·æ•°æ®
+ * @return      [in/out]  é…ç½®ç»“æžœ
  * @note        None
  *******************************************************************************
  */
@@ -146,10 +155,10 @@ void HAL_Serial_Register(HAL_Serial_Interface_t *ops, void *userData)
 
 /**
  *******************************************************************************
- * @brief       UART Çý¶¯³õÊ¼»¯
- * @param       [in/out]  serial    Éè±¸¾ä±ú
- * @param       [in/out]  config    ÅäÖÃ²ÎÊý
- * @return      [in/out]  ÅäÖÃ½á¹û
+ * @brief       UART é©±åŠ¨åˆå§‹åŒ–
+ * @param       [in/out]  serial    è®¾å¤‡å¥æŸ„
+ * @param       [in/out]  config    é…ç½®å‚æ•°
+ * @return      [in/out]  é…ç½®ç»“æžœ
  * @note        None
  *******************************************************************************
  */
@@ -157,9 +166,9 @@ void HAL_Serial_Init(HAL_Serial_t *serial, HAL_Serial_Config_t *config)
 {
     memset(serial, 0, sizeof(HAL_Serial_t));
 
-    FwBuf_Init(&serial->Tx.Fifo, config->Buffer.Tx, config->Buffer.TxLen);
-    FwBuf_Init(&serial->Rx.Fifo, config->Buffer.Rx, config->Buffer.RxLen);
-    
+    FwBufInit(&serial->Tx.Fifo, config->Buffer.Tx, config->Buffer.TxLen);
+    FwBufInit(&serial->Rx.Fifo, config->Buffer.Rx, config->Buffer.RxLen);
+
     serial->Attribute.Port = config->Attribute.Port;
 
     serial->Tx.State   = HAL_SERIAL_INIT;
@@ -170,13 +179,13 @@ void HAL_Serial_Init(HAL_Serial_t *serial, HAL_Serial_Config_t *config)
     
     serial->Dev        = &DeviceSerial.Parent;
     
-    //! ³õÊ¼»¯Ó²¼þ
+    //! åˆå§‹åŒ–ç¡¬ä»¶
     if (!IS_PTR_NULL(DeviceSerial.Ops.Config))
     {
         DeviceSerial.Ops.Config(serial, config);
     }
     
-    //! ×¢²áÉè±¸Çý¶¯»Øµ÷    
+    //! æ³¨å†Œè®¾å¤‡é©±åŠ¨å›žè°ƒ    
     Serial_Callback callback = {.Callback = HAL_Serial_Isr_Handle, .Param = (void *)serial};
     
     if (!IS_PTR_NULL(DeviceSerial.Ops.Control))
@@ -184,85 +193,91 @@ void HAL_Serial_Init(HAL_Serial_t *serial, HAL_Serial_Config_t *config)
         DeviceSerial.Ops.Control(serial, HAL_SET_CALLBACK_CMD, (void *)&callback);
     }
 
-    //! ÅäÖÃÎ»¼ì²â
+    //! é…ç½®ä½æ£€æµ‹
     HAL_Serial_EnableTx(serial);
     HAL_Serial_EnableRx(serial);
 }
 
 /**
  *******************************************************************************
- * @brief       UART Ê¹ÄÜ·¢ËÍ×é¼þ
- * @param       [in/out]  serial     Éè±¸¾ä±ú
+ * @brief       UART ä½¿èƒ½å‘é€ç»„ä»¶
+ * @param       [in/out]  serial     è®¾å¤‡å¥æŸ„
  * @return      [in/out]  void
  * @note        None
  *******************************************************************************
  */
 void HAL_Serial_EnableTx(HAL_Serial_t *serial)
 {
-    serial->Tx.State = HAL_SERIAL_TX_IDLE;
-    
-    FwBuf_SetEmpty(&serial->Tx.Fifo);
+    if (serial->Tx.State == HAL_SERIAL_INIT || serial->Tx.State == HAL_SERIAL_SLEEP)
+    {
+		serial->Tx.State = HAL_SERIAL_IDLE;
+
+        FwBufSetEmpty(&serial->Tx.Fifo);
+    }
 }
 
 /**
  *******************************************************************************
- * @brief       UART ½ûÓÃ·¢ËÍ×é¼þ
- * @param       [in/out]  serial    Éè±¸¾ä±ú
+ * @brief       UART ç¦ç”¨å‘é€ç»„ä»¶
+ * @param       [in/out]  serial    è®¾å¤‡å¥æŸ„
  * @return      [in/out]  void
  * @note        None
  *******************************************************************************
  */
 void HAL_Serial_DisableTx(HAL_Serial_t *serial)
 {
-    serial->Tx.State = HAL_SERIAL_TX_SLEEP;
+    serial->Tx.State = HAL_SERIAL_SLEEP;
     
-    FwBuf_SetEmpty(&serial->Tx.Fifo);
+    FwBufSetEmpty(&serial->Tx.Fifo);
 }
 
 /**
  *******************************************************************************
- * @brief       UART Ê¹ÄÜ½ÓÊÕ×é¼þ
- * @param       [in/out]  serial    Éè±¸¾ä±ú
+ * @brief       UART ä½¿èƒ½æŽ¥æ”¶ç»„ä»¶
+ * @param       [in/out]  serial    è®¾å¤‡å¥æŸ„
  * @return      [in/out]  void
  * @note        None
  *******************************************************************************
  */
 void HAL_Serial_EnableRx(HAL_Serial_t *serial)
 {
-    serial->Rx.State = HAL_SERIAL_RX_IDLE;
+    if (serial->Rx.State == HAL_SERIAL_INIT || serial->Rx.State == HAL_SERIAL_SLEEP)
+    {
+        serial->Rx.State = HAL_SERIAL_IDLE;
     
-    FwBuf_SetEmpty(&serial->Rx.Fifo);
+        FwBufSetEmpty(&serial->Rx.Fifo);
+    }
 }
 
 /**
  *******************************************************************************
- * @brief       UART ½ûÓÃ½ÓÊÕ×é¼þ
- * @param       [in/out]  serial    Éè±¸¾ä±ú
+ * @brief       UART ç¦ç”¨æŽ¥æ”¶ç»„ä»¶
+ * @param       [in/out]  serial    è®¾å¤‡å¥æŸ„
  * @return      [in/out]  void
  * @note        None
  *******************************************************************************
  */
 void HAL_Serial_DisableRx(HAL_Serial_t *serial)
 {
-    serial->Rx.State = HAL_SERIAL_RX_SLEEP;
+    serial->Rx.State = HAL_SERIAL_SLEEP;
     
-    FwBuf_SetEmpty(&serial->Rx.Fifo);
+    FwBufSetEmpty(&serial->Rx.Fifo);
 }
 
 /**
  *******************************************************************************
- * @brief       ¼ì²â UART ·¢ËÍÊÇ·ñÍê³É
- * @param       [in/out]  serial    Éè±¸¾ä±ú
- * @return      [in/out]  0         ·¢ËÍÖÐ
- * @return      [in/out]  1         ·¢ËÍÍê³É
+ * @brief       æ£€æµ‹ UART å‘é€æ˜¯å¦å®Œæˆ
+ * @param       [in/out]  serial    è®¾å¤‡å¥æŸ„
+ * @return      [in/out]  0         å‘é€ä¸­
+ * @return      [in/out]  1         å‘é€å®Œæˆ
  * @note        None
  *******************************************************************************
  */
 uint16_t HAL_Serial_IsTxDone(HAL_Serial_t *serial)
 {
-    if (serial->Tx.State == HAL_SERIAL_TX_SLEEP)
+    if (serial->Tx.State == HAL_SERIAL_DONE)
     {
-        serial->Tx.State = HAL_SERIAL_TX_IDLE;
+        serial->Tx.State = HAL_SERIAL_IDLE;
         
         return 1;
     }
@@ -272,18 +287,18 @@ uint16_t HAL_Serial_IsTxDone(HAL_Serial_t *serial)
 
 /**
  *******************************************************************************
- * @brief       ¼ì²â UART ½ÓÊÕÊÇ·ñÍê³É
- * @param       [in/out]  serial    Éè±¸¾ä±ú
- * @return      [in/out]  0         ½ÓÊÕÖÐ
- * @return      [in/out]  1         ½ÓÊÕÍê³É
+ * @brief       æ£€æµ‹ UART æŽ¥æ”¶æ˜¯å¦å®Œæˆ
+ * @param       [in/out]  serial    è®¾å¤‡å¥æŸ„
+ * @return      [in/out]  0         æŽ¥æ”¶ä¸­
+ * @return      [in/out]  1         æŽ¥æ”¶å®Œæˆ
  * @note        None
  *******************************************************************************
  */
 uint16_t HAL_Serial_IsRxDone(HAL_Serial_t *serial)
 {
-    if (serial->Rx.State == HAL_SERIAL_RX_BUSY)
+    if (serial->Rx.State == HAL_SERIAL_DONE)
     {
-        serial->Rx.State = HAL_SERIAL_RX_IDLE;
+        serial->Rx.State = HAL_SERIAL_IDLE;
         
         return 1;
     }
@@ -293,11 +308,11 @@ uint16_t HAL_Serial_IsRxDone(HAL_Serial_t *serial)
 
 /**
  *******************************************************************************
- * @brief       UART Êä³ö×Ö·û
- * @param       [in/out]  serial    Éè±¸¾ä±ú
- * @param       [in/out]  c         ·¢ËÍµÄ×Ö·û
- * @return      [in/out]  0         Êä³öÊ§°Ü
- * @return      [in/out]  1         Êä³ö³É¹¦
+ * @brief       UART è¾“å‡ºå­—ç¬¦
+ * @param       [in/out]  serial    è®¾å¤‡å¥æŸ„
+ * @param       [in/out]  c         å‘é€çš„å­—ç¬¦
+ * @return      [in/out]  0         è¾“å‡ºå¤±è´¥
+ * @return      [in/out]  1         è¾“å‡ºæˆåŠŸ
  * @note        None
  *******************************************************************************
  */
@@ -309,11 +324,11 @@ uint16_t HAL_Serial_PutChar(HAL_Serial_t *serial, uint8_t c)
 
 /**
  *******************************************************************************
- * @brief       UART ÊäÈë×Ö·û
- * @param       [in/out]  serial    Éè±¸¾ä±ú
- * @return      [in/out]  *c        ½ÓÊÕµÄ×Ö·û
- * @return      [in/out]  0         ÊäÈëÊ§°Ü
- * @return      [in/out]  1         ÊäÈë³É¹¦
+ * @brief       UART è¾“å…¥å­—ç¬¦
+ * @param       [in/out]  serial    è®¾å¤‡å¥æŸ„
+ * @return      [in/out]  *c        æŽ¥æ”¶çš„å­—ç¬¦
+ * @return      [in/out]  0         è¾“å…¥å¤±è´¥
+ * @return      [in/out]  1         è¾“å…¥æˆåŠŸ
  * @note        None
  *******************************************************************************
  */
@@ -325,12 +340,12 @@ uint16_t HAL_Serial_GetChar(HAL_Serial_t *serial, uint8_t *c)
 
 /**
  *******************************************************************************
- * @brief       UART Êä³ö×Ö·û´®
- * @param       [in/out]  serial    Éè±¸¾ä±ú
- * @param       [in/out]  buf       ·¢ËÍ»º´æ
- * @param       [in/out]  pos       ·¢ËÍµØÖ·Æ«ÒÆÁ¿
- * @param       [in/out]  len       ·¢ËÍÊý¾Ý³¤¶È
- * @return      [in/out]  Êµ¼ÊÐ´ÈëÊý¾ÝµÄÊý¾Ý³¤¶È
+ * @brief       UART è¾“å‡ºå­—ç¬¦ä¸²
+ * @param       [in/out]  serial    è®¾å¤‡å¥æŸ„
+ * @param       [in/out]  buf       å‘é€ç¼“å­˜
+ * @param       [in/out]  pos       å‘é€åœ°å€åç§»é‡
+ * @param       [in/out]  len       å‘é€æ•°æ®é•¿åº¦
+ * @return      [in/out]  å®žé™…å†™å…¥æ•°æ®çš„æ•°æ®é•¿åº¦
  * @note        None
  *******************************************************************************
  */
@@ -342,11 +357,11 @@ uint16_t HAL_Serial_Put(HAL_Serial_t *serial, uint8_t *buf, uint16_t pos, uint16
 
 /**
  *******************************************************************************
- * @brief       UART Ð´Èë
- * @param       [in/out]  drv       Éè±¸¾ä±ú
- * @param       [in/out]  buf       ·¢ËÍ»º´æ
- * @param       [in/out]  len       ·¢ËÍÊý¾Ý³¤¶È
- * @return      [in/out]  Êµ¼ÊÐ´ÈëÊý¾ÝµÄÊý¾Ý³¤¶È
+ * @brief       UART å†™å…¥
+ * @param       [in/out]  drv       è®¾å¤‡å¥æŸ„
+ * @param       [in/out]  buf       å‘é€ç¼“å­˜
+ * @param       [in/out]  len       å‘é€æ•°æ®é•¿åº¦
+ * @return      [in/out]  å®žé™…å†™å…¥æ•°æ®çš„æ•°æ®é•¿åº¦
  * @note        None
  *******************************************************************************
  */
@@ -356,14 +371,14 @@ uint16_t HAL_Serial_Write(HAL_Serial_t *serial, uint8_t *buf, uint16_t len)
     
     switch (serial->Tx.State)
     {
-        case HAL_SERIAL_TX_IDLE:
-            FwBuf_Write(&serial->Tx.Fifo, &buf[0], len);
+        case HAL_SERIAL_IDLE:
+            FwBufWrite(&serial->Tx.Fifo, &buf[0], len);
             Serial_Send_Handle(serial);
-            serial->Tx.State = HAL_SERIAL_TX_BUSY;
+            serial->Tx.State = HAL_SERIAL_BUSY;
             break;
-        case HAL_SERIAL_TX_SLEEP:
-        case HAL_SERIAL_TX_BUSY:
-            len = FwBuf_Write(&serial->Tx.Fifo, &buf[0], len);
+        case HAL_SERIAL_SLEEP:
+        case HAL_SERIAL_BUSY:
+            len = FwBufWrite(&serial->Tx.Fifo, &buf[0], len);
             break;
         default:
             len = 0;
@@ -377,34 +392,44 @@ uint16_t HAL_Serial_Write(HAL_Serial_t *serial, uint8_t *buf, uint16_t len)
 
 /**
  *******************************************************************************
- * @brief       UART ¶ÁÈ¡
- * @param       [in/out]  serial    Éè±¸¾ä±ú
- * @param       [in/out]  buf       ½ÓÊÕ»º´æ
- * @param       [in/out]  len       ½ÓÊÕÊý¾Ý³¤¶È
- * @return      [in/out]  Êµ¼Ê¶ÁÈ¡µ½µÄÊý¾Ý³¤¶È
+ * @brief       UART è¯»å–
+ * @param       [in/out]  serial    è®¾å¤‡å¥æŸ„
+ * @param       [in/out]  buf       æŽ¥æ”¶ç¼“å­˜
+ * @param       [in/out]  len       æŽ¥æ”¶æ•°æ®é•¿åº¦
+ * @return      [in/out]  å®žé™…è¯»å–åˆ°çš„æ•°æ®é•¿åº¦
  * @note        None
  *******************************************************************************
  */
 uint16_t HAL_Serial_Read(HAL_Serial_t *serial, uint8_t *buf, uint16_t len)
 {
-    uint16_t state;
+    uint16_t i;
+    
+    FwBuf_t *fifo = &serial->Rx.Fifo;
     
     HAL_Atom_Begin();
+
+    for (i=0; i<len && fifo->Head != fifo->Tail; i++)
+    {
+        buf[i] = fifo->Buffer[fifo->Head++];
     
-    state = FwBuf_Read(&serial->Rx.Fifo, &buf[0], len);
-    
+        if (fifo->Head >= fifo->Len)
+        {
+            fifo->Head = 0;
+        }
+    }
+
     HAL_Atom_End();
     
-    return state;
+    return i;
 }
 
 /**
  *******************************************************************************
- * @brief       UART ÊÂ¼þ´¦Àí
- * @param       [in/out]  *port     Éè±¸¾ä±ú
- * @param       [in/out]  event     ´¥·¢ÊÂ¼þ
+ * @brief       UART äº‹ä»¶å¤„ç†
+ * @param       [in/out]  *port     è®¾å¤‡å¥æŸ„
+ * @param       [in/out]  event     è§¦å‘äº‹ä»¶
  * @return      [in/out]  void
- * @note        Ö§³ÖDMA·¢ËÍ¡¢DMA½ÓÊÕ¡¢UART·¢ËÍ¡¢UART½ÓÊÕ ½¨Òé·ÅÔÚÖÐ¶Ïº¯ÊýÖÐ´¦Àí
+ * @note        æ”¯æŒDMAå‘é€ã€DMAæŽ¥æ”¶ã€UARTå‘é€ã€UARTæŽ¥æ”¶ å»ºè®®æ”¾åœ¨ä¸­æ–­å‡½æ•°ä¸­å¤„ç†
  *******************************************************************************
  */
 void HAL_Serial_Isr_Handle(void *port, uint16_t event)
@@ -418,6 +443,7 @@ void HAL_Serial_Isr_Handle(void *port, uint16_t event)
         {
             uint8_t ch;
             int16_t state;
+            uint16_t size;
             FwBuf_t *fifo = &serial->Rx.Fifo;
             
             while (1)
@@ -429,7 +455,7 @@ void HAL_Serial_Isr_Handle(void *port, uint16_t event)
                     break;
                 }
                 
-                //! ½ö±£Áô×îÐÂ½ÓÊÕµÄÊý¾Ý
+                //! ä»…ä¿ç•™æœ€æ–°æŽ¥æ”¶çš„æ•°æ®
                 fifo->Buffer[fifo->Tail++] = ch;
                 
                 if(fifo->Tail >= fifo->Len)
@@ -448,7 +474,16 @@ void HAL_Serial_Isr_Handle(void *port, uint16_t event)
             
             if (!IS_PTR_NULL(serial->Super))
             {
-                serial->Super(serial->SuperParam, HAL_SERIAL_EVENT_RX_IND, FwBuf_Used(&serial->Rx.Fifo));
+                if (fifo->Tail >= fifo->Head)
+                {
+                    size = fifo->Tail - fifo->Head;
+                }
+                else
+                {
+                    size = fifo->Len - (fifo->Head - fifo->Tail);
+                }
+                
+                serial->Super(serial->SuperParam, (uint32_t)HAL_SERIAL_EVENT_RX_IND, size);
             }
             break;
         }
@@ -459,31 +494,39 @@ void HAL_Serial_Isr_Handle(void *port, uint16_t event)
         case HAL_SERIAL_EVENT_TX_DONE:
         {
             FwBuf_t *fifo = &serial->Tx.Fifo;
-            uint16_t ch = FwBuf_ReadByte(fifo);
             
-            if (ch != 0xFFFF)
+            if (fifo->Tail == fifo->Head)
             {
-                Serial_PutChar(serial, ch);
-            }
-            else
-            {
-                serial->Tx.State = HAL_SERIAL_TX_IDLE;
+                serial->Tx.State = HAL_SERIAL_IDLE;
 
                 if (!IS_PTR_NULL(serial->Super))
                 {
-                    serial->Super(serial->SuperParam, HAL_SERIAL_EVENT_TX_DONE, NULL);
+                    serial->Super(serial->SuperParam, (uint32_t)HAL_SERIAL_EVENT_TX_DONE, 0);
                 }
+                
+                break;
             }
+
+            char ch = fifo->Buffer[fifo->Head++];
+
+            fifo->Size --;
+
+            if (fifo->Head >= fifo->Len)
+            {
+                fifo->Head = 0;
+            }
+            
+            Serial_PutChar(serial, ch);
             break;
         }
         /* Rx DMA transfer done */
         case HAL_SERIAL_EVENT_RX_DMADONE:
-            //! ´¥·¢½ÓÊÕÍê³ÉÊÂ¼þ
+            //! è§¦å‘æŽ¥æ”¶å®Œæˆäº‹ä»¶
             HAL_Evt_Set(serial->Attribute.Event, HAL_SERIAL_RX_DONE);
             break;
         /* Tx DMA transfer done */
         case HAL_SERIAL_EVENT_TX_DMADONE:
-            //! ·¢ËÍÍê³É´¦Àí
+            //! å‘é€å®Œæˆå¤„ç†
             HAL_Evt_Set(serial->Attribute.Event, HAL_SERIAL_TX_DONE);
             break;
         default:

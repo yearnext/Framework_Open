@@ -116,7 +116,11 @@ void MSP_GPIO_CLK_CMD(GPIO_TypeDef *port, uint8_t cmd)
  * @note        None
  *******************************************************************************
  */
-#define MSP_GPIO_Base_Get(port) (GPIO_TypeDef *)(AHB2PERIPH_BASE + (port) * 0x400UL)
+__STATIC_INLINE
+GPIO_TypeDef *MSP_GPIO_Base_Get(uint16_t port)
+{
+    return (GPIO_TypeDef *)(AHB2PERIPH_BASE + port * 0x400UL);
+}
 
 /**
  *******************************************************************************
@@ -126,7 +130,11 @@ void MSP_GPIO_CLK_CMD(GPIO_TypeDef *port, uint8_t cmd)
  * @note        None
  *******************************************************************************
  */
-#define MSP_GPIO_PinMask_Get(pin) _bv(pin)
+__STATIC_INLINE
+uint32_t MSP_GPIO_PinMask_Get(uint16_t pin)
+{
+    return _bv(pin);
+}
 
 /**
  *******************************************************************************
@@ -181,11 +189,11 @@ static void pin_ops_write(HAL_Device_t *dev, uint32_t pin, uint32_t value)
 
     if (value)
     {
-        LL_GPIO_SetOutputPin(port, pinMask);
+        WRITE_REG(port->BSRR, pinMask);
     }
     else
     {
-        LL_GPIO_ResetOutputPin(port, pinMask);
+        WRITE_REG(port->BRR, pinMask);
     }
 }
 
@@ -204,7 +212,7 @@ static void pin_ops_toggle(HAL_Device_t *dev, uint32_t pin)
     GPIO_TypeDef *port = MSP_GPIO_Base_Get(HAL_PORT(pin));
     uint32_t pinMask = MSP_GPIO_PinMask_Get(HAL_PIN(pin));
 
-    LL_GPIO_TogglePin(handle, pinMask);
+    WRITE_REG(port->ODR, READ_REG(port->ODR) ^ pinMask);
 }
 
 /**
@@ -242,7 +250,7 @@ void MSP_Pin_Set(uint16_t port, uint32_t pin)
     GPIO_TypeDef *handle = MSP_GPIO_Base_Get(port);
     uint32_t pinMask = MSP_GPIO_PinMask_Get(pin);
 
-    LL_GPIO_SetOutputPin(handle, pinMask);
+    _set_reg(handle->BSRR, pinMask);
 }
 
 __INLINE
@@ -251,7 +259,7 @@ void MSP_Pin_Clr(uint16_t port, uint32_t pin)
     GPIO_TypeDef *handle = MSP_GPIO_Base_Get(port);
     uint32_t pinMask = MSP_GPIO_PinMask_Get(pin);
 
-    LL_GPIO_ResetOutputPin(handle, pinMask);
+    _clr_reg(handle->BRR, pinMask);
 }
 
 __INLINE
@@ -260,7 +268,14 @@ void MSP_Pin_Toggle(uint16_t port, uint32_t pin)
     GPIO_TypeDef *handle = MSP_GPIO_Base_Get(port);
     uint32_t pinMask = MSP_GPIO_PinMask_Get(pin);
     
-    LL_GPIO_TogglePin(handle, pinMask);
+    if (_get_reg(handle->IDR, pinMask))
+    {
+        _clr_reg(handle->BRR, pinMask);
+    }
+    else
+    {
+        _set_reg(handle->BSRR, pinMask);
+    }
 }
 
 __INLINE

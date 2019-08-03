@@ -34,13 +34,13 @@ extern "C"
 /* Exported macro ------------------------------------------------------------*/
 /**
  *******************************************************************************
- * @brief        ”≤º˛–≈œ¢∂®“Â
+ * @brief        Á°¨‰ª∂‰ø°ÊÅØÂÆö‰πâ
  *******************************************************************************
  */
 /*! @brief The board name */
 #define BOARD_NAME                    "YH i.MX RT1052 Board"
 
-/* µ˜ ‘¥Æø⁄∂®“Âµƒ–≈œ¢ */
+/* Ë∞ÉËØï‰∏≤Âè£ÂÆö‰πâÁöÑ‰ø°ÊÅØ */
 #define BOARD_DEBUG_UART_TYPE         DEBUG_CONSOLE_DEVICE_TYPE_LPUART
 #define BOARD_DEBUG_UART_BASEADDR     (uint32_t) LPUART1
 #define BOARD_DEBUG_UART_INSTANCE     1U
@@ -54,12 +54,12 @@ extern "C"
 #define BOARD_DEBUG_UART_BAUDRATE     (115200U)
 #endif /* BOARD_DEBUG_UART_BAUDRATE */
 
-/*! @brief FLASHø’º‰¥Û–° */
+/*! @brief FLASHÁ©∫Èó¥Â§ßÂ∞è */
 #define BOARD_FLASH_SIZE    (0x2000000U)
 
 /**
  *******************************************************************************
- * @brief         ±÷”∆µ¬ ∂®“Â
+ * @brief        Êó∂ÈíüÈ¢ëÁéáÂÆö‰πâ
  *******************************************************************************
  */
 #define BOARD_XTAL0_CLK_HZ                         24000000U  /*!< Board xtal0 frequency in Hz */
@@ -68,7 +68,7 @@ extern "C"
 
 /**
  *******************************************************************************
- * @brief        ”≤º˛÷–∂œ≤Ÿ◊˜
+ * @brief        Á°¨‰ª∂‰∏≠Êñ≠Êìç‰Ωú
  *******************************************************************************
  */
 #define MSP_Enable_Interrupt()  _st(__enable_irq();)

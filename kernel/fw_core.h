@@ -45,10 +45,26 @@ extern "C"
 /* Includes ------------------------------------------------------------------*/
 #include "compiler.h"
 #include "fw_server.h"
+#include "fw_debug.h"
 
 #if defined(FRAMEWORK_VERSION_NANO)
 #include "fw_nano.h"
+
 #elif defined(FRAMEWORK_VERSION_FULL)
+/**
+ *******************************************************************************
+ * @brief       定义框架软件版本
+ *******************************************************************************
+ */
+#define FRAMEWORK_SOFT_VERSION                                           "1.3.3"
+
+/**
+ *******************************************************************************
+ * @brief       定义框架编译日期
+ *******************************************************************************
+ */
+#define FRAMEWORK_BUILD_DATE                                        "2019-03-22"
+
 /**
  *******************************************************************************
  * @brief        定义协程相关接口
@@ -66,7 +82,7 @@ extern "C"
                                                                   case __LINE__:
 //! ProtoThread API
 #define Fw_PT_Wait(state)                                        Fw_PT_Enter();\
-                                                            if(state) {return ;}
+                                                         if(!(state)) {return ;}
 //! ProtoThread API
 #define Fw_PT_Delay(tick)                                  Fw_Task_Delay(tick);\
                                    FwCurTask->ThreadState = (uint16_t)__LINE__;\
@@ -279,7 +295,7 @@ typedef struct
 //! 事件可以由多个任务做出响应
 typedef struct
 { 
-    uint32_t   Event;
+    uint32_t Event;
     
     FwList_t List;
 }FwEvt_t;
@@ -310,10 +326,7 @@ typedef struct
 	uint8_t ReadyTable[(FRAMEWORK_TASK_PRIORITY_MAX % 8) ? (FRAMEWORK_TASK_PRIORITY_MAX / 8 + 1) : (FRAMEWORK_TASK_PRIORITY_MAX / 8)];
 
 	//! 框架事件
-	volatile uint16_t Event;
-
-	//! 中断锁
-	volatile uint16_t IsrLock;
+	volatile uint32_t Event;
 }FwCore_t;
 
 /* Exported variables --------------------------------------------------------*/
@@ -327,7 +340,6 @@ extern FwCore_t FwCore;
 //! 用于兼容老代码
 #define FwCurTask                                               (FwCore.CurTask)
 #define FwIdleHook                                             (FwCore.IdleHook)
-#define FwIsrLock                                               (FwCore.IsrLock)
 #define FwCoreEvent                                               (FwCore.Event)
 #define FwTaskReadyTable                                     (FwCore.ReadyTable)
 #define FwActiveTaskTable                                   (FwCore.ActiveTable)
@@ -345,26 +357,6 @@ extern FwTimerHandle_t FwTimer;
  * @defgroup framework core interface
  * @{
  */
-/**
- *******************************************************************************
- * @brief       进入临界点函数
- * @param       [in/out]  void
- * @return      [in/out]  void
- * @note        用户可调用
- *******************************************************************************
- */
-extern void Fw_Enter_Critical(void);
-
-/**
- *******************************************************************************
- * @brief       退出临界点函数
- * @param       [in/out]  void
- * @return      [in/out]  void
- * @note        用户可调用
- *******************************************************************************
- */
-extern void Fw_Exit_Critical(void);
-
 /**
  *******************************************************************************
  * @brief       框架HAL初始化函数
@@ -582,8 +574,8 @@ extern FwErr_t Fw_MQ_Recv(FwMQ_t *queue, void *msg, uint16_t size, size_t tick);
 extern FwErr_t Fw_MQ_Recv_Mirror(FwMQ_t *queue, void *msg, uint16_t size);
 
 //! 由用户程序调用
-#define Fw_MQ_Read(queue, msg, size) _st(if(Fw_MQ_Recv((queue), (void *)(msg), (size), 0) == FW_ERR_EMPTY) {break;})
-#define Fw_MQ_Read_Mirror(queue, msg, size) _st(if(Fw_MQ_Recv_Mirror((queue), (void *)(msg), (size)) == FW_ERR_EMPTY) {break;})
+#define Fw_MQ_Read(queue, msg, size) _st(if(Fw_MQ_Recv((queue), (void *)(msg), (size), 0) == FW_ERR_EMPTY) {return;})
+#define Fw_MQ_Read_Mirror(queue, msg, size) _st(if(Fw_MQ_Recv_Mirror((queue), (void *)(msg), (size)) == FW_ERR_EMPTY) {return;})
 
 /** @}*/     /** framework core interface */
 
@@ -765,191 +757,13 @@ extern uint32_t Fw_Tick_Past(uint32_t lastTick);
 extern void FwTimer_Component_Handle(void);
 /** @}*/     /** framework timer interface */
 
-/**
- * @defgroup framework debug interface
- * @{
- */
-
-/**
- *******************************************************************************
- * @brief       调试组件初始化函数
- * @param       [in/out]  void
- * @return      [in/out]  void
- * @note        由Fw_Core_Start调用
- *******************************************************************************
- */
-extern int Fwdbg_Component_Init(void);
-
-#ifdef ENABLE_FRAMEWORK_DEBUG
-/**
- *******************************************************************************
- * @brief       运行时间测试起始函数
- * @param       [in/out]  void
- * @return      [in/out]  void
- * @note        None
- *******************************************************************************
- */
-extern void Fw_TimeTest_Begin(void);
-
-/**
- *******************************************************************************
- * @brief       运行时间测试结束函数
- * @param       [in/out]  void
- * @return      [in/out]  void
- * @note        None
- *******************************************************************************
- */
-extern void Fw_TimeTest_End(void);
-
-/**
- *******************************************************************************
- * @brief       定时器测试函数——压力测试
- * @param       [in/out]  void
- * @return      [in/out]  void
- * @note        None
- *******************************************************************************
- */
-extern void Fw_Timer_Test(void);
-
-/**
- *******************************************************************************
- * @brief       内核输出日志API
- * @param       [in/out]  str     日志信息
- * @param       [in/out]  ...     日志参数
- * @return      [in/out]  void
- * @note        None
- *******************************************************************************
- */
-extern void Fw_Core_Log(char *str, ...);
-
-/**
- *******************************************************************************
- * @brief       内核输出错误API
- * @param       [in/out]  str     日志信息
- * @param       [in/out]  ...     日志参数
- * @return      [in/out]  void
- * @note        None
- *******************************************************************************
- */
-extern void Fw_Core_Error(char *str, ...);
-
-/**
- *******************************************************************************
- * @brief       日志输出API
- * @param       [in/out]  str     日志信息
- * @param       [in/out]  ...     日志参数
- * @return      [in/out]  void
- * @note        None
- *******************************************************************************
- */
-extern void Fw_Log(char *str, ...);
-
-/**
- *******************************************************************************
- * @brief       错误输出API
- * @param       [in/out]  str     日志信息
- * @param       [in/out]  ...     日志参数
- * @return      [in/out]  void
- * @note        None
- *******************************************************************************
- */
-extern void Fw_Error(char *str, ...);
-
-/**
- *******************************************************************************
- * @brief       当前时间转字符串API
- * @param       [in/out]  level    转换等级
- * @return      [in/out]  void
- * @note        None
- *******************************************************************************
- */
-#define FW_TIME_2_STR_ALL  0
-#define FW_TIME_2_STR_DATE 1
-#define FW_TIME_2_STR_TIME 0x10
-
-extern char *Fw_Time_To_Str(uint8_t level);
-
-/**
- *******************************************************************************
- * @brief       输出内核信息API
- * @param       [in/out]  void
- * @return      [in/out]  void
- * @note        None
- *******************************************************************************
- */
-extern void Fw_Put_Info(void);
-
-/**
- *******************************************************************************
- * @brief       输出任务列表API
- * @param       [in/out]  void
- * @return      [in/out]  void
- * @note        None
- *******************************************************************************
- */
-extern void Fw_Put_Task_List(void);
-
-/**
- *******************************************************************************
- * @brief       输出定时器列表API
- * @param       [in/out]  void
- * @return      [in/out]  void
- * @note        None
- *******************************************************************************
- */
-extern void Fw_Put_Timer_List(void);
-
-/**
- *******************************************************************************
- * @brief       事件生成函数
- * @param       [in/out]  void
- * @return      [in/out]  void
- * @note        测试用
- *******************************************************************************
- */
-extern void Fw_Event_General(void);
-
-/**
- *******************************************************************************
- * @brief       定时器测试函数——压力测试
- * @param       [in/out]  void
- * @return      [in/out]  void
- * @note        None
- *******************************************************************************
- */
-extern void Fw_Timer_Test(void);
-#else
-#define Fw_TimeTest_Begin()
-#define Fw_TimeTest_End()
-#define Fw_Timer_Test()
-#define Fw_Core_Log(s, ...)
-#define Fw_Core_Error(s, ...)
-#define Fw_Log(s, ...)
-#define Fw_Error(s, ...)
-#define Fw_Put_Info()
-#define Fw_Event_General()
-#define Fw_Timer_Test()
+#ifdef ENABLE_FRAMEWORK_SM_COMPONENT
+#include "fw_sm.h"
 #endif
-
-/** @}*/     /** framework debug interface */
 
 #endif
 
 /* Exported macro ------------------------------------------------------------*/
-/**
- *******************************************************************************
- * @brief       定义框架软件版本
- *******************************************************************************
- */
-#define FRAMEWORK_SOFT_VERSION                                           "1.3.3"
-
-/**
- *******************************************************************************
- * @brief       定义框架编译日期
- *******************************************************************************
- */
-#define FRAMEWORK_BUILD_DATE                                        "2019-03-22"
-
 /**
  *******************************************************************************
  * @brief       禁用全局中断
@@ -969,6 +783,20 @@ extern void Fw_Timer_Test(void);
  *******************************************************************************
  */
 #define Fw_IRQ_Enable()                                       __ENABLE_ALL_ISR()
+
+/**
+ *******************************************************************************
+ * @brief       临界点操作函数
+ * @note        用户可调用
+ *******************************************************************************
+ */
+#if defined(FRAMEWORK_VERSION_NANO) && !defined(ENABLE_FRAMEWORK_NANO_EXPAND)
+#define Fw_Atom_Begin(x)       _st((x) = __GET_ISR_FLAG(); __DISABLE_ALL_ISR();)
+#define Fw_Atom_End(x)                                   _st(__SET_ISR_FLAG(x);)
+#else
+#define Fw_Atom_Begin(x)                    _st((x) = (x); Fw_Enter_Critical();)
+#define Fw_Atom_End(x)                       _st((x) = (x); Fw_Exit_Critical();)
+#endif
 
 /**
  *******************************************************************************

@@ -24,13 +24,13 @@
  *                 GCC                                                         *
  *******************************************************************************
  * @note                                                                       *
- * 1.20170110 ´´½¨ÎÄ¼ş ÎÄ¼şÃû:fw_debug.c                                       *
- * 2.20171106 ºÏ²¢fw_stream.c×é¼şÄÚÈİ£¬ÊµÏÖ´®¿ÚÁ÷¿Ø£¬¿çÆ½Ì¨¿ØÖÆ                *
- *            ¸üÃûÎªHAL_SERIAL.c                                               *
- * 3.20180423 Í³Ò»Ó²¼ş³éÏó²ã£¬ĞŞ¸ÄÓ²¼şµ×²ãÇı¶¯(²Î¿¼RT-THREAD)                  *
- *            Ö§³Ö¶àÖÖUARTÄ£Ê½                                                 *
- * 4.20180804 ĞŞ¸ÄÎÄ¼şÃû£¬½«HAL_SERIAL.cĞŞ¸ÄÎªHAL_SERIAL.c                     *
- * 5.20180815 ²¨ÌØÂÊ115200ÏÂÍ¨¹ıÑ¹Á¦²âÊÔ(Ã¿¸ô10MS·¢ËÍ"Hello World!")           *
+ * 1.20170110 åˆ›å»ºæ–‡ä»¶ æ–‡ä»¶å:fw_debug.c                                       *
+ * 2.20171106 åˆå¹¶fw_stream.cç»„ä»¶å†…å®¹ï¼Œå®ç°ä¸²å£æµæ§ï¼Œè·¨å¹³å°æ§åˆ¶                *
+ *            æ›´åä¸ºHAL_SERIAL.c                                               *
+ * 3.20180423 ç»Ÿä¸€ç¡¬ä»¶æŠ½è±¡å±‚ï¼Œä¿®æ”¹ç¡¬ä»¶åº•å±‚é©±åŠ¨(å‚è€ƒRT-THREAD)                  *
+ *            æ”¯æŒå¤šç§UARTæ¨¡å¼                                                 *
+ * 4.20180804 ä¿®æ”¹æ–‡ä»¶åï¼Œå°†HAL_SERIAL.cä¿®æ”¹ä¸ºHAL_SERIAL.c                     *
+ * 5.20180815 æ³¢ç‰¹ç‡115200ä¸‹é€šè¿‡å‹åŠ›æµ‹è¯•(æ¯éš”10MSå‘é€"Hello World!")           *
  *******************************************************************************
  */
 /* Define to prevent recursive inclusion -------------------------------------*/
@@ -44,137 +44,9 @@ extern "C"
 #endif
 
 /* Includes ------------------------------------------------------------------*/
+#include "hal_def.h"
+
 /* Exported macro ------------------------------------------------------------*/
-/**
- *******************************************************************************
- * @brief        HAL SERIAL PORT
- *******************************************************************************
- */
-enum HAL_SERIAL_PORT
-{
-    HAL_SERIAL_0,
-    HAL_SERIAL_1,
-    HAL_SERIAL_2,
-    HAL_SERIAL_3,
-    HAL_SERIAL_4,
-    HAL_SERIAL_5,
-    HAL_SERIAL_6,
-    HAL_SERIAL_7,
-    HAL_SERIAL_8,
-    
-    HAL_SERIAL_MAX,
-};
-
-/**
- *******************************************************************************
- * @brief      ¶¨Òå SERIAL ²¨ÌØÂÊÅäÖÃ²ÎÊı
- *******************************************************************************
- */
-#define HAL_SERIAL_BAUD_2400              2400
-#define HAL_SERIAL_BAUD_4800              4800
-#define HAL_SERIAL_BAUD_9600              9600
-#define HAL_SERIAL_BAUD_19200             19200
-#define HAL_SERIAL_BAUD_38400             38400
-#define HAL_SERIAL_BAUD_57600             57600
-#define HAL_SERIAL_BAUD_115200            115200
-#define HAL_SERIAL_BAUD_230400            230400
-#define HAL_SERIAL_BAUD_460800            460800
-#define HAL_SERIAL_BAUD_921600            921600
-#define HAL_SERIAL_BAUD_2000000           2000000
-#define HAL_SERIAL_BAUD_3000000           3000000
-
-/**
- *******************************************************************************
- * @brief      ¶¨Òå SERIAL Êı¾İÎ»ÅäÖÃ²ÎÊı
- *******************************************************************************
- */
-#define HAL_SERIAL_DATA_BITS_5            5
-#define HAL_SERIAL_DATA_BITS_6            6
-#define HAL_SERIAL_DATA_BITS_7            7
-#define HAL_SERIAL_DATA_BITS_8            8
-#define HAL_SERIAL_DATA_BITS_9            9
-
-/**
- *******************************************************************************
- * @brief      ¶¨Òå SERIAL Í£Ö¹Î»ÅäÖÃ²ÎÊı
- *******************************************************************************
- */
-#define HAL_SERIAL_STOP_BITS_1            1
-#define HAL_SERIAL_STOP_BITS_2            2
-#define HAL_SERIAL_STOP_BITS_3            3
-#define HAL_SERIAL_STOP_BITS_4            4
-
-/**
- *******************************************************************************
- * @brief      ¶¨Òå SERIAL Ğ£ÑéÎ»ÅäÖÃ²ÎÊı
- *******************************************************************************
- */
-#define HAL_SERIAL_PARITY_NONE            0
-#define HAL_SERIAL_PARITY_ODD             1                           //! ÆæĞ£Ñé
-#define HAL_SERIAL_PARITY_EVEN            2                           //! Å¼Ğ£Ñé
-
-/**
- *******************************************************************************
- * @brief      ¶¨Òå SERIAL ±àÂë·½Ê½ÅäÖÃ²ÎÊı
- *******************************************************************************
- */
-#define HAL_SERIAL_NRZ_NORMAL             0       /* Non Return to Zero : normal mode */
-#define HAL_SERIAL_NRZ_INVERTED           1       /* Non Return to Zero : inverted mode */
-
-/**
- *******************************************************************************
- * @brief      SERIAL ·¢ËÍ»º´æÇø³¤¶È
- *******************************************************************************
- */
-#define HAL_SERIAL_CACHE_SIZE            64
-
-/**
- *******************************************************************************
- * @brief      SERIAL ÊÂ¼ş¶¨Òå
- *******************************************************************************
- */
-//! Ó²¼şÊÂ¼ş
-#define HAL_SERIAL_EVENT_RX_IND          0x01       /* Rx indication */
-#define HAL_SERIAL_EVENT_TX_DONE         0x02       /* Tx complete   */
-#define HAL_SERIAL_EVENT_RX_FIFO_DONE    0x03       /* Rx fifo transfer done */
-#define HAL_SERIAL_EVENT_TX_FIFO_DONE    0x04       /* Tx fifo transfer complete */
-#define HAL_SERIAL_EVENT_RX_DMADONE      0x05       /* Rx DMA transfer done */
-#define HAL_SERIAL_EVENT_TX_DMADONE      0x06       /* Tx DMA transfer done */
-#define HAL_SERIAL_EVENT_RX_TIMEOUT      0x07       /* Rx timeout    */
-
-//! ×é¼şÊÂ¼ş
-#define HAL_SERIAL_TX_DONE               0x08
-#define HAL_SERIAL_TX_START              0x09
-#define HAL_SERIAL_TX_TIMEOUT            0x0A
-#define HAL_SERIAL_RX_ONCE               0x0B
-#define HAL_SERIAL_RX_DONE               0x0C
-#define HAL_SERIAL_RX_TIMEOUT            0x0D
-#define HAL_SERIAL_RX_OVERFLOW           0x0E
-
-/**
- *******************************************************************************
- * @brief      SERIAL ´«Êä·½Ïò¶¨Òå
- *******************************************************************************
- */
-#define HAL_SERIAL_DIR_TX                0x00
-#define HAL_SERIAL_DIR_RX                0x01
-    
-/**
- *******************************************************************************
- * @brief      SERIAL Ê±¼ä²ÎÊı
- *******************************************************************************
- */
-#define HAL_SERIAL_RX_TICK              10
-
-/**
- *******************************************************************************
- * @brief      SERIAL ¹¤×÷±êÖ¾Î»
- *******************************************************************************
- */
-#define HAL_SERIAL_TRANSFER_ISR                                           0x0001
-#define HAL_SERIAL_TRANSFER_FIFO                                          0x0002
-#define HAL_SERIAL_TRANSFER_DMA                                           0x0004
-
 /* Exported types ------------------------------------------------------------*/
 /**
  *******************************************************************************
@@ -186,17 +58,8 @@ typedef enum
     HAL_SERIAL_INIT,
     HAL_SERIAL_IDLE,
     HAL_SERIAL_BUSY,
+    HAL_SERIAL_DONE,
     HAL_SERIAL_SLEEP,
-
-    HAL_SERIAL_TX_INIT  = HAL_SERIAL_INIT,
-    HAL_SERIAL_TX_IDLE  = HAL_SERIAL_IDLE,
-    HAL_SERIAL_TX_BUSY  = HAL_SERIAL_BUSY,
-    HAL_SERIAL_TX_SLEEP = HAL_SERIAL_SLEEP,
-    
-    HAL_SERIAL_RX_INIT  = HAL_SERIAL_INIT,
-    HAL_SERIAL_RX_IDLE  = HAL_SERIAL_IDLE,
-    HAL_SERIAL_RX_BUSY  = HAL_SERIAL_BUSY,
-    HAL_SERIAL_RX_SLEEP = HAL_SERIAL_SLEEP,
 }Serial_Status;
 
 /**
@@ -254,24 +117,24 @@ typedef struct
 /**
  *******************************************************************************
  * @brief      SERIAL COMPONENT HANDLE
- * @note       todo Ìí¼Ó¶Ô¶¯Ì¬ÄÚ´æµÄÖ§³Ö£¬ĞèÒª¿ªÆôLIBC×é¼ş
+ * @note       todo æ·»åŠ å¯¹åŠ¨æ€å†…å­˜çš„æ”¯æŒï¼Œéœ€è¦å¼€å¯LIBCç»„ä»¶
  *******************************************************************************
  */
 typedef struct
 {
     HAL_Atrribute_t Attribute;
     
-    //! ÉÏ²ã»Øµ÷
+    //! ä¸Šå±‚å›è°ƒ
     SerialSuper_t Super;
     void          *SuperParam;
-    
-    //! µ×²ã²Ù×÷¾ä±ú
+
+    //! åº•å±‚æ“ä½œå¥æŸ„
     void *Param;
-    
-    //! Éè±¸²Ù×÷¾ä±ú
+
+    //! è®¾å¤‡æ“ä½œå¥æŸ„
     HAL_Device_t *Dev;
-    
-    //! Í¨Ñ¶¹ÜµÀ
+
+    //! é€šè®¯ç®¡é“
     Serial_Pipe_t Tx;
     Serial_Pipe_t Rx;
 }HAL_Serial_t;
@@ -309,12 +172,12 @@ typedef struct
 /* Exported functions --------------------------------------------------------*/
 /**
  *******************************************************************************
- * @brief       SERIAL Éè±¸×¢²áº¯Êı
- * @param       [in/out]  name       Éè±¸Ãû³Æ
- * @param       [in/out]  ops        Éè±¸µ×²ã²Ù×÷½Ó¿Ú
- * @param       [in/out]  flag       Éè±¸ÅäÖÃ²ÎÊı
- * @param       [in/out]  userData   ÓÃ»§Êı¾İ
- * @return      [in/out]  ÅäÖÃ½á¹û
+ * @brief       SERIAL è®¾å¤‡æ³¨å†Œå‡½æ•°
+ * @param       [in/out]  name       è®¾å¤‡åç§°
+ * @param       [in/out]  ops        è®¾å¤‡åº•å±‚æ“ä½œæ¥å£
+ * @param       [in/out]  flag       è®¾å¤‡é…ç½®å‚æ•°
+ * @param       [in/out]  userData   ç”¨æˆ·æ•°æ®
+ * @return      [in/out]  é…ç½®ç»“æœ
  * @note        None
  *******************************************************************************
  */
@@ -322,10 +185,10 @@ extern void HAL_Serial_Register(HAL_Serial_Interface_t *ops, void *userData);
 
 /**
  *******************************************************************************
- * @brief       SERIAL Çı¶¯³õÊ¼»¯
- * @param       [in/out]  serial    Éè±¸¾ä±ú
- * @param       [in/out]  config    ÅäÖÃ²ÎÊı
- * @return      [in/out]  ÅäÖÃ½á¹û
+ * @brief       SERIAL é©±åŠ¨åˆå§‹åŒ–
+ * @param       [in/out]  serial    è®¾å¤‡å¥æŸ„
+ * @param       [in/out]  config    é…ç½®å‚æ•°
+ * @return      [in/out]  é…ç½®ç»“æœ
  * @note        None
  *******************************************************************************
  */
@@ -333,8 +196,8 @@ extern void HAL_Serial_Init(HAL_Serial_t *serial, HAL_Serial_Config_t *config);
 
 /**
  *******************************************************************************
- * @brief       SERIAL Ê¹ÄÜ·¢ËÍ×é¼ş
- * @param       [in/out]  serial    Éè±¸¾ä±ú
+ * @brief       SERIAL ä½¿èƒ½å‘é€ç»„ä»¶
+ * @param       [in/out]  serial    è®¾å¤‡å¥æŸ„
  * @return      [in/out]  void
  * @note        None
  *******************************************************************************
@@ -343,8 +206,8 @@ extern void HAL_Serial_EnableTx(HAL_Serial_t *serial);
 
 /**
  *******************************************************************************
- * @brief       SERIAL ½ûÓÃ·¢ËÍ×é¼ş
- * @param       [in/out]  serial    Éè±¸¾ä±ú
+ * @brief       SERIAL ç¦ç”¨å‘é€ç»„ä»¶
+ * @param       [in/out]  serial    è®¾å¤‡å¥æŸ„
  * @return      [in/out]  void
  * @note        None
  *******************************************************************************
@@ -353,8 +216,8 @@ extern void HAL_Serial_DisableTx(HAL_Serial_t *serial);
 
 /**
  *******************************************************************************
- * @brief       SERIAL Ê¹ÄÜ½ÓÊÕ×é¼ş
- * @param       [in/out]  serial    Éè±¸¾ä±ú
+ * @brief       SERIAL ä½¿èƒ½æ¥æ”¶ç»„ä»¶
+ * @param       [in/out]  serial    è®¾å¤‡å¥æŸ„
  * @return      [in/out]  void
  * @note        None
  *******************************************************************************
@@ -363,8 +226,8 @@ extern void HAL_Serial_EnableRx(HAL_Serial_t *serial);
 
 /**
  *******************************************************************************
- * @brief       SERIAL ½ûÓÃ½ÓÊÕ×é¼ş
- * @param       [in/out]  serial    Éè±¸¾ä±ú
+ * @brief       SERIAL ç¦ç”¨æ¥æ”¶ç»„ä»¶
+ * @param       [in/out]  serial    è®¾å¤‡å¥æŸ„
  * @return      [in/out]  void
  * @note        None
  *******************************************************************************
@@ -373,11 +236,11 @@ extern void HAL_Serial_DisableRx(HAL_Serial_t *serial);
 
 /**
  *******************************************************************************
- * @brief       SERIAL Êä³ö×Ö·û
- * @param       [in/out]  serial    Éè±¸¾ä±ú
- * @param       [in/out]  c         ·¢ËÍµÄ×Ö·û
- * @return      [in/out]  0         Êä³öÊ§°Ü
- * @return      [in/out]  1         Êä³ö³É¹¦
+ * @brief       SERIAL è¾“å‡ºå­—ç¬¦
+ * @param       [in/out]  serial    è®¾å¤‡å¥æŸ„
+ * @param       [in/out]  c         å‘é€çš„å­—ç¬¦
+ * @return      [in/out]  0         è¾“å‡ºå¤±è´¥
+ * @return      [in/out]  1         è¾“å‡ºæˆåŠŸ
  * @note        None
  *******************************************************************************
  */
@@ -385,11 +248,11 @@ extern uint16_t HAL_Serial_PutChar(HAL_Serial_t *serial, uint8_t c);
 
 /**
  *******************************************************************************
- * @brief       SERIAL ÊäÈë×Ö·û
- * @param       [in/out]  serial    Éè±¸¾ä±ú
- * @return      [in/out]  *c        ½ÓÊÕµÄ×Ö·û
- * @return      [in/out]  0         ÊäÈëÊ§°Ü
- * @return      [in/out]  1         ÊäÈë³É¹¦
+ * @brief       SERIAL è¾“å…¥å­—ç¬¦
+ * @param       [in/out]  serial    è®¾å¤‡å¥æŸ„
+ * @return      [in/out]  *c        æ¥æ”¶çš„å­—ç¬¦
+ * @return      [in/out]  0         è¾“å…¥å¤±è´¥
+ * @return      [in/out]  1         è¾“å…¥æˆåŠŸ
  * @note        None
  *******************************************************************************
  */
@@ -397,12 +260,12 @@ extern uint16_t HAL_Serial_GetChar(HAL_Serial_t *serial, uint8_t *c);
 
 /**
  *******************************************************************************
- * @brief       SERIAL Êä³ö×Ö·û´®
- * @param       [in/out]  serial    Éè±¸¾ä±ú
- * @param       [in/out]  buf       ·¢ËÍ»º´æ
- * @param       [in/out]  pos       ·¢ËÍµØÖ·Æ«ÒÆÁ¿
- * @param       [in/out]  len       ·¢ËÍÊı¾İ³¤¶È
- * @return      [in/out]  Êµ¼ÊĞ´ÈëÊı¾İµÄÊı¾İ³¤¶È
+ * @brief       SERIAL è¾“å‡ºå­—ç¬¦ä¸²
+ * @param       [in/out]  serial    è®¾å¤‡å¥æŸ„
+ * @param       [in/out]  buf       å‘é€ç¼“å­˜
+ * @param       [in/out]  pos       å‘é€åœ°å€åç§»é‡
+ * @param       [in/out]  len       å‘é€æ•°æ®é•¿åº¦
+ * @return      [in/out]  å®é™…å†™å…¥æ•°æ®çš„æ•°æ®é•¿åº¦
  * @note        None
  *******************************************************************************
  */
@@ -410,11 +273,11 @@ extern uint16_t HAL_Serial_Put(HAL_Serial_t *serial, uint8_t *buf, uint16_t pos,
 
 /**
  *******************************************************************************
- * @brief       SERIAL Ğ´Èë
- * @param       [in/out]  serial    Éè±¸¾ä±ú
- * @param       [in/out]  buf       ·¢ËÍ»º´æ
- * @param       [in/out]  len       ·¢ËÍÊı¾İ³¤¶È
- * @return      [in/out]  Êµ¼ÊĞ´ÈëÊı¾İµÄÊı¾İ³¤¶È
+ * @brief       SERIAL å†™å…¥
+ * @param       [in/out]  serial    è®¾å¤‡å¥æŸ„
+ * @param       [in/out]  buf       å‘é€ç¼“å­˜
+ * @param       [in/out]  len       å‘é€æ•°æ®é•¿åº¦
+ * @return      [in/out]  å®é™…å†™å…¥æ•°æ®çš„æ•°æ®é•¿åº¦
  * @note        None
  *******************************************************************************
  */
@@ -422,11 +285,11 @@ extern uint16_t HAL_Serial_Write(HAL_Serial_t *serial, uint8_t *buf, uint16_t le
 
 /**
  *******************************************************************************
- * @brief       SERIAL ¶ÁÈ¡
- * @param       [in/out]  serial    Éè±¸¾ä±ú
- * @param       [in/out]  buf       ½ÓÊÕ»º´æ
- * @param       [in/out]  len       ½ÓÊÕÊı¾İ³¤¶È
- * @return      [in/out]  Êµ¼Ê¶ÁÈ¡µ½µÄÊı¾İ³¤¶È
+ * @brief       SERIAL è¯»å–
+ * @param       [in/out]  serial    è®¾å¤‡å¥æŸ„
+ * @param       [in/out]  buf       æ¥æ”¶ç¼“å­˜
+ * @param       [in/out]  len       æ¥æ”¶æ•°æ®é•¿åº¦
+ * @return      [in/out]  å®é™…è¯»å–åˆ°çš„æ•°æ®é•¿åº¦
  * @note        None
  *******************************************************************************
  */
@@ -434,19 +297,19 @@ extern uint16_t HAL_Serial_Read(HAL_Serial_t *serial, uint8_t *buf, uint16_t len
 
 /**
  *******************************************************************************
- * @brief       SERIAL Ó²¼şÊÂ¼ş´¦Àí
- * @param       [in/out]  *port     Éè±¸¾ä±ú
- * @param       [in/out]  event     ´¥·¢ÊÂ¼ş
+ * @brief       SERIAL ç¡¬ä»¶äº‹ä»¶å¤„ç†
+ * @param       [in/out]  *port     è®¾å¤‡å¥æŸ„
+ * @param       [in/out]  event     è§¦å‘äº‹ä»¶
  * @return      [in/out]  void
- * @note        Ö§³ÖDMA·¢ËÍ¡¢DMA½ÓÊÕ¡¢UART·¢ËÍ¡¢UART½ÓÊÕ
+ * @note        æ”¯æŒDMAå‘é€ã€DMAæ¥æ”¶ã€UARTå‘é€ã€UARTæ¥æ”¶
  *******************************************************************************
  */
 extern void HAL_Serial_Isr_Handle(void *port, uint16_t event);
 
 /**
  *******************************************************************************
- * @brief       SERIAL Ê±ÖÓÊÂ¼ş´¦Àí
- * @param       [in/out]  drv       Éè±¸¾ä±ú
+ * @brief       SERIAL æ—¶é’Ÿäº‹ä»¶å¤„ç†
+ * @param       [in/out]  drv       è®¾å¤‡å¥æŸ„
  * @return      [in/out]  void
  * @note        void
  *******************************************************************************

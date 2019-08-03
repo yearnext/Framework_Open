@@ -150,7 +150,7 @@ __INLINE uint32_t MSP_GPIO_Read(GPIO_Type *port)
 
 void MSP_GPIO_Init(void)
 {
-    //! 使能IO复用时钟
+    //! 浣胯兘IO澶嶇敤鏃堕挓
     CLOCK_EnableClock(kCLOCK_Iomuxc);
     
 #ifdef ENABLE_HAL_GPIO_DRIVER

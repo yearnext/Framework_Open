@@ -13,38 +13,77 @@
  *   See the License for the specific language governing permissions and       *
  *   limitations under the License.                                            *
  *******************************************************************************
- * @file       hal_spi_sim.c                                                   *
+ * @file       fw_qt.c                                                         *
  * @author     Accumulate Team                                                 *
  * @version    1.0.0                                                           *
- * @date       2018-10-31                                                      *
- * @brief      hal spi simulation driver component source file                 *
+ * @date       2019-05-26                                                      *
+ * @brief      framework qt support component source files                     *
  * @par        work platform                                                   *
  *                 Windows                                                     *
  * @par        compiler                                                        *
  *                 GCC                                                         *
  *******************************************************************************
  * @note                                                                       *
- * 1. 2018-06-28 从“hal_device.h”分离出SPI驱动                                 *
+ * 1.20190526    Create File                                                   *
  *******************************************************************************
  */
- 
+
 /**
-* @defgroup hal spi simulation driver component
-* @{
-*/
+ * @defgroup framework qt support component
+ * @{
+ */
 
 /* Includes ------------------------------------------------------------------*/
-#include "hal_spi_sim.h"
+#include "fw_qt.h"
 
-/* Private typedef -----------------------------------------------------------*/
-/* Private define ------------------------------------------------------------*/
-/* Private constants ---------------------------------------------------------*/
-/* Exported constants --------------------------------------------------------*/
+/* Exported macro ------------------------------------------------------------*/
+/* Exported types ------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
+/* Exported variables --------------------------------------------------------*/
 /* Exported variables --------------------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
 /* Exported functions --------------------------------------------------------*/
+FwServer::FwServer(QObject* parent)
+	: QThread(parent)
+{
+	this->coreInit();
+}
 
-/** @}*/     /** hal spi simulation driver component */
+FwServer::~FwServer()
+{
+	this->coreExit();
+	this->wait();
+}
+
+void FwServer::run()
+{
+	qDebug() << tr("mythread QThread::currentThreadId()==") << QThread::currentThreadId();
+
+	this->coreRun();
+}
+
+void FwServer::coreInit()
+{
+	Fw_Core_Init();
+
+	this->enableCore = false;
+}
+
+void FwServer::coreRun()
+{
+	this->enableCore = true;
+
+	while (this->enableCore)
+	{
+		Fw_Core_Dispatch();
+	}
+}
+
+void FwServer::coreExit()
+{
+	this->enableCore = false;
+}
+
+/** @}*/     /** framework qt support component */
 
 /**********************************END OF FILE*********************************/

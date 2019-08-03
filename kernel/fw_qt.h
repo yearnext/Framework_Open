@@ -13,38 +13,60 @@
  *   See the License for the specific language governing permissions and       *
  *   limitations under the License.                                            *
  *******************************************************************************
- * @file       hal_spi_sim.c                                                   *
+ * @file       fw_qt.h                                                         *
  * @author     Accumulate Team                                                 *
  * @version    1.0.0                                                           *
- * @date       2018-10-31                                                      *
- * @brief      hal spi simulation driver component source file                 *
+ * @date       2019-05-26                                                      *
+ * @brief      framework qt support component head file                        *
  * @par        work platform                                                   *
  *                 Windows                                                     *
  * @par        compiler                                                        *
  *                 GCC                                                         *
  *******************************************************************************
  * @note                                                                       *
- * 1. 2018-06-28 从“hal_device.h”分离出SPI驱动                                 *
+ * 1.20190526    Create File                                                   *
  *******************************************************************************
  */
- 
+
 /**
-* @defgroup hal spi simulation driver component
-* @{
-*/
+ * @defgroup framework qt support component
+ * @{
+ */
+/* Define to prevent recursive inclusion -------------------------------------*/
+#ifndef FRAMEWORK_QT_SUPPORT_H__
+#define FRAMEWORK_QT_SUPPORT_H__
 
 /* Includes ------------------------------------------------------------------*/
-#include "hal_spi_sim.h"
+#include <QObject>
+#include <QThread>
+#include <QDebug>
+#include "compiler.h"
+#include "fw_core.h"
 
-/* Private typedef -----------------------------------------------------------*/
-/* Private define ------------------------------------------------------------*/
-/* Private constants ---------------------------------------------------------*/
-/* Exported constants --------------------------------------------------------*/
-/* Private variables ---------------------------------------------------------*/
+/* Exported macro ------------------------------------------------------------*/
+/* Exported types ------------------------------------------------------------*/
+class FwServer : public QThread
+{
+public:
+	FwServer(QObject *parent = nullptr);
+	~FwServer();
+
+protected:
+	virtual void run();
+
+private:
+	bool enableCore;
+
+	void coreInit();
+	void coreRun();
+	void coreExit();
+};
+
 /* Exported variables --------------------------------------------------------*/
-/* Private functions ---------------------------------------------------------*/
 /* Exported functions --------------------------------------------------------*/
 
-/** @}*/     /** hal spi simulation driver component */
+#endif       /** end include define */
+
+/** @}*/     /** framework qt support component */
 
 /**********************************END OF FILE*********************************/

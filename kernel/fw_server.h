@@ -141,60 +141,75 @@ typedef struct
 /* Exported functions --------------------------------------------------------*/
 /**
  *******************************************************************************
+ * @brief       初始化函数
+ *******************************************************************************
+ */
+extern void Fw_Server_Init(void);
+
+/**
+ *******************************************************************************
+ * @brief       进入临界点函数
+ *******************************************************************************
+ */
+extern void Fw_Enter_Critical(void);
+extern void Fw_Exit_Critical(void);
+
+/**
+ *******************************************************************************
  * @brief       ring buffer function api
  *******************************************************************************
  */
-extern void     FwBuf_Init(FwBuf_t *fifo, void *buf, uint16_t len);
-extern void     FwBuf_Fini(FwBuf_t *fifo);
-extern void     FwBuf_SetEmpty(FwBuf_t *fifo);
-extern uint16_t FwBuf_Len(FwBuf_t *fifo);
-extern uint16_t FwBuf_Used(FwBuf_t *fifo);
-extern uint16_t FwBuf_Free(FwBuf_t *fifo);
-extern uint16_t FwBuf_Write(FwBuf_t *fifo, uint8_t *buf, uint16_t len);
-extern uint16_t FwBuf_WriteByte(FwBuf_t *fifo, uint8_t wrByte);
-extern uint16_t FwBuf_Read(FwBuf_t *fifo, uint8_t *buf, uint16_t len);
-extern uint16_t FwBuf_ReadByte(FwBuf_t *fifo);
-extern uint16_t FwBuf_ReadMirror(FwBuf_t *fifo, uint8_t *buf, uint16_t len);
-extern uint16_t FwBuf_ReadMirrorByte(FwBuf_t *fifo, uint16_t cursor);
+extern void     FwBufInit(FwBuf_t *fifo, void *buf, uint16_t len);
+extern void     FwBufFini(FwBuf_t *fifo);
+extern void     FwBufSetEmpty(FwBuf_t *fifo);
+extern uint16_t FwBufLen(FwBuf_t *fifo);
+extern uint16_t FwBufUsed(FwBuf_t *fifo);
+extern uint16_t FwBufFree(FwBuf_t *fifo);
+extern uint16_t FwBufWrite(FwBuf_t *fifo, uint8_t *buf, uint16_t len);
+extern uint16_t FwBufWriteByte(FwBuf_t *fifo, uint8_t wrByte);
+extern uint16_t FwBufRead(FwBuf_t *fifo, uint8_t *buf, uint16_t len);
+extern uint16_t FwBufReadByte(FwBuf_t *fifo);
+extern uint16_t FwBufReadMirror(FwBuf_t *fifo, uint8_t *buf, uint16_t len);
+extern uint16_t FwBufReadMirrorByte(FwBuf_t *fifo, uint16_t cursor);
 
 /**
  *******************************************************************************
  * @brief       queue function api
  *******************************************************************************
  */
-extern void     FwQueue_Init(FwQueue_t *queue, uint8_t *buf, uint16_t len);
-extern void     FwQueue_Fini(FwQueue_t *queue);
-extern uint16_t FwQueue_Write(FwQueue_t *queue, uint8_t *buf, uint16_t len);
-extern uint16_t FwQueue_Read(FwQueue_t *queue, uint8_t *buf, uint16_t len);
-extern uint16_t FwQueue_Free(FwQueue_t *queue);
-extern uint16_t FwQueue_Used(FwQueue_t *queue);
+extern void     FwQueueInit(FwQueue_t *queue, uint8_t *buf, uint16_t len);
+extern void     FwQueueFini(FwQueue_t *queue);
+extern uint16_t FwQueueWrite(FwQueue_t *queue, uint8_t *buf, uint16_t len);
+extern uint16_t FwQueueRead(FwQueue_t *queue, uint8_t *buf, uint16_t len);
+extern uint16_t FwQueueFree(FwQueue_t *queue);
+extern uint16_t FwQueueUsed(FwQueue_t *queue);
 
 /**
  *******************************************************************************
  * @brief       single link list interface
  *******************************************************************************
  */
-extern void       FwSList_Init(FwSList_t *list);
-extern void       FwSList_Append(FwSList_t *list, FwSList_t *node);
-extern void       FwSList_Insert(FwSList_t *list, FwSList_t *node);
-extern void       FwSList_Remove(FwSList_t *list, FwSList_t *node);
-extern FwSList_t* FwSList_Tail(FwSList_t *list);
-extern uint8_t    FwSList_IsEmpty(FwSList_t *list);
-extern int        FwSList_Len(FwSList_t *list);
+extern void       FwSListInit(FwSList_t *list);
+extern void       FwSListAppend(FwSList_t *list, FwSList_t *node);
+extern void       FwSListInsert(FwSList_t *list, FwSList_t *node);
+extern void       FwSListRemove(FwSList_t *list, FwSList_t *node);
+extern FwSList_t* FwSListTail(FwSList_t *list);
+extern uint8_t    FwSListIsEmpty(FwSList_t *list);
+extern int        FwSListLen(FwSList_t *list);
 
 /**
  *******************************************************************************
  * @brief       link list interface
  *******************************************************************************
  */
-extern void       FwList_Init(FwList_t *list);
-extern void       FwList_InsertAfter(FwList_t *list, FwList_t *node);
-extern void       FwList_InsertBefore(FwList_t *list, FwList_t *node);
-extern void       FwList_Remove(FwList_t *list);
-extern FwList_t*  FwList_DeleteAfter(FwList_t *list);
-extern uint8_t    FwList_IsEmpty(FwList_t *list);
-extern uint8_t    FwList_IsLife(FwList_t *list, FwList_t *node);
-extern int        FwList_Len(FwList_t *list);
+extern void       FwListInit(FwList_t *list);
+extern void       FwListInsertAfter(FwList_t *list, FwList_t *node);
+extern void       FwListInsertBefore(FwList_t *list, FwList_t *node);
+extern void       FwListRemove(FwList_t *list);
+extern FwList_t*  FwListDeleteAfter(FwList_t *list);
+extern uint8_t    FwListIsEmpty(FwList_t *list);
+extern uint8_t    FwListIsLife(FwList_t *list, FwList_t *node);
+extern int        FwListLen(FwList_t *list);
 
 /* Add c++ compatibility------------------------------------------------------*/
 #ifdef __cplusplus

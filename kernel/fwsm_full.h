@@ -33,8 +33,8 @@
  * @{
  */
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __FRAMEWORK_STATE_MACHINE_NANO_H__
-#define __FRAMEWORK_STATE_MACHINE_NANO_H__
+#ifndef __FRAMEWORK_STATE_MACHINE_H__
+#define __FRAMEWORK_STATE_MACHINE_H__
 
 /* Add c++ compatibility -----------------------------------------------------*/
 #ifdef __cplusplus
@@ -44,8 +44,16 @@ extern "C"
 
 /* Includes ------------------------------------------------------------------*/
 #include "compiler.h"
+#include "fw_core.h"
 
 /* Exported macro ------------------------------------------------------------*/
+/**
+ *******************************************************************************
+ * @brief      定义SM最大嵌套层级
+ *******************************************************************************
+ */
+#define FW_SM_SUPER_LAYER_MAX                                                  5
+
 /**
  *******************************************************************************
  * @brief      定义SM事件队列使能状态
@@ -55,43 +63,15 @@ extern "C"
 
 /**
  *******************************************************************************
- * @brief      定义SM状态表使能状态
- *******************************************************************************
- */
-#define FW_SM_EVENT_TABLE_ENABLE
-
-/**
- *******************************************************************************
  * @brief      定义SM相关处理功能
  *******************************************************************************
  */
 #define Fw_Sm_Tran(me, state)         (((FwSm_t *)me)->Temp = (SmStateHandle)(state), \
                                        FW_SM_RET_TRAN)
 #define Fw_Sm_Handle()                (FW_SM_RET_HANDLED)
-#define Fw_Sm_Super(me, super)        (((FwSm_t *)me)->SuperId = (super), FW_SM_RET_SUPER)
-#define Fw_Sm_Back(me, state)         (((FwSm_t *)me)->Temp = (SmStateHandle)(state), \
-                                       FW_SM_RET_BACK)
-#define Fw_Sm_ExitSub()               (FW_SM_RET_EXIT_SUB)
+#define Fw_Sm_Super()                 (FW_SM_RET_SUPER)
 #define Fw_Sm_Unhandle()              (FW_SM_RET_UNHANDLED)
-#define Fw_Sm_Wait(me, wait)          (((FwSm_t *)me)->Wait = (wait), FW_SM_RET_WAIT)
-
-/**
- *******************************************************************************
- * @brief      定义SM过滤等级
- *******************************************************************************
- */
-#define FW_SM_NONE_LEVEL      0xFFFF
-#define FW_SM_SUPER_LEVEL     0xF000
-#define FW_SM_SUB_LEVEL       0x0F00
-#define FW_SM_SUBSUB_LEVEL    0x00F0
-#define FW_SM_SUBSUBSUB_LEVEL 0x000F
-
-/**
- *******************************************************************************
- * @brief      定义空状态机
- *******************************************************************************
- */
-#define FW_SM_NULL 0xFF
+#define Fw_Sm_Wait()                  (FW_SM_RET_WAIT)
 
 /* Exported types ------------------------------------------------------------*/
 /**
@@ -109,7 +89,6 @@ enum FW_SM_RET
     
     FW_SM_RET_CALL,
     FW_SM_RET_BACK,
-    FW_SM_RET_EXIT_SUB,
     
     FW_SM_RET_HANDLED,
     FW_SM_RET_IGNORED,
@@ -127,66 +106,72 @@ enum FW_SM_RET
 //! 定义状态机状态
 typedef uint8_t FwSmState_t;
 
+struct FW_SM_ROOT;
+
 //! 定义状态机事件
 typedef struct FW_SM_EVT
 {
-    uint16_t Sig;
-    uint8_t  Id;
-    uint8_t  Next;
-}FwSmMsg_t;
+    uint32_t Sig;
+    
+    union
+    {
+        size_t Expand;
+        
+        void *Ptr;
 
-typedef struct
-{
-	uint16_t NowState;
-    uint16_t NowLevel;
-	uint16_t InputEvent;
-	uint16_t NextState;
-    uint16_t NextLevel;
-	uint16_t OutEvent;
-}FwSmTab_t;
+#ifdef USE_KEIL_C51_COMPILER
+        uint8_t (__CODE *Last)(void *me, struct FW_SM_EVT *evt) reentrant;
+#else
+        uint8_t (*Last)(void *me, struct FW_SM_EVT *evt);
+#endif
+    };
+}FwSmEvt_t;
 
 //! 定义状态机处理函数
-struct FW_SM;
 #ifdef USE_KEIL_C51_COMPILER
-typedef uint8_t (__CODE *SmStateHandle)(struct FW_SM *me, FwSmMsg_t *evt) reentrant;
+typedef uint8_t (__CODE *SmStateHandle)(void *me, FwSmEvt_t *evt) reentrant;
 #else
-typedef uint8_t (*SmStateHandle)(struct FW_SM *me, FwSmMsg_t *evt);
+typedef uint8_t (*SmStateHandle)(void *me, FwSmEvt_t *evt);
 #endif
 
 /**
  *******************************************************************************
- * @brief      FSM 数据结构
+ * @brief      HSM 数据结构
  *******************************************************************************
  */
-//! FSM处理句柄
-typedef struct FW_SM
+typedef struct FW_SM_ROOT
 {
-    SmStateHandle State;
-    SmStateHandle Temp;	
+    //! 根节点
+    char              *Name;
+    struct FW_SM_ROOT *Super;
     
-    uint16_t Wait;
-	uint16_t StateCode;
-
-    uint8_t TimerId;
-	uint8_t SmId;
-    uint8_t SuperId;
-    uint8_t SubSmId;
-}FwSm_t;
+    //! SM List
+    FwList_t List;
+    
+    //! Sub SM List
+    FwList_t SubList;
+ 
+    SmStateHandle State;
+    SmStateHandle Temp;
+    
+    FwTimer_t Timer;
+}FwSmRoot_t, FwSm_t;
 
 /* Exported variables --------------------------------------------------------*/
 /* Exported functions --------------------------------------------------------*/
-extern void FwSm_Task_Init(uint8_t taskId);
-extern uint16_t FwSm_Task_Handle(uint8_t taskid, uint16_t evt);
-extern void Fw_Sm_Init(uint8_t smId, uint8_t timerId, SmStateHandle init);
-extern uint16_t FwSm_Release_Wait(FwSm_t *me);
-extern void FwSm_Clear_Wait(FwSm_t *me);
-extern void FwSm_Post_Msg(uint16_t sm, uint16_t sig);
+extern int FwSm_Component_Init(void);
+
+extern void FwSm_AddRoot(FwSmRoot_t *root, char *name, SmStateHandle init);
+extern void FwSm_AddSub(FwSmRoot_t *root, FwSm_t *sm, char *name, SmStateHandle init);
+
+extern uint8_t FwSm_Dispatch(FwSm_t *me, FwSmEvt_t *evt);
+
+extern uint16_t FwSmPost(FwSm_t *me, uint32_t sig, uint32_t param);
+extern uint16_t FwSmEmit(FwSm_t *me, uint32_t sig);
+extern void *FwSm_State(FwSm_t *me);
+
 extern void FwSm_Timer_Start(FwSm_t *me, uint32_t tick);
 extern void FwSm_Timer_Stop(FwSm_t *me);
-extern uint32_t FwSm_Timer_Tick(FwSm_t *me);
-extern uint16_t Fw_Sm_Code(FwSm_t *me);
-extern void Fw_Sm_SetCode(FwSm_t *me, uint16_t sCode);
-extern void *Fw_Sm_State(uint16_t smId);
 
 /* Add c++ compatibility------------------------------------------------------*/
 #ifdef __cplusplus

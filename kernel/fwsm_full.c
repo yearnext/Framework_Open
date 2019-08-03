@@ -37,12 +37,45 @@
 #include "fw_sm.h"
 
 /* Exported macro ------------------------------------------------------------*/
-/* Exported types ------------------------------------------------------------*/
+/* Private types -------------------------------------------------------------*/
+//! SM 句柄
+typedef struct
+{
+    //! 任务句柄
+    FwTask_t Task;
+
+    FwMQ_t Queue;
+    
+    //! SM Root List
+    FwList_t List;
+}FwSmHandle_t;
+
+typedef struct
+{
+    FwSm_t *Object;
+    FwSmEvt_t Event;
+}FwSmMsg_t;
+
 /* Private variables ---------------------------------------------------------*/
+static FwSmHandle_t SmHandle;
+static FwSmMsg_t SmQueue[FRAMEWORK_SM_COMPONENT_QUEUE_SIZE];
+
 /* Exported variables --------------------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
+void FwSm_Task_Handle(void *param)
+{   
+    FwSmMsg_t msg;
+
+    while (1)
+    {
+        Fw_MQ_Read(&SmHandle.Queue, &msg, sizeof(msg));
+        
+        FwSm_Dispatch(msg.Object, &msg.Event);
+    }
+}
+
 __STATIC_INLINE
-uint8_t Fw_Sm_Tran_Handle(FwSm_t *me)
+uint8_t FwSmTran(FwSm_t *me)
 {
     uint8_t ret;
     
@@ -59,65 +92,73 @@ uint8_t Fw_Sm_Tran_Handle(FwSm_t *me)
     return ret;
 }
 
-void Fw_Sm_Timer_Handle(void *param)
+void FwSm_Timer_Handle(void *param)
 {
     FwSm_t *me = (FwSm_t *)param;
     FwSmEvt_t evt; 
 
     //! 启动SM调度器
-    evt.Sig = FRAMEWORK_TIMEOUT_EVENT;
-    evt.Ptr = NULL;
-    Fw_Sm_Dispatch(me, &evt);
+    evt.Sig    = FRAMEWORK_TIMEOUT_EVENT;
+    evt.Expand = 0;
+    FwSm_Dispatch(me, &evt);
     
     //! 唤醒消息队列
-    Fw_Task_Wakeup(&me->Task);
+    //Fw_Task_Wakeup(&me->Task);
 }
 
-uint16_t Fw_Sm_Task_Handle(void *param)
-{
-    FwSm_t *me = (FwSm_t *)param;
-    FwSmEvt_t evt;
-    
-    while (1)
-    {
-        //! 消息预处理
-        Fw_MQ_Read_Mirror(&me->Queue, &evt, sizeof(evt));
-        
-        if (Fw_Sm_Dispatch(me, &evt) == 0)
-        {
-            Fw_Task_Sleep(&me->Task);
-            break;
-        }
-
-        //! 移除消息
-        Fw_MQ_Read(&me->Queue, &evt, sizeof(evt));
-    }
-    
-    return 0;
-}
-
-/* Exported functions --------------------------------------------------------*/
-void Fw_Sm_Init(FwSm_t *me, void *buf, uint16_t size, SmStateHandle init)
+void FwSmInit(FwSm_t *me, SmStateHandle init)
 {
     FwSmEvt_t evt;
 
-    Fw_Task_Init(&me->Task, "SM Task", Fw_Sm_Task_Handle, (void *)me);
-    Fw_Task_Startup(&me->Task, FRAMEWORK_TASK_PRIORITY_MAX-2, 0);
+    Fw_Timer_Init(&me->Timer, "SM Timer", NULL, (void *)me, 0, 0);
+    Fw_Timer_Stop(&me->Timer);
     
-    Fw_Timer_Init(&me->Task.Timer, "SM Timer", NULL, (void *)me);
-    Fw_Timer_Stop(&me->Task.Timer);
-    
-    Fw_MQ_Init(&me->Queue, (uint8_t *)buf, size);
+    me->Temp = init;
 
-    me->Temp  = init;
-
-    evt.Sig = FRAMEWORK_ENTRY_EVENT;    
+    evt.Sig    = FRAMEWORK_INIT_EVENT;
+    evt.Expand = 0;
     me->Temp(me, &evt);
     
     me->State = me->Temp;
 }
 
-uint8_t Fw_Sm_Dispatch(FwSm_t *me, FwSmEvt_t *evt)
+/* Exported functions --------------------------------------------------------*/
+int FwSm_Component_Init(void)
+{
+    memset((void *)&SmHandle, 0, sizeof(SmHandle));
+
+    Fw_Task_Init(&SmHandle.Task, "SM Task", FwSm_Task_Handle, NULL, FRAMEWORK_TASK_PRIORITY_MAX-1, 0);
+    Fw_Task_Start(&SmHandle.Task);
+    
+    Fw_MQ_Init(&SmHandle.Queue, &SmQueue[0], sizeof(SmQueue));
+    
+    FwList_Init(&SmHandle.List);
+    
+    return 0;
+}
+INIT_COMPONENT_EXPORT(FwSm_Component_Init);
+
+void FwSm_AddRoot(FwSm_t *me, char *name, SmStateHandle init)
+{   
+    me->Super = NULL;
+    me->Name  = name;
+
+    FwList_InsertAfter(&SmHandle.List, &me->List);
+    
+    FwSmInit(me, init);
+}
+
+void FwSm_AddSub(FwSm_t *root, FwSm_t *me, char *name, SmStateHandle init)
+{
+    me->Super = root;
+    me->Name  = name;
+
+    FwList_InsertAfter(&SmHandle.List, &me->List);
+    
+    FwSmInit(me, init);
+}
+
+uint8_t FwSm_Dispatch(FwSm_t *me, FwSmEvt_t *evt)
 {
     uint8_t status;
     
@@ -131,7 +172,7 @@ __SM_RET_HANDLE:
         //! 状态转移处理
         if (ret == FW_SM_RET_TRAN)
         {
-            ret = Fw_Sm_Tran_Handle(me);
+            ret = FwSmTran(me);
             
             goto __SM_RET_HANDLE;
         }
@@ -152,25 +193,41 @@ __SM_RET_HANDLE:
     return status;
 }
 
+uint16_t FwSmPost(FwSm_t *me, uint32_t sig, uint32_t param)
+{
+    FwSmMsg_t msg;
+    
+    msg.Object       = me;
+    msg.Event.Sig    = sig;
+    msg.Event.Expand = param;
+    
+    return Fw_MQ_Send(&SmHandle.Queue, (void *)&msg, sizeof(msg));
+}
+
+uint16_t FwSmEmit(FwSm_t *me, uint32_t sig)
+{
+    FwSmMsg_t msg;
+    
+    msg.Object       = me;
+    msg.Event.Sig    = sig;
+    msg.Event.Expand = 0;
+
+    return Fw_MQ_Send(&SmHandle.Queue, (void *)&msg, sizeof(msg));
+}
+
+void FwSm_Timer_Start(FwSm_t *me, uint32_t tick)
+{
+    Fw_Timer_Init(&me->Timer, "SM Timer", FwSm_Timer_Handle, (void *)me, tick, 0);
+    Fw_Timer_Start(&me->Timer);
+}
+
+void FwSm_Timer_Stop(FwSm_t *me)
+{
+    Fw_Timer_Stop(&me->Timer);
+}
+
 __INLINE
-uint16_t Fw_SmEvt_Post(FwSm_t *me, FwSmEvt_t *evt)
-{
-    return Fw_MQ_Send(&me->Queue, (void *)evt, sizeof(FwSmEvt_t));
-}
-
-void Fw_SmTimer_Start(FwSm_t *me, uint32_t tick)
-{
-    Fw_Timer_Init(&me->Task.Timer, "SM Timer", Fw_Sm_Timer_Handle, (void *)me);
-    Fw_Timer_Startup(&me->Task.Timer, tick, 0);
-}
-
-void Fw_SmTimer_Stop(FwSm_t *me)
-{
-    Fw_Timer_Stop(&me->Task.Timer);
-}
-
-__INLINE
-void *Fw_Sm_State(FwSm_t *me)
+void *FwSm_State(FwSm_t *me)
 {
     return (void *)me->State;
 }

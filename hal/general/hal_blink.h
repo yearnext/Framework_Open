@@ -24,8 +24,8 @@
  *                 GCC                                                         *
  *******************************************************************************
  * @note                                                                       *
- * 1.2018-01-16 ´´½¨ÎÄ¼ş£¬Ôö¼ÓLEDÉÁË¸¹¦ÄÜ                                      *
- * 1.2018-06-28 ĞŞ¸ÄÎÄ¼şÃûÎª¡°hal_blink.c¡±£¬ÕûºÏ¿ò¼Ü£¬Í³Ò»HAL²ã                 *
+ * 1.2018-01-16 åˆ›å»ºæ–‡ä»¶ï¼Œå¢åŠ LEDé—ªçƒåŠŸèƒ½                                      *
+ * 1.2018-06-28 ä¿®æ”¹æ–‡ä»¶åä¸ºâ€œhal_blink.câ€ï¼Œæ•´åˆæ¡†æ¶ï¼Œç»Ÿä¸€HALå±‚                 *
  *******************************************************************************
  */
 /* Define to prevent recursive inclusion -------------------------------------*/
@@ -40,40 +40,31 @@ extern "C"
 
 
 /* Includes ------------------------------------------------------------------*/
-/* Exported macro ------------------------------------------------------------*/
-//! BLINK ×´Ì¬¶¨Òå
-#define HAL_BLINK_INIT_STATE  0
-#define HAL_BLINK_ON_STATE    1
-#define HAL_BLINK_OFF_STATE   2
-#define HAL_BLINK_DOING_STATE 3
+#include "hal_def.h"
 
-//! BLINK ÃüÁî¶¨Òå
-#define HAL_BLINK_INIT_CMD    0
-#define HAL_BLINK_ON_CMD      1
-#define HAL_BLINK_OFF_CMD     2
-    
+/* Exported macro ------------------------------------------------------------*/    
 /* Exported types ------------------------------------------------------------*/
 typedef int (__CODE* HALBlinkCallback)(void *handle, uint8_t cmd);
 
 typedef struct HAL_BLINK
 {
-    //! ¶¨Ê±Æ÷¾ä±ú
+    //! å®šæ—¶å™¨å¥æŸ„
     HalDevTim_t Timer;
     
-    //! ÉèÖÃ»Øµ÷º¯Êı
+    //! è®¾ç½®å›è°ƒå‡½æ•°
     HALBlinkCallback Callback;
     
-    //! »Øµ÷²ÎÊı
+    //! å›è°ƒå‚æ•°
     void *Param;
     
-    //! Éè±¸Ãû³Æ
+    //! è®¾å¤‡åç§°
     char *Name;
     
-    //! µ±Ç°×´Ì¬
+    //! å½“å‰çŠ¶æ€
     uint8_t State;
-    //! ÉÁË¸´ÎÊı
+    //! é—ªçƒæ¬¡æ•°
     int16_t Count;
-    //! ÉÁË¸³¬Ê±Ê±¼ä
+    //! é—ªçƒè¶…æ—¶æ—¶é—´
     uint16_t Timeout;
 }HAL_Blink_t;
 

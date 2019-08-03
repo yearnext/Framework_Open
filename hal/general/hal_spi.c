@@ -24,7 +24,7 @@
  *                 GCC                                                         *
  *******************************************************************************
  * @note                                                                       *
- * 1. 2018-06-28 从“hal_device.h”分离出SPI驱动                                 *
+ * 1. 2018-06-28 浠庘�渉al_device.h鈥濆垎绂诲嚭SPI椹卞姩                                 *
  *******************************************************************************
  */
  
@@ -103,15 +103,15 @@ void HAL_SPI_Device_Init(HAL_SPI_Device_t *spiDev, uint8_t busPort, uint32_t css
     LinkList_t *list = DeviceSPIBus.List.Next;
     HAL_SPI_Bus_t *spiBus;
     
-    //! 初始化spi设备 css 引脚
+    //! 鍒濆鍖杝pi璁惧 css 寮曡剼
     spiDev->Css.Port = HAL_PORT(css);
     spiDev->Css.Pin  = HAL_PIN(css);
     spiDev->Css.Mode = HAL_PIN_OUTPUT;
     HAL_Pin_Init(css, HAL_PIN_OUTPUT);
-    //! 释放spi总线
+    //! 閲婃斁spi鎬荤嚎
     HAL_Pin_Set(css);
     
-    //! 载入总线句柄
+    //! 杞藉叆鎬荤嚎鍙ユ焺
     while(!IS_PTR_NULL(list))
     {
         spiBus = LinkListEntry(list, HAL_SPI_Bus_t, List);
@@ -127,7 +127,7 @@ void HAL_SPI_Device_Init(HAL_SPI_Device_t *spiDev, uint8_t busPort, uint32_t css
     
 uint8_t HAL_SPI_Bus_Take(HAL_SPI_Device_t *spi)
 {
-    //! 总线空闲则占用总线
+    //! 鎬荤嚎绌洪棽鍒欏崰鐢ㄦ�荤嚎
     if (HAL_Flag_Get(spi->Bus->Atrribute.Flag, HAL_SPI_TAKE_FLAG) == 0)
     {
         HAL_Flag_Set(spi->Bus->Atrribute.Flag, HAL_SPI_TAKE_FLAG);
@@ -141,7 +141,7 @@ uint8_t HAL_SPI_Bus_Take(HAL_SPI_Device_t *spi)
 
 uint8_t HAL_SPI_Bus_Release(HAL_SPI_Device_t *spi)
 {
-    //! 总线被占用则释放总线
+    //! 鎬荤嚎琚崰鐢ㄥ垯閲婃斁鎬荤嚎
     if (spi->Bus->Owner == spi)
     {
         if (HAL_Flag_Get(spi->Bus->Atrribute.Flag, HAL_SPI_TAKE_FLAG))
@@ -167,7 +167,7 @@ uint8_t HAL_SPI_Take(HAL_SPI_Device_t *spi)
     {
         HAL_Flag_Set(spi->Atrribute.Flag, HAL_SPI_TAKE_FLAG);
 
-        //! 占用SPI总线
+        //! 鍗犵敤SPI鎬荤嚎
         HAL_Pin_Clr(HAL_PIN_ID(spi->Css.Port, spi->Css.Pin));
         
         return 0;
@@ -187,7 +187,7 @@ uint8_t HAL_SPI_Release(HAL_SPI_Device_t *spi)
     {
         HAL_Flag_Clr(spi->Atrribute.Flag, HAL_SPI_TAKE_FLAG);
 
-        //! 释放SPI总线
+        //! 閲婃斁SPI鎬荤嚎
         HAL_Pin_Set(HAL_PIN_ID(spi->Css.Port, spi->Css.Pin));
         return 0;
     }
@@ -199,7 +199,7 @@ uint16_t HAL_SPI_Send(HAL_SPI_Device_t *spiDev, uint8_t *buf, uint16_t len)
 {
     SPI_Message_t msg;
     
-    //! 获取SPI总线
+    //! 鑾峰彇SPI鎬荤嚎
     if (HAL_SPI_Take(spiDev))
     {
         return 0;
@@ -217,7 +217,7 @@ uint16_t HAL_SPI_Send(HAL_SPI_Device_t *spiDev, uint8_t *buf, uint16_t len)
         len = DeviceSPIBus.Ops.Transfer(spiDev->Bus, &msg);
     }
     
-    //! 释放SPI总线
+    //! 閲婃斁SPI鎬荤嚎
     if (HAL_SPI_Release(spiDev))
     {
         return 0;
@@ -230,7 +230,7 @@ uint16_t HAL_SPI_Recv(HAL_SPI_Device_t *spiDev, uint8_t *buf, uint16_t len)
 {
     SPI_Message_t msg;
     
-    //! 获取SPI总线
+    //! 鑾峰彇SPI鎬荤嚎
     if (HAL_SPI_Take(spiDev))
     {
         return 0;
@@ -248,7 +248,7 @@ uint16_t HAL_SPI_Recv(HAL_SPI_Device_t *spiDev, uint8_t *buf, uint16_t len)
         len = DeviceSPIBus.Ops.Transfer(spiDev->Bus, &msg);
     }
     
-    //! 释放SPI总线
+    //! 閲婃斁SPI鎬荤嚎
     if (HAL_SPI_Release(spiDev))
     {
         return 0;
@@ -261,7 +261,7 @@ uint16_t HAL_SPI_Transfer(HAL_SPI_Device_t *spiDev, uint8_t *sendBuf, uint8_t *r
 {
     SPI_Message_t msg;
     
-    //! 获取SPI总线
+    //! 鑾峰彇SPI鎬荤嚎
     if (HAL_SPI_Take(spiDev))
     {
         return 0;
@@ -280,7 +280,7 @@ uint16_t HAL_SPI_Transfer(HAL_SPI_Device_t *spiDev, uint8_t *sendBuf, uint8_t *r
         len = DeviceSPIBus.Ops.Transfer(spiDev->Bus, &msg);
     }
     
-    //! 释放SPI总线
+    //! 閲婃斁SPI鎬荤嚎
     if (HAL_SPI_Release(spiDev))
     {
         return 0;
@@ -304,7 +304,7 @@ uint16_t HAL_SPI_Send_Then_Send(HAL_SPI_Device_t *spiDev, uint8_t *sendBuf1, uin
     SPI_Message_t msg;
     uint16_t len;
     
-    //! 获取SPI总线
+    //! 鑾峰彇SPI鎬荤嚎
     if (HAL_SPI_Take(spiDev))
     {
         return 0;
@@ -329,7 +329,7 @@ uint16_t HAL_SPI_Send_Then_Send(HAL_SPI_Device_t *spiDev, uint8_t *sendBuf1, uin
         len += DeviceSPIBus.Ops.Transfer(spiDev->Bus, &msg);
     }
     
-    //! 释放SPI总线
+    //! 閲婃斁SPI鎬荤嚎
     if (HAL_SPI_Release(spiDev))
     {
         return 0;
@@ -343,7 +343,7 @@ uint16_t HAL_SPI_Send_Then_Recv(HAL_SPI_Device_t *spiDev, uint8_t *sendBuf, uint
     SPI_Message_t msg;
     uint16_t len;
     
-    //! 获取SPI总线
+    //! 鑾峰彇SPI鎬荤嚎
     if (HAL_SPI_Take(spiDev))
     {
         return 0;
@@ -368,7 +368,7 @@ uint16_t HAL_SPI_Send_Then_Recv(HAL_SPI_Device_t *spiDev, uint8_t *sendBuf, uint
         len += DeviceSPIBus.Ops.Transfer(spiDev->Bus, &msg);
     }
     
-    //! 释放SPI总线
+    //! 閲婃斁SPI鎬荤嚎
     if (HAL_SPI_Release(spiDev))
     {
         return 0;

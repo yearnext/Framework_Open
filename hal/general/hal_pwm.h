@@ -39,40 +39,9 @@ extern "C"
 #endif
 
 /* Includes ------------------------------------------------------------------*/
+#include "hal_def.h"
+
 /* Exported macro ------------------------------------------------------------*/
-/**
- *******************************************************************************
- * @brief        HAL PWM PORT
- *******************************************************************************
- */
-enum HAL_PWM_PORT
-{
-    HAL_PWM_CH0,  HAL_PWM_CH1,  HAL_PWM_CH2,  HAL_PWM_CH3,
-    HAL_PWM_CH4,  HAL_PWM_CH5,  HAL_PWM_CH6,  HAL_PWM_CH7,
-    HAL_PWM_CH8,  HAL_PWM_CH9,  HAL_PWM_CH10, HAL_PWM_CH11,
-    HAL_PWM_CH12, HAL_PWM_CH13, HAL_PWM_CH14, HAL_PWM_CH15,
-    HAL_PWM_CH16, HAL_PWM_CH17, HAL_PWM_CH18, HAL_PWM_CH19,
-    HAL_PWM_CH20, HAL_PWM_CH21, HAL_PWM_CH22, HAL_PWM_CH23,
-    HAL_PWM_CH24, HAL_PWM_CH25, HAL_PWM_CH26, HAL_PWM_CH27,
-    HAL_PWM_CH28, HAL_PWM_CH29, HAL_PWM_CH30, HAL_PWM_CH31,
-    
-    HAL_PWM_CH_MAX,
-};
-
-enum HAL_PWM_CMD
-{
-    HAL_PWM_CHANNEL_NORMAL = HAL_SPECIAL_CMD,
-    HAL_PWM_CHANNEL_NEGATION,
-};
-
-/**
- *******************************************************************************
- * @brief        HAL PWM OPTION
- *******************************************************************************
- */
-#define HAL_PWM_READ                                                           0
-#define HAL_PWM_WRITE                                                          1
-
 /* Exported types ------------------------------------------------------------*/
 typedef struct
 {

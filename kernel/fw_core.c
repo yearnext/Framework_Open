@@ -138,7 +138,7 @@ void FwMQ_Timer_Callback(void *param)
     if (queue->Task->State == FW_TASK_YEILD)
     {
         //! 消息已更新
-        if (FwBuf_Used(&queue->Buffer) >= sizeof(FwMsg_t))
+        if (FwBufUsed(&queue->Buffer) >= sizeof(FwMsg_t))
         {
             Fw_Task_Ready(queue->Task);
             
@@ -152,54 +152,6 @@ void FwMQ_Timer_Callback(void *param)
 }
 
 /* Exported functions --------------------------------------------------------*/
-/**
- *******************************************************************************
- * @brief       进入临界点函数
- * @param       [in/out]  void
- * @return      [in/out]  void
- * @note        由用户调用
- *******************************************************************************
- */
-__INLINE
-void Fw_Enter_Critical(void)
-{
-    if (FwIsrLock == 0)
-    {
-        Fw_IRQ_Disable();
-
-        FwIsrLock++;
-    }
-    else 
-    {
-        if (FwIsrLock < 0xFFFF)
-        {
-            FwIsrLock++;
-        }
-    }
-}
-
-/**
- *******************************************************************************
- * @brief       退出临界点函数
- * @param       [in/out]  void
- * @return      [in/out]  void
- * @note        由用户调用
- *******************************************************************************
- */
-__INLINE
-void Fw_Exit_Critical(void)
-{
-    if (FwIsrLock)
-    {
-        FwIsrLock --;
-        
-        if (FwIsrLock == 0)
-        {
-            Fw_IRQ_Enable();
-        }
-    }
-}
-
 /**
  *******************************************************************************
  * @brief       任务初始化函数
@@ -245,7 +197,7 @@ void Fw_Task_Init(FwTask_t *task, char *name, void *handle, void *param, uint8_t
     }
 #endif
     
-    FwList_Init(&task->List);
+    FwListInit(&task->List);
 }
 
 /**
@@ -312,7 +264,7 @@ void Fw_Task_Sleep(FwTask_t *task)
 {
     task->State = FW_TASK_SLEEP;
 
-    FwList_Remove(&task->List);
+    FwListRemove(&task->List);
 }
 
 /**
@@ -346,13 +298,13 @@ void Fw_Task_Ready(FwTask_t *task)
     }
 
     //! 移除操作
-    FwList_Remove(&task->List);
+    FwListRemove(&task->List);
     
     //! 查找操作
     for (head = &FwActiveTaskTable[task->Priority], p = head->Next; p != head; p = p->Next);
     
     //! 在末尾插入
-	FwList_InsertBefore(p, &task->List);
+	FwListInsertBefore(p, &task->List);
 	
 	//! 将任务加入任务就绪表中
     _mem_bit_set(FwTaskReadyTable, 8, task->Priority);
@@ -419,7 +371,7 @@ uint32_t Fw_Self_Flag_Get(uint32_t flag)
 __INLINE
 void Fw_MQ_Init(FwMQ_t *queue, void *buf, uint16_t len)
 {
-    FwBuf_Init(&queue->Buffer, (uint8_t *)buf, len);
+    FwBufInit(&queue->Buffer, (uint8_t *)buf, len);
     
     queue->Task = NULL;
 }
@@ -435,7 +387,7 @@ void Fw_MQ_Init(FwMQ_t *queue, void *buf, uint16_t len)
 __INLINE
 void Fw_MQ_Fini(FwMQ_t *queue)
 {
-    FwBuf_Fini(&queue->Buffer);
+    FwBufFini(&queue->Buffer);
 }
 
 /**
@@ -451,7 +403,7 @@ void Fw_MQ_Fini(FwMQ_t *queue)
 __INLINE
 uint16_t Fw_MQ_Send(FwMQ_t *queue, void *msg, uint16_t size)
 {
-    uint16_t result = FwBuf_Write(&queue->Buffer, (uint8_t *)msg, size);
+    uint16_t result = FwBufWrite(&queue->Buffer, (uint8_t *)msg, size);
     
     if (!IS_PTR_NULL(queue->Task))
     {
@@ -478,7 +430,7 @@ uint16_t Fw_MQ_Send(FwMQ_t *queue, void *msg, uint16_t size)
  */
 FwErr_t Fw_MQ_Recv(FwMQ_t *queue, void *msg, uint16_t size, size_t tick)
 {
-    if (FwBuf_Read(&queue->Buffer, (uint8_t *)msg, size) != size)
+    if (FwBufRead(&queue->Buffer, (uint8_t *)msg, size) != size)
     {
         //! 设置队列等待任务
         queue->Task = FwCurTask;
@@ -513,7 +465,7 @@ FwErr_t Fw_MQ_Recv(FwMQ_t *queue, void *msg, uint16_t size, size_t tick)
  */
 FwErr_t Fw_MQ_Recv_Mirror(FwMQ_t *queue, void *msg, uint16_t size)
 {
-    if (FwBuf_ReadMirror(&queue->Buffer, (uint8_t *)msg, size) != size)
+    if (FwBufReadMirror(&queue->Buffer, (uint8_t *)msg, size) != size)
     {       
         //! 设置队列等待任务
         queue->Task = FwCurTask;
@@ -553,9 +505,6 @@ __INLINE
 void Fw_Core_Init(void)
 {
     uint16_t i;
-    
-    //! 初始化中断锁
-    FwIsrLock = 0;
 
     Fw_Enter_Critical();
     
@@ -565,7 +514,7 @@ void Fw_Core_Init(void)
     //! 初始化任务就绪表
     for (i = 0; i<_dimof(FwActiveTaskTable); i++)
     {
-        FwList_Init(&FwActiveTaskTable[i]);
+        FwListInit(&FwActiveTaskTable[i]);
     }
 
     for (i=0; i<_dimof(FwTaskReadyTable); i++)
@@ -576,8 +525,11 @@ void Fw_Core_Init(void)
     //! 初始化当前任务指针
     FwCurTask = NULL;
 
-	//! 输出系统信息
-	Fw_Put_Info();
+    //! 系统服务初始化
+    Fw_Server_Init();
+    
+    //! 初始化控制台
+    Fw_Console_Init();
 
     //! 框架组件初始化
     Fw_Component_Init();
@@ -638,7 +590,7 @@ void Fw_Core_Startup(void)
                 }
                 
                 //! 2. 获取就绪任务句柄
-                list = FwList_DeleteAfter(&FwActiveTaskTable[prio]);
+                list = FwListDeleteAfter(&FwActiveTaskTable[prio]);
                 
                 if (IS_PTR_NULL(list))
                 {
@@ -659,7 +611,7 @@ void Fw_Core_Startup(void)
                 }
                 
                 //! 4. 处理任务就绪标志
-                if (FwList_IsEmpty(&FwActiveTaskTable[prio]))
+                if (FwListIsEmpty(&FwActiveTaskTable[prio]))
                 {
                     goto __CLEAR_TASK_READY_FLAG;
                 }
@@ -821,6 +773,34 @@ int Fw_Component_Init(void)
 }
 
 #endif
+
+/**
+ *******************************************************************************
+ * @brief       系统服务初始化函数
+ * @param       [in/out]  void
+ * @return      [in/out]  void
+ * @note        由框架调用
+ *******************************************************************************
+ */
+__WEAK
+void Fw_Server_Init(void)
+{
+    
+}
+
+/**
+ *******************************************************************************
+ * @brief       控制台初始化函数
+ * @param       [in/out]  void
+ * @return      [in/out]  void
+ * @note        由Fw_Core_Start调用
+ *******************************************************************************
+ */
+__WEAK
+void Fw_Console_Init(void)
+{
+    
+}
 
 /** @}*/     /** framework core interface */
 

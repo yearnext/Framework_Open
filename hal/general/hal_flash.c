@@ -24,8 +24,8 @@
  *                 GCC                                                         *
  *******************************************************************************
  * @note                                                                       *
- * 1. 20171027    创建文件"veeprom.c"                                          *
- * 2. 20180829    精简veeprom组件，更名为"hal_flash.c"                         *
+ * 1. 20171027    鍒涘缓鏂囦欢"veeprom.c"                                          *
+ * 2. 20180829    绮剧畝veeprom缁勪欢锛屾洿鍚嶄负"hal_flash.c"                         *
  *******************************************************************************
  */
  
@@ -306,7 +306,7 @@ uint8_t HAL_Flash_Update(void *param)
         {
             uint8_t state = flash_get_flag(HAL_FLASH_ERASE_FLAG, 0, 0);
             
-            //! 写入成功
+            //! 鍐欏叆鎴愬姛
             if (state == 0)
             {
                 flash->Addr += flash->PhyInfo.PageSize;
@@ -321,7 +321,7 @@ uint8_t HAL_Flash_Update(void *param)
                     flash->Atrribute.State = HAL_FLASH_ERASE;
                 }
             }
-            //! 写入失败
+            //! 鍐欏叆澶辫触
             else if (state == 2)
             {
                 flash->Atrribute.State = HAL_FLASH_HW_ERROR;
@@ -345,7 +345,7 @@ uint8_t HAL_Flash_Update(void *param)
             
             if (state == 0)
             {
-                //! 校验成功
+                //! 鏍￠獙鎴愬姛
                 if (flash_get_flag(HAL_FLASH_VERIFY_FLAG, flash->Addr, wrData) == 0)
                 {
                     flash->Addr += HAL_FLASH_ALIGNMENT;
@@ -362,13 +362,13 @@ uint8_t HAL_Flash_Update(void *param)
                         flash->Atrribute.State = HAL_FLASH_WRITE;
                     }
                 }
-                //! 校验失败
+                //! 鏍￠獙澶辫触
                 else
                 {
                     flash->Atrribute.State = HAL_FLASH_WRITE;
                 }
             }
-            //! 写入失败
+            //! 鍐欏叆澶辫触
             else if (state == 2)
             {
                 flash->Atrribute.State = HAL_FLASH_HW_ERROR;

@@ -39,48 +39,9 @@ extern "C"
 #endif
 
 /* Includes ------------------------------------------------------------------*/
+#include "hal_def.h"
+
 /* Exported macro ------------------------------------------------------------*/
-/**
- *******************************************************************************
- * @brief        HAL DMA PORT
- *******************************************************************************
- */
-enum HAL_DMA_PORT
-{
-    HAL_DMA_CH0,  HAL_DMA_CH1,  HAL_DMA_CH2,  HAL_DMA_CH3,
-    HAL_DMA_CH4,  HAL_DMA_CH5,  HAL_DMA_CH6,  HAL_DMA_CH7,
-    HAL_DMA_CH8,  HAL_DMA_CH9,  HAL_DMA_CH10, HAL_DMA_CH11,
-    HAL_DMA_CH12, HAL_DMA_CH13, HAL_DMA_CH14, HAL_DMA_CH15,
-    HAL_DMA_CH16, HAL_DMA_CH17, HAL_DMA_CH18, HAL_DMA_CH19,
-    HAL_DMA_CH20, HAL_DMA_CH21, HAL_DMA_CH22, HAL_DMA_CH23,
-    HAL_DMA_CH24, HAL_DMA_CH25, HAL_DMA_CH26, HAL_DMA_CH27,
-    HAL_DMA_CH28, HAL_DMA_CH29, HAL_DMA_CH30, HAL_DMA_CH31,
-    
-    HAL_DMA_CH_MAX,
-};
-
-enum HAL_DMA_CMD
-{
-    HAL_DMA_CHANNEL_NORMAL = HAL_SPECIAL_CMD,
-    HAL_DMA_CHANNEL_NEGATION,
-};
-
-/**
- *******************************************************************************
- * @brief        HAL DMA OPTION
- *******************************************************************************
- */
-#define HAL_DMA_READ                                                           0
-#define HAL_DMA_WRITE                                                          1
-
-/**
- *******************************************************************************
- * @brief        HAL DMA EVENT
- *******************************************************************************
- */
-#define HAL_DMA_EVENT_TX_DONE                                                  2
-#define HAL_DMA_EVENT_RX_DONE                                                  3
-
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
 /* Exported functions --------------------------------------------------------*/

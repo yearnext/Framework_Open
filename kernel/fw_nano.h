@@ -50,6 +50,20 @@ extern "C"
 /* Exported macro ------------------------------------------------------------*/
 /**
  *******************************************************************************
+ * @brief       定义框架软件版本
+ *******************************************************************************
+ */
+#define FRAMEWORK_SOFT_VERSION                                           "1.3.5"
+
+/**
+ *******************************************************************************
+ * @brief       定义框架编译日期
+ *******************************************************************************
+ */
+#define FRAMEWORK_BUILD_DATE                                        "2019-05-20"
+
+/**
+ *******************************************************************************
  * @brief        任务组件
  *******************************************************************************
  */
@@ -80,7 +94,7 @@ extern "C"
  * @brief        tick block
  *******************************************************************************
  */
-#ifdef FRAMEWORK_NANO_EXPAND
+#ifdef ENABLE_FRAMEWORK_NANO_EXPAND
 typedef uint32_t FwTick_t;
 #define FRAMEWORK_TICK_MAX UINT32_MAX
 #else
@@ -95,14 +109,23 @@ typedef uint16_t FwTick_t;
  */
 typedef struct
 {
-#ifdef FRAMEWORK_NANO_EXPAND
+#ifdef ENABLE_FRAMEWORK_NANO_EXPAND
     union
     {
         void (*Callback)(void *param);
-        void *Ptr;
-    }Handle;
+        void *Func;
+    };
     
-    void *param;
+    union
+    {
+        void *Param;
+        
+        struct
+        {
+            uint16_t SmId;
+            uint16_t Sig;
+        };
+    };
     
     FwTick_t Reload;
 #endif
@@ -135,7 +158,7 @@ typedef struct
 {
     FwTimer_t Timer;
     
-#ifdef FRAMEWORK_NANO_EXPAND
+#ifdef ENABLE_FRAMEWORK_NANO_EXPAND
     uint16_t State;
 #endif
     
@@ -147,14 +170,14 @@ typedef struct
 {
     volatile FwTick_t Tick;
     
-#ifdef FRAMEWORK_NANO_EXPAND
+#ifdef ENABLE_FRAMEWORK_NANO_EXPAND
     volatile uint32_t IsrLock;
 #endif
     
     volatile uint16_t Event;
     
     uint16_t CurTask;
-}FwHandle_t;
+}FwCore_t;
 
 /* Exported variables --------------------------------------------------------*/
 /**
@@ -168,71 +191,17 @@ extern __CODE Fw_Task_Init_t FwTaskInitList[];
 
 #ifdef USE_KEIL_C51_COMPILER
 extern __DATA FwTask_t FwTask[];
-extern __DATA FwHandle_t FwCore;
+extern __DATA FwCore_t FwCore;
 #else
 extern FwTask_t FwTask[];
-extern FwHandle_t FwCore;
+extern FwCore_t FwCore;
 #endif
 
 /* Exported functions --------------------------------------------------------*/
 /**
- * @defgroup framework core interface
+ * @defgroup framework nano interface
  * @{
  */
-/**
- *******************************************************************************
- * @brief       禁用全局中断
- * @param       [in/out]  void
- * @return      [in/out]  void
- * @note        用户可调用
- *******************************************************************************
- */
-#define Fw_IRQ_Disable()                                     __DISABLE_ALL_ISR()
-
-/**
- *******************************************************************************
- * @brief       开启全局中断函数
- * @param       [in/out]  void
- * @return      [in/out]  void
- * @note        用户可调用
- *******************************************************************************
- */
-#define Fw_IRQ_Enable()                                       __ENABLE_ALL_ISR()
-
-/**
- *******************************************************************************
- * @brief       临界点操作函数
- * @note        用户可调用
- *******************************************************************************
- */
-#ifdef FRAMEWORK_NANO_EXPAND
-#define Fw_Atom_Begin(x)                    _st((x) = (x); Fw_Enter_Critical();)
-#define Fw_Atom_End(x)                       _st((x) = (x); Fw_Exit_Critical();)
-#else
-#define Fw_Atom_Begin(x)       _st((x) = __GET_ISR_FLAG(); __DISABLE_ALL_ISR();)
-#define Fw_Atom_End(x)                                   _st(__SET_ISR_FLAG(x);)
-#endif
-
-/**
- *******************************************************************************
- * @brief       进入临界点函数
- * @param       [in/out]  void
- * @return      [in/out]  void
- * @note        用户可调用
- *******************************************************************************
- */
-extern void Fw_Enter_Critical(void);
-
-/**
- *******************************************************************************
- * @brief       退出临界点函数
- * @param       [in/out]  void
- * @return      [in/out]  void
- * @note        用户可调用
- *******************************************************************************
- */
-extern void Fw_Exit_Critical(void);
-
 /**
  *******************************************************************************
  * @brief       硬件组件初始化
@@ -272,7 +241,7 @@ extern void Fw_Sleep_Handle(void);
  * @note        用户实现
  *******************************************************************************
  */
-#define Fw_Task_Evt_Set(id, evt)             Fw_Evt_Set(FwTask[(id)].Event, evt)
+#define FwTask_Set_Evt(id, evt)             Fw_Evt_Set(FwTask[(id)].Event, evt)
 
 /**
  *******************************************************************************
@@ -281,7 +250,7 @@ extern void Fw_Sleep_Handle(void);
  * @note        用户实现
  *******************************************************************************
  */
-#define Fw_Task_Evt_Clr(evt)       Fw_Evt_Clr(FwTask[FwCore.CurTask].Event, evt)
+#define FwTask_Clr_Evt(evt)       Fw_Evt_Clr(FwTask[FwCore.CurTask].Event, evt)
 
 /**
  *******************************************************************************
@@ -290,7 +259,7 @@ extern void Fw_Sleep_Handle(void);
  * @note        用户实现
  *******************************************************************************
  */
-#define Fw_Task_Evt_Rst(id)               _st(FwTask[FwCore.CurTask].Event = 0;)
+#define FwTask_Rst_Evt(id)               _st(FwTask[FwCore.CurTask].Event = 0;)
 
 /**
  *******************************************************************************
@@ -299,7 +268,7 @@ extern void Fw_Sleep_Handle(void);
  * @note        用户实现
  *******************************************************************************
  */
-#define Fw_Task_Evt_Get(evt)       Fw_Evt_Get(FwTask[FwCore.CurTask].Event, evt)
+#define FwTask_Get_Evt(evt)       Fw_Evt_Get(FwTask[FwCore.CurTask].Event, evt)
 
 /**
  *******************************************************************************
@@ -326,16 +295,6 @@ extern uint8_t Fw_Msg_Recv(uint8_t id);
 
 /**
  *******************************************************************************
- * @brief       事件生成函数
- * @param       [in/out]  void
- * @return      [in/out]  void
- * @note        测试用
- *******************************************************************************
- */
-extern void Fw_Event_General(void);
-
-/**
- *******************************************************************************
  * @brief       任务消息接收函数
  * @param       [in/out]  id         任务ID
  * @return      [in/out]  0          消息队列中无消息
@@ -343,7 +302,7 @@ extern void Fw_Event_General(void);
  * @note        由用户调用
  *******************************************************************************
  */
-#define Fw_Task_Msg_Recv()                           Fw_Msg_Recv(FwCore.CurTask)
+#define FwTask_Msg_Recv()                           Fw_Msg_Recv(FwCore.CurTask)
 
 /**
  *******************************************************************************
@@ -353,7 +312,7 @@ extern void Fw_Event_General(void);
  * @note        由用户调用
  *******************************************************************************
  */
-#ifdef FRAMEWORK_NANO_EXPAND
+#ifdef ENABLE_FRAMEWORK_NANO_EXPAND
 #define Fw_Task_Delay(tick)     _st(FwTask[FwCore.CurTask].Timer.Reload = 0;   \
                                     FwTask[FwCore.CurTask].Timer.Tick = (tick);)
 #else
@@ -362,19 +321,34 @@ extern void Fw_Event_General(void);
 
 /**
  *******************************************************************************
+ * @brief       初始化任务定时器
+ * @param       [in/out]  id       定时器ID
+ * @param       [in/out]  callback 定时器回调
+ * @param       [in/out]  param    回调参数
+ * @return      [in/out]  void
+ * @note        None
+ *******************************************************************************
+ */
+extern void Fw_TaskTimer_Init(uint8_t id, void *callback, void *param);
+    
+/**
+ *******************************************************************************
  * @brief       启动任务定时器
  * @param       [in/out]  tick    定时时间
  * @return      [in/out]  void
  * @note        由用户调用
  *******************************************************************************
  */
-#ifdef FRAMEWORK_NANO_EXPAND
-#define Fw_TaskTimer_Start(id, tick)        _st(FwTask[id].Timer.Reload = 0;   \
-                                                FwTask[id].Timer.Tick = (tick);)
-#else
-#define Fw_TaskTimer_Start(id, tick)        _st(FwTask[id].Timer.Tick = (tick);)
-#endif
+extern void Fw_TaskTimer_Start(uint8_t id, FwTick_t tick, uint16_t flag);
 
+/**
+ *******************************************************************************
+ * @brief       停止任务定时器
+ * @param       [in/out]  id       定时器ID
+ * @return      [in/out]  void
+ * @note        由用户调用
+ *******************************************************************************
+ */
 #define Fw_TaskTimer_Stop(id)                  _st(FwTask[id].Timer.Tick = (0);)
 
  /**
@@ -397,7 +371,7 @@ extern uint16_t Fw_Task_Num(void);
  */
 extern uint16_t Fw_Timer_Num(void);
 
-#ifdef FRAMEWORK_NANO_EXPAND
+#ifdef ENABLE_FRAMEWORK_NANO_EXPAND
 /**
  *******************************************************************************
  * @brief       任务就绪
@@ -438,40 +412,6 @@ extern void Fw_Task_Yeild(uint8_t id);
  */
 extern uint8_t Fw_Task_State(uint8_t id);
 #endif
-
-/**
- *******************************************************************************
- * @brief       初始化定时器
- * @param       [in/out]  id       定时器ID
- * @param       [in/out]  callback 定时器回调
- * @param       [in/out]  param    回调参数
- * @return      [in/out]  void
- * @note        None
- *******************************************************************************
- */
-extern void Fw_Timer_Init(uint8_t id, void *callback, void *param);
-
-/**
- *******************************************************************************
- * @brief       启动定时器
- * @param       [in/out]  id       定时器ID
- * @param       [in/out]  tick     定时器时间
- * @param       [in/out]  flag     定时器参数
- * @return      [in/out]  void
- * @note        None
- *******************************************************************************
- */
-extern void Fw_Timer_Start(uint8_t id, FwTick_t tick, uint16_t flag);
-
-/**
- *******************************************************************************
- * @brief       停止定时器
- * @param       [in/out]  id       定时器ID
- * @return      [in/out]  void
- * @note        None
- *******************************************************************************
- */
-extern void Fw_Timer_Stop(uint8_t id);
 
 /**
  *******************************************************************************
@@ -570,6 +510,82 @@ extern void Fw_Tick_Handle(void);
                                                        BSP_Msg_Send(evt);    \
                                                    }                         \
                                                })
+
+#ifdef ENABLE_FRAMEWORK_TIMER_COMPONENT
+/**
+ *******************************************************************************
+ * @brief       初始化定时器
+ * @param       [in/out]  id       定时器ID
+ * @param       [in/out]  callback 定时器回调
+ * @param       [in/out]  param    回调参数
+ * @return      [in/out]  void
+ * @note        None
+ *******************************************************************************
+ */
+extern void Fw_Timer_Init(uint8_t id, void *callback, void *param);
+
+/**
+ *******************************************************************************
+ * @brief       启动定时器
+ * @param       [in/out]  id       定时器ID
+ * @param       [in/out]  tick     定时器时间
+ * @param       [in/out]  flag     定时器参数
+ * @return      [in/out]  void
+ * @note        None
+ *******************************************************************************
+ */
+extern void Fw_Timer_Start(uint8_t id, FwTick_t tick, uint16_t flag);
+
+/**
+ *******************************************************************************
+ * @brief       设置定时器回调函数
+ * @param       [in/out]  id           定时器ID
+ * @param       [in/out]  callback     回调函数
+ * @param       [in/out]  param        回调参数
+ * @return      [in/out]  void
+ * @note        None
+ *******************************************************************************
+ */
+extern void Fw_Timer_SetCallback(uint8_t id, void *callback, void *param);
+
+/**
+ *******************************************************************************
+ * @brief       设置定时器信号发射器
+ * @param       [in/out]  id       定时器ID
+ * @param       [in/out]  smId     状态机ID
+ * @param       [in/out]  sig      触发信号
+ * @return      [in/out]  void
+ * @note        None
+ *******************************************************************************
+ */
+extern void Fw_Timer_SetSmSig(uint8_t id, uint16_t smId, uint16_t sig);
+
+/**
+ *******************************************************************************
+ * @brief       获取定时器当前时间
+ * @param       [in/out]  id       定时器ID
+ * @return      [in/out]  tick     定时器当前Tick
+ * @note        None
+ *******************************************************************************
+ */
+extern FwTick_t Fw_Timer_Tick(uint8_t id);
+
+/**
+ *******************************************************************************
+ * @brief       停止定时器
+ * @param       [in/out]  id       定时器ID
+ * @return      [in/out]  void
+ * @note        None
+ *******************************************************************************
+ */
+extern void Fw_Timer_Stop(uint8_t id);
+#else
+#define Fw_Timer_Init(id, callback, param)
+#define Fw_Timer_Start(id, tick, flag)
+#define Fw_Timer_Tick(id)
+#define Fw_Timer_Stop(id)
+#endif
+
 /**
  *******************************************************************************
  * @brief       框架内核初始化函数
@@ -579,6 +595,16 @@ extern void Fw_Tick_Handle(void);
  *******************************************************************************
  */
 extern void Fw_Core_Init(void);
+
+/**
+ *******************************************************************************
+ * @brief       框架内核调度函数
+ * @param       [in/out]  void
+ * @return      [in/out]  void
+ * @note        用户可调用
+ *******************************************************************************
+ */
+extern void Fw_Core_Dispatch(void);
 
 /**
  *******************************************************************************
@@ -628,16 +654,6 @@ extern void Fw_Log(char *str, ...);
 #define Fw_PT_Exit()                                  
 #define Fw_PT_Delay(tick)
 #endif
-
-/**
- *******************************************************************************
- * @brief        定义日志相关接口
- *******************************************************************************
- */
-extern void Fw_Core_Log(char *str, ...);
-extern void Fw_Core_Error(char *str, ...);
-extern void Fw_Log(char *str, ...);
-extern void Fw_Error(char *str, ...);
 
 /**
  *******************************************************************************

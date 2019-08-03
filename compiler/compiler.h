@@ -59,6 +59,8 @@ extern "C"
 #include "8051\compiler_sdcc51.h"
 #elif defined(__XC8) || defined(__PICC__)
 #include "..\compiler\picc\compiler_picc.h"
+#elif defined(__ICCSTM8__)
+#include "..\compiler\stm8\compiler_iccstm8.h"
 #elif defined (_MSC_VER)
 #include "msvc\compiler_msvc.h"
 #else
@@ -259,7 +261,7 @@ extern "C"
 /**
  *******************************************************************************
  * @brief       MACRO
- * @note        “∆÷≤”⁄RTTHREAD
+ * @note        ÁßªÊ§ç‰∫éRTTHREAD
  *******************************************************************************
  */
 #ifdef ENABLE_FRAMEWORK_COMPONENT_INIT

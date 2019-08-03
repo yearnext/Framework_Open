@@ -24,12 +24,12 @@
  *                 GCC                                                         *
  *******************************************************************************
  * @note                                                                       *
- * 1.Ä¿Ç°Ö§³ÖĞ´Èë²Ù×÷¡¢¶ÁÈ¡²Ù×÷¡£                                              *
- * 2. DemoÆ½Ì¨ M0516LDN                                                        *
+ * 1.ç›®å‰æ”¯æŒå†™å…¥æ“ä½œã€è¯»å–æ“ä½œã€‚                                              *
+ * 2. Demoå¹³å° M0516LDN                                                        *
  *******************************************************************************
  * @par update                                                                 *
- * 1. 20171027    ´´½¨ÎÄ¼ş"veeprom.h"                                          *
- * 2. 20180829    ½«veeprom×é¼şÇ¨ÒÆµ½hal²ãÖĞ£¬¸üÃûÎª"hal_veeprom.h"            *
+ * 1. 20171027    åˆ›å»ºæ–‡ä»¶"veeprom.h"                                          *
+ * 2. 20180829    å°†veepromç»„ä»¶è¿ç§»åˆ°halå±‚ä¸­ï¼Œæ›´åä¸º"hal_veeprom.h"            *
  *******************************************************************************
  */
 
@@ -45,28 +45,28 @@ extern "C"
 
 /* Includes ------------------------------------------------------------------*/
 /* Exported macro ------------------------------------------------------------*/
-//! ÎïÀíÒ³×´Ì¬
+//! ç‰©ç†é¡µçŠ¶æ€
 #define HAL_VEEPROM_PAGE_INVAILD                                    (0x5A8888A5)
 #define HAL_VEEPROM_PAGE_INIT                                       (0xFFFFFFFF)
 #define HAL_VEEPROM_PAGE_FREE                                       (0x5AFFFFA5)
 #define HAL_VEEPROM_PAGE_USE                                        (0x5ACCCCA5)
 
-//! Ó²¼şÒì³£×´Ì¬
+//! ç¡¬ä»¶å¼‚å¸¸çŠ¶æ€
 #define HAL_VEEPROM_NORMAL                                                   (0)
 #define HAL_VEEPROM_FIX                                                      (1)
 #define HAL_VEEPROM_EXCEPTION                                                (2)
 
-//! ĞéÄâÒ³×´Ì¬
+//! è™šæ‹Ÿé¡µçŠ¶æ€
 #define HAL_VEEPROM_SET_PAGE0                                                (0)
 #define HAL_VEEPROM_USE_PAGE0                                                (1)
 #define HAL_VEEPROM_SET_PAGE1                                                (2)
 #define HAL_VEEPROM_USE_PAGE1                                                (3)
 
-//! VEEPROMÊÂ¼ş
+//! VEEPROMäº‹ä»¶
 #define HAL_VEEPROM_SWITCH_PAGE0_EVENT                                       (0)
 #define HAL_VEEPROM_SWITCH_PAGE1_EVENT                                       (1)
 
-//! VEEPROM ±êÊ¶
+//! VEEPROM æ ‡è¯†
 #define HAL_VEEPROM_LOCK_FLAG                                           (0x0001)
 #define HAL_VEEPROM_VERIFY_FLAG                                         (0x0002)
 #define HAL_VEEPROM_ERASE_FLAG                                          (0x0004)
@@ -90,7 +90,7 @@ enum __HAL_VEEPROM_STATE
 };
 
 /* Exported types ------------------------------------------------------------*/
-//! veeprom update ·µ»ØÖµ
+//! veeprom update è¿”å›å€¼
 typedef enum
 {
     HAL_VEEPROM_RET_NONE,
@@ -108,7 +108,7 @@ typedef enum
     HAL_VEEPROM_RET_HW_ERROR,
 }VeepromState;
 
-//! Veeprom Ó²¼ş²Ù×÷½Ó¿Ú
+//! Veeprom ç¡¬ä»¶æ“ä½œæ¥å£
 typedef struct 
 {
     uint32_t (*ReadWord)(uint32_t addr);
@@ -121,12 +121,12 @@ typedef struct
 
 typedef struct
 {
-    //! Ò³ÎïÀíµØÖ·
+    //! é¡µç‰©ç†åœ°å€
     size_t Page0Base;
     size_t Page0End;
     size_t Page1Base;
     size_t Page1End;
-    //! ÎïÀíÒ³´óĞ¡
+    //! ç‰©ç†é¡µå¤§å°
     size_t PageSize;
 }VeepromInfo;
 
@@ -134,10 +134,10 @@ typedef struct
 {
     VeepromInfo Atrribute;
     
-    //! RAM»º³åÇø
+    //! RAMç¼“å†²åŒº
     volatile uint8_t *Buffer;
     
-    //! EEPROM¿Õ¼ä
+    //! EEPROMç©ºé—´
     uint16_t BufferLen;
 }HAL_Veeprom_Config_t;
 
@@ -146,22 +146,22 @@ typedef struct
     HAL_Atrribute_t   Atrribute;
     VeepromInfo PhyInfo;
 
-    //! µ±Ç°Ò³µØÖ·
+    //! å½“å‰é¡µåœ°å€
     size_t Addr;
     
-    //! RAM»º³åÇø
+    //! RAMç¼“å†²åŒº
     volatile uint8_t *Buffer;
     
-    //! EEPROM¿Õ¼ä
+    //! EEPROMç©ºé—´
     uint16_t BufferLen;
     
-    //! Ò³×´Ì¬
+    //! é¡µçŠ¶æ€
     uint8_t PageState;
     
-    //! ¿é´óĞ¡
+    //! å—å¤§å°
     uint16_t BlockNum; 
 
-    //! Êı¾İ·ÖÇøÇĞ»»×´Ì¬
+    //! æ•°æ®åˆ†åŒºåˆ‡æ¢çŠ¶æ€
     uint8_t UpdateState; 
 }HAL_Veeprom_t;
 

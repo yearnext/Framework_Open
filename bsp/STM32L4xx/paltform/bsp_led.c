@@ -86,7 +86,6 @@ Led_Handle_t BOARD_LED_CONFIG[] =
 {
     {.Port = LED1_PORT, .Pin = LED1_PIN,  .Flag = LED_DRV_LOW_FLAG},
     {.Port = LED2_PORT, .Pin = LED2_PIN,  .Flag = LED_DRV_LOW_FLAG},
-    {.Port = LED3_PORT, .Pin = LED3_PIN,  .Flag = LED_DRV_LOW_FLAG},
 };
 
 /* Exported constants --------------------------------------------------------*/

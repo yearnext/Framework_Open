@@ -42,6 +42,13 @@ extern "C"
 {
 #endif
 
+#pragma warning(disable:4100)
+#pragma warning(disable:4101)
+#pragma warning(disable:4189)
+#pragma warning(disable:4244)
+#pragma warning(disable:4819)
+#pragma warning(disable:26495)
+
 /* Includes ------------------------------------------------------------------*/
 #include <stdarg.h>
 #include <stdint.h>
@@ -206,6 +213,10 @@ extern "C"
 #define __PACKED_TAIL
 #endif
 
+#ifndef __packed
+#define __packed
+#endif
+
 /**
  *******************************************************************************
  * @brief      define NULL
@@ -220,14 +231,12 @@ extern "C"
  * @brief      define atom option
  *******************************************************************************
  */
-extern void MSP_Disable_Irq(void);
 #ifndef __DISABLE_ALL_ISR
-#define __DISABLE_ALL_ISR()                                    MSP_Disable_Irq()
+#define __DISABLE_ALL_ISR()
 #endif
 
-extern void MSP_Enable_Irq(void);
 #ifndef __ENABLE_ALL_ISR
-#define __ENABLE_ALL_ISR()                                      MSP_Enable_Irq()
+#define __ENABLE_ALL_ISR()
 #endif
 
 #ifndef __GET_ISR_FLAG

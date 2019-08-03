@@ -24,12 +24,12 @@
  *                 GCC                                                         *
  *******************************************************************************
  * @note                                                                       *
- * 1.Ŀǰ֧��д���������ȡ������                                              *
- * 2. Demoƽ̨ M0516LDN                                                        *
+ * 1.目前支持写入操作、读取操作。                                              *
+ * 2. Demo平台 M0516LDN                                                        *
  *******************************************************************************
  * @par update                                                                 *
- * 1. 20171027    �����ļ�"veeprom.c"                                          *
- * 2. 20180829    ��veeprom���Ǩ�Ƶ�hal���У�����Ϊ"hal_veeprom.c"            *
+ * 1. 20171027    创建文件"veeprom.c"                                          *
+ * 2. 20180829    将veeprom组件迁移到hal层中，更名为"hal_veeprom.c"            *
  *******************************************************************************
  */
  
@@ -44,7 +44,7 @@
 /* Private define ------------------------------------------------------------*/
 /**
  *******************************************************************************
- * @brief       ��ز�����
+ * @brief       相关参数宏
  *******************************************************************************
  */
 #define HAL_VEEPROM_PAGE_INFO_SIZE              (sizeof(size_t)/sizeof(uint8_t))
@@ -73,14 +73,14 @@ struct
 #ifdef ENABLE_HAL_VIRTUAL_EEPROM_DRIVER
 /**
  *******************************************************************************
- * @brief       ��ȡveeprom��־λ
- * @param       [in/out]  flag          ��־λ
- * @param       [in/out]  addr          У���ַ
- * @param       [in/out]  vData         У������
+ * @brief       获取veeprom标志位
+ * @param       [in/out]  flag          标志位
+ * @param       [in/out]  addr          校验地址
+ * @param       [in/out]  vData         校验数据
  * @return      [in/out]  0             normal
  * @return      [in/out]  1             busy
  * @return      [in/out]  2             error
- * @note        ˽�У��û�����ֱ�ӷ���
+ * @note        私有，用户不可直接访问
  *******************************************************************************
  */
 __STATIC_INLINE
@@ -96,10 +96,10 @@ uint32_t veeprom_get_flag(uint32_t flag, uint32_t addr, uint32_t vData)
 
 /**
  *******************************************************************************
- * @brief       ����Ӳ��
+ * @brief       锁定硬件
  * @param       [in/out]  void
  * @return      [in/out]  void
- * @note        ˽�У��û�����ֱ�ӷ���
+ * @note        私有，用户不可直接访问
  *******************************************************************************
  */
 __STATIC_INLINE
@@ -113,10 +113,10 @@ void veeprom_lock(void)
 
 /**
  *******************************************************************************
- * @brief       ����Ӳ��
+ * @brief       解锁硬件
  * @param       [in/out]  void
  * @return      [in/out]  void
- * @note        ˽�У��û�����ֱ�ӷ���
+ * @note        私有，用户不可直接访问
  *******************************************************************************
  */
 __STATIC_INLINE
@@ -130,10 +130,10 @@ void veeprom_unlock(void)
 
 /**
  *******************************************************************************
- * @brief       ����veeprom��д����
+ * @brief       锁定veeprom读写操作
  * @param       [in/out]  void
  * @return      [in/out]  void
- * @note        ˽�У��û�����ֱ�ӷ���
+ * @note        私有，用户不可直接访问
  *******************************************************************************
  */
 __STATIC_INLINE
@@ -144,10 +144,10 @@ void veeprom_rw_unlock(HAL_Veeprom_t *eeprom)
 
 /**
  *******************************************************************************
- * @brief       ����veeprom��д����
+ * @brief       解锁veeprom读写操作
  * @param       [in/out]  void
  * @return      [in/out]  void
- * @note        ˽�У��û�����ֱ�ӷ���
+ * @note        私有，用户不可直接访问
  *******************************************************************************
  */
 __STATIC_INLINE
@@ -158,11 +158,11 @@ void veeprom_rw_lock(HAL_Veeprom_t *eeprom)
 
 /**
  *******************************************************************************
- * @brief       ��ȡveeprom��д��������״̬
- * @param       [in/out]  *eeprom    �������
- * @return      [in/out]  0          δ����
- * @return      [in/out]  1          ������
- * @note        ˽�У��û�����ֱ�ӷ���
+ * @brief       获取veeprom读写操作锁定状态
+ * @param       [in/out]  *eeprom    操作句柄
+ * @return      [in/out]  0          未锁定
+ * @return      [in/out]  1          已锁定
+ * @note        私有，用户不可直接访问
  *******************************************************************************
  */
 __STATIC_INLINE
@@ -173,10 +173,10 @@ uint8_t veeprom_is_rw_lock(HAL_Veeprom_t *eeprom)
 
 /**
  *******************************************************************************
- * @brief       ��������ҳ
- * @param       [in/out]  addr    ������ַ
+ * @brief       擦除物理页
+ * @param       [in/out]  addr    物理地址
  * @return      [in/out]  void
- * @note        ˽�У��û�����ֱ�ӷ���
+ * @note        私有，用户不可直接访问
  *******************************************************************************
  */
 __STATIC_INLINE
@@ -190,12 +190,12 @@ void veeprom_erase_page(uint32_t addr)
 
 /**
  *******************************************************************************
- * @brief       ����veeprom���ݿ�
- * @param       [in/out]  addr        ������ʼ��ַ
- * @param       [in/out]  pageSize    ҳ��С
- * @param       [in/out]  num         ҳ����
+ * @brief       擦除veeprom数据块
+ * @param       [in/out]  addr        数据起始地址
+ * @param       [in/out]  pageSize    页大小
+ * @param       [in/out]  num         页数量
  * @return      [in/out]  void
- * @note        ˽�У��û�����ֱ�ӷ���
+ * @note        私有，用户不可直接访问
  *******************************************************************************
  */
 __STATIC_INLINE
@@ -215,10 +215,10 @@ void veeprom_erase_block(uint32_t addr, uint16_t pageSize, uint16_t num)
 
 /**
  *******************************************************************************
- * @brief       ��ȡӲ������--1��
- * @param       [in/out]  addr        ������ʼ��ַ
- * @return      [in/out]  data        ��ȡ��������
- * @note        ˽�У��û�����ֱ�ӷ���
+ * @brief       读取硬件数据--1字
+ * @param       [in/out]  addr        数据起始地址
+ * @return      [in/out]  data        读取到的数据
+ * @note        私有，用户不可直接访问
  *******************************************************************************
  */
 __STATIC_INLINE
@@ -234,11 +234,11 @@ uint32_t veeprom_read_word(uint32_t addr)
 
 /**
  *******************************************************************************
- * @brief       д��Ӳ������--1��
- * @param       [in/out]  addr        ����д���ַ
- * @param       [in/out]  addr        д�������
+ * @brief       写入硬件数据--1字
+ * @param       [in/out]  addr        数据写入地址
+ * @param       [in/out]  addr        写入的数据
  * @return      [in/out]  void
- * @note        ˽�У��û�����ֱ�ӷ���
+ * @note        私有，用户不可直接访问
  *******************************************************************************
  */
 __STATIC_INLINE
@@ -252,11 +252,11 @@ void veeprom_write_word(uint32_t addr, uint32_t wr)
 
 /**
  *******************************************************************************
- * @brief       д��Ӳ������--1��(������ʽ)
- * @param       [in/out]  addr        ����д���ַ
- * @param       [in/out]  addr        д�������
+ * @brief       写入硬件数据--1字(阻塞形式)
+ * @param       [in/out]  addr        数据写入地址
+ * @param       [in/out]  addr        写入的数据
  * @return      [in/out]  void
- * @note        ˽�У��û�����ֱ�ӷ���
+ * @note        私有，用户不可直接访问
  *******************************************************************************
  */
 __STATIC_INLINE
@@ -272,10 +272,10 @@ void veeprom_write_word_at_once(uint32_t addr, uint32_t wr)
 
 /**
  *******************************************************************************
- * @brief       ����veeprom״̬
- * @param       [in/out]  *eeprom         veeprom���
- * @return      [in/out]  VeepromState    veeprom״̬
- * @note        ˽�У��û�����ֱ�ӷ���
+ * @brief       加载veeprom状态
+ * @param       [in/out]  *eeprom         veeprom句柄
+ * @return      [in/out]  VeepromState    veeprom状态
+ * @note        私有，用户不可直接访问
  *******************************************************************************
  */
 __STATIC_INLINE 
@@ -283,11 +283,11 @@ VeepromState veeprom_load_state(HAL_Veeprom_t *eeprom)
 {
     uint32_t pageState, page1State;
 
-    //! ��ȡҳ��Ϣ
+    //! 读取页信息
     pageState  = veeprom_read_word(eeprom->PhyInfo.Page0Base);
     page1State = veeprom_read_word(eeprom->PhyInfo.Page1Base);
     
-    //! page0 ��ʹ��
+    //! page0 已使用
     if(pageState == HAL_VEEPROM_PAGE_USE)
     {
         eeprom->Addr      = eeprom->PhyInfo.Page0Base + HAL_VEEPROM_ALIGNMENT;
@@ -295,7 +295,7 @@ VeepromState veeprom_load_state(HAL_Veeprom_t *eeprom)
         
         return HAL_VEEPROM_RET_LOAD;
     }
-    //! page0 δʹ��
+    //! page0 未使用
     else if(pageState == HAL_VEEPROM_PAGE_FREE)
     {
         eeprom->Addr      = eeprom->PhyInfo.Page0Base + HAL_VEEPROM_ALIGNMENT;
@@ -303,7 +303,7 @@ VeepromState veeprom_load_state(HAL_Veeprom_t *eeprom)
         
         return HAL_VEEPROM_RET_NORMAL;
     }
-    //! page1 ��ʹ��
+    //! page1 已使用
     else if(page1State == HAL_VEEPROM_PAGE_USE)
     {
         eeprom->Addr      = eeprom->PhyInfo.Page1Base + HAL_VEEPROM_ALIGNMENT;
@@ -311,7 +311,7 @@ VeepromState veeprom_load_state(HAL_Veeprom_t *eeprom)
         
         return HAL_VEEPROM_RET_LOAD;
     }
-    //! page1 δʹ��
+    //! page1 未使用
     else if(page1State == HAL_VEEPROM_PAGE_FREE)
     {
         eeprom->Addr      = eeprom->PhyInfo.Page1Base + HAL_VEEPROM_ALIGNMENT;
@@ -320,16 +320,16 @@ VeepromState veeprom_load_state(HAL_Veeprom_t *eeprom)
         return HAL_VEEPROM_RET_NORMAL;
     }
     
-    //! ��Ч״̬
+    //! 无效状态
     return HAL_VEEPROM_RET_RESET;
 }
 
 /**
  *******************************************************************************
- * @brief       ��λveeprom���
- * @param       [in/out]  *eeprom         veeprom���
- * @return      [in/out]  VeepromState    veeprom״̬
- * @note        ˽�У��û�����ֱ�ӷ���
+ * @brief       复位veeprom组件
+ * @param       [in/out]  *eeprom         veeprom句柄
+ * @return      [in/out]  VeepromState    veeprom状态
+ * @note        私有，用户不可直接访问
  *******************************************************************************
  */
 __STATIC_INLINE 
@@ -339,12 +339,12 @@ VeepromState veeprom_reset(HAL_Veeprom_t *eeprom)
     uint32_t load;
 #endif
     
-    //! ��������
+    //! 擦除扇区
     veeprom_lock();
     veeprom_erase_block(eeprom->PhyInfo.Page0Base, eeprom->PhyInfo.PageSize, eeprom->BlockNum);
     veeprom_erase_block(eeprom->PhyInfo.Page1Base, eeprom->PhyInfo.PageSize, eeprom->BlockNum);
 
-    //! д�뵱ǰҳ״̬
+    //! 写入当前页状态
     veeprom_write_word_at_once(eeprom->PhyInfo.Page0Base, HAL_VEEPROM_PAGE_FREE);
     
 #ifdef ENABLE_VEEPROM_CHECK
@@ -368,10 +368,10 @@ VeepromState veeprom_reset(HAL_Veeprom_t *eeprom)
 
 /**
  *******************************************************************************
- * @brief       ����veeprom����
- * @param       [in/out]  *eeprom         veeprom���
+ * @brief       加载veeprom数据
+ * @param       [in/out]  *eeprom         veeprom句柄
  * @return      [in/out]  void
- * @note        ˽�У��û�����ֱ�ӷ���
+ * @note        私有，用户不可直接访问
  *******************************************************************************
  */
 __STATIC_INLINE
@@ -380,7 +380,7 @@ void veeprom_load_data(HAL_Veeprom_t *eeprom)
     uint32_t rdata;
     uint16_t addr, tmp;
     
-    //! ��������
+    //! 加载数据
     while(1)
     {
         rdata = veeprom_read_word(eeprom->Addr);
@@ -390,8 +390,8 @@ void veeprom_load_data(HAL_Veeprom_t *eeprom)
             tmp   = rdata & 0x0000FFFF;
             addr  = rdata >> 16;
             
-            //! ��⵽��Ч���ݵ�ַ
-            //! ���������ݵĶ�ȡ��ʹ��ΪĬ����ֵ
+            //! 检测到无效数据地址
+            //! 跳过该数据的读取，使其为默认数值
             if(addr < eeprom->BufferLen)
             {
                 *((uint16_t *)&eeprom->Buffer[addr]) = tmp;
@@ -402,7 +402,7 @@ void veeprom_load_data(HAL_Veeprom_t *eeprom)
             break;
         }
 		
-		//! ������ַ�߽籣��
+		//! 物理地址边界保护
         eeprom->Addr += HAL_VEEPROM_ALIGNMENT;
 
 		if(eeprom->PageState == HAL_VEEPROM_USE_PAGE0 && eeprom->Addr > eeprom->PhyInfo.Page0End)
@@ -418,12 +418,12 @@ void veeprom_load_data(HAL_Veeprom_t *eeprom)
 
 /**
  *******************************************************************************
- * @brief       veeprom���ݳ�ʼ��
- * @param       [in/out]  *eeprom         veeprom���
- * @return      [in/out]  0               �洢����ʹ����������װ��
- * @return      [in/out]  1               �洢��δʹ��
- * @return      [in/out]  2               ����
- * @note        ˽�У��û�����ֱ�ӷ���
+ * @brief       veeprom数据初始化
+ * @param       [in/out]  *eeprom         veeprom句柄
+ * @return      [in/out]  0               存储器已使用且数据已装载
+ * @return      [in/out]  1               存储器未使用
+ * @return      [in/out]  2               错误
+ * @note        私有，用户不可直接访问
  *******************************************************************************
  */
 __STATIC_INLINE
@@ -460,11 +460,11 @@ uint8_t veeprom_init_data(HAL_Veeprom_t *eeprom)
 
 /**
  *******************************************************************************
- * @brief       ����Ƿ���Ҫ�л��洢��
- * @param       [in/out]  *eeprom         veeprom���
- * @return      [in/out]  0               ����Ҫ�л��ҿ��Լ���ʹ��
- * @return      [in/out]  1               ��Ҫ�л�
- * @note        ˽�У��û�����ֱ�ӷ���
+ * @brief       检测是否需要切换存储块
+ * @param       [in/out]  *eeprom         veeprom句柄
+ * @return      [in/out]  0               不需要切换且可以继续使用
+ * @return      [in/out]  1               需要切换
+ * @note        私有，用户不可直接访问
  *******************************************************************************
  */
 __STATIC_INLINE
@@ -519,12 +519,12 @@ uint8_t veeprom_block_check(HAL_Veeprom_t *eeprom)
 
 /**
  *******************************************************************************
- * @brief       д�����ݵ�������ַ
- * @param       [in/out]  *eeprom         veeprom���
- * @param       [in/out]  addr            veeprom�����ַ
- * @param       [in/out]  wr              д�������
+ * @brief       写入数据到物理地址
+ * @param       [in/out]  *eeprom         veeprom句柄
+ * @param       [in/out]  addr            veeprom虚拟地址
+ * @param       [in/out]  wr              写入的数据
  * @return      [in/out]  void
- * @note        ˽�У��û�����ֱ�ӷ���
+ * @note        私有，用户不可直接访问
  *******************************************************************************
  */
 __STATIC_INLINE
@@ -550,9 +550,9 @@ void veeprom_to_phy(HAL_Veeprom_t *eeprom, uint16_t addr, uint16_t wr)
 #ifdef ENABLE_HAL_VIRTUAL_EEPROM_DRIVER
 /**
  *******************************************************************************
- * @brief       veeprom�豸ע��
- * @param       [in/out]  *ops            veeprom��������
- * @param       [in/out]  *userData       �û�����
+ * @brief       veeprom设备注册
+ * @param       [in/out]  *ops            veeprom操作方法
+ * @param       [in/out]  *userData       用户数据
  * @return      [in/out]  void
  * @note        None
  *******************************************************************************
@@ -585,12 +585,12 @@ void HAL_Veeprom_Register(HAL_Veeprom_Interface_t *ops, void *userData)
 
 /**
  *******************************************************************************
- * @brief       veeprom��ʼ��
- * @param       [in/out]  *eeprom         veeprom���
- * @param       [in/out]  *config         veeprom����
- * @return      [in/out]  0               �洢����ʹ����������װ��
- * @return      [in/out]  1               �洢��δʹ��
- * @return      [in/out]  2               ����
+ * @brief       veeprom初始化
+ * @param       [in/out]  *eeprom         veeprom句柄
+ * @param       [in/out]  *config         veeprom配置
+ * @return      [in/out]  0               存储器已使用且数据已装载
+ * @return      [in/out]  1               存储器未使用
+ * @return      [in/out]  2               错误
  * @note        None
  *******************************************************************************
  */
@@ -600,7 +600,7 @@ uint8_t HAL_Veeprom_Init(HAL_Veeprom_t *eeprom, HAL_Veeprom_Config_t *config)
 
     memset(eeprom, 0, sizeof(HAL_Veeprom_t));
 
-    //! ���ò���
+    //! 配置参数
     eeprom->PhyInfo.Page0Base = config->Atrribute.Page0Base;
     eeprom->PhyInfo.Page0End  = config->Atrribute.Page0End;
     eeprom->PhyInfo.Page1Base = config->Atrribute.Page1Base;
@@ -619,14 +619,14 @@ uint8_t HAL_Veeprom_Init(HAL_Veeprom_t *eeprom, HAL_Veeprom_Config_t *config)
     
     memset((void *)eeprom->Buffer, 0, eeprom->BufferLen);
     
-    //! �������ݿ���ռ�õĿռ�(PAGE1 + PAGE2)
+    //! 计算数据块所占用的空间(PAGE1 + PAGE2)
     block = eeprom->PhyInfo.Page0End - eeprom->PhyInfo.Page0Base + 1;
-    //! ����EEPROM���ݿ�ռ������ҳ������
+    //! 计算EEPROM数据块占用物理页的数量
     eeprom->BlockNum = block / eeprom->PhyInfo.PageSize;
-    //! �Ƴ�״ָ̬ʾ��
+    //! 移除状态指示符
     block = block - HAL_VEEPROM_ALIGNMENT;
     
-    //! ���EEPROM��ַ�����Ƿ����
+    //! 检测EEPROM地址定义是否合理
     if (block < eeprom->BufferLen || block % eeprom->PhyInfo.PageSize)
     {
         return HAL_VEEPROM_RET_HW_ERROR;
@@ -639,12 +639,12 @@ uint8_t HAL_Veeprom_Init(HAL_Veeprom_t *eeprom, HAL_Veeprom_Config_t *config)
 
 /**
  *******************************************************************************
- * @brief       veeprom д���ֽ�����
- * @param       [in/out]  *eeprom         veeprom���
- * @param       [in/out]  addr            д��veeprom�����ַ
- * @param       [in/out]  ch              д������
- * @return      [in/out]  0               д��ʧ��
- * @return      [in/out]  1               д��ɹ�
+ * @brief       veeprom 写入字节数据
+ * @param       [in/out]  *eeprom         veeprom句柄
+ * @param       [in/out]  addr            写入veeprom虚拟地址
+ * @param       [in/out]  ch              写入数据
+ * @return      [in/out]  0               写入失败
+ * @return      [in/out]  1               写入成功
  * @note        None
  *******************************************************************************
  */
@@ -688,13 +688,13 @@ uint8_t HAL_Veeprom_WriteByte(HAL_Veeprom_t *eeprom, uint16_t addr, uint8_t ch)
 
 /**
  *******************************************************************************
- * @brief       veeprom д������
- * @param       [in/out]  *eeprom         veeprom���
- * @param       [in/out]  *buf            д�뻺����
- * @param       [in/out]  addr            д�����ַ
- * @param       [in/out]  len             д�����ݳ���
- * @return      [in/out]  0               д��ʧ��
- * @return      [in/out]  len             д��ɹ�
+ * @brief       veeprom 写入数据
+ * @param       [in/out]  *eeprom         veeprom句柄
+ * @param       [in/out]  *buf            写入缓冲区
+ * @param       [in/out]  addr            写入基地址
+ * @param       [in/out]  len             写入数据长度
+ * @return      [in/out]  0               写入失败
+ * @return      [in/out]  len             写入成功
  * @note        None
  *******************************************************************************
  */
@@ -720,7 +720,7 @@ uint16_t HAL_Veeprom_Write(HAL_Veeprom_t *eeprom, uint8_t *buf, uint16_t addr, u
         uint16_t *pEEPROM = (uint16_t *)&eeprom->Buffer[addr];
         uint16_t *pWrite  = (uint16_t *)&buf[0];
         
-        //! ��ַд�����
+        //! 地址写入对齐
         if (addr % 2)
         {
             if(eeprom->Buffer[addr] != buf[0])
@@ -747,7 +747,7 @@ uint16_t HAL_Veeprom_Write(HAL_Veeprom_t *eeprom, uint8_t *buf, uint16_t addr, u
             pWrite  ++;
         }
         
-        //! ����д�����
+        //! 数据写入对齐
         if (addr > endAddr)
         {
             if(eeprom->Buffer[addr-1] != buf[addr-1])
@@ -769,11 +769,11 @@ uint16_t HAL_Veeprom_Write(HAL_Veeprom_t *eeprom, uint8_t *buf, uint16_t addr, u
 
 /**
  *******************************************************************************
- * @brief       veeprom ��ȡ�ֽ�
- * @param       [in/out]  *eeprom         veeprom���
- * @param       [in/out]  addr            ��ȡ��ַ
- * @return      [in/out]  0xFF            ��ȡʧ��
- * @return      [in/out]  data            ��ȡ�ɹ�
+ * @brief       veeprom 读取字节
+ * @param       [in/out]  *eeprom         veeprom句柄
+ * @param       [in/out]  addr            读取地址
+ * @return      [in/out]  0xFF            读取失败
+ * @return      [in/out]  data            读取成功
  * @note        None
  *******************************************************************************
  */
@@ -811,13 +811,13 @@ uint8_t HAL_Veeprom_ReadByte(HAL_Veeprom_t *eeprom, uint32_t addr)
 
 /**
  *******************************************************************************
- * @brief       veeprom ��ȡ����
- * @param       [in/out]  *eeprom         veeprom���
- * @param       [in/out]  *buf            ��ȡ������
- * @param       [in/out]  addr            ��ȡ����ַ
- * @param       [in/out]  len             ��ȡ���ݳ���
- * @return      [in/out]  0               ��ȡʧ��
- * @return      [in/out]  len             ��ȡ�ɹ�
+ * @brief       veeprom 读取数据
+ * @param       [in/out]  *eeprom         veeprom句柄
+ * @param       [in/out]  *buf            读取缓冲区
+ * @param       [in/out]  addr            读取基地址
+ * @param       [in/out]  len             读取数据长度
+ * @return      [in/out]  0               读取失败
+ * @return      [in/out]  len             读取成功
  * @note        None
  *******************************************************************************
  */
@@ -859,8 +859,8 @@ uint16_t HAL_Veeprom_Read(HAL_Veeprom_t *eeprom, uint8_t *buf, uint16_t addr, ui
 
 /**
  *******************************************************************************
- * @brief       veeprom ��������(�л����ݿ�)
- * @param       [in/out]  *param         veeprom���
+ * @brief       veeprom 更新数据(切换数据块)
+ * @param       [in/out]  *param         veeprom句柄
  * @return      [in/out]  void
  * @note        None
  *******************************************************************************
@@ -909,7 +909,7 @@ void HAL_Veeprom_Update(void *param)
             uint8_t state = veeprom_get_flag(HAL_VEEPROM_ERASE_FLAG, 0, 0);
             uint8_t page  = (eeprom->Addr > eeprom->PhyInfo.Page1Base) ? (1) : (0);
             
-            //! д��ɹ�
+            //! 写入成功
             if (state == 0)
             {
                 eeprom->Addr += eeprom->PhyInfo.PageSize;
@@ -939,7 +939,7 @@ void HAL_Veeprom_Update(void *param)
                     }
                 }
             }
-            //! д��ʧ��
+            //! 写入失败
             else if (state == 2)
             {
                 eeprom->UpdateState = HAL_VEEPROM_HW_ERROR;
@@ -958,19 +958,19 @@ void HAL_Veeprom_Update(void *param)
 
             if (state == 0)
             {
-                //! У��ɹ�
+                //! 校验成功
                 if (veeprom_get_flag(HAL_VEEPROM_VERIFY_FLAG, eeprom->Addr, HAL_VEEPROM_PAGE_USE) == 0)
                 {
                     eeprom->Addr += HAL_VEEPROM_ALIGNMENT;
                     eeprom->UpdateState = HAL_VEEPROM_WRITE;
                 }
-                //! У��ʧ��
+                //! 校验失败
                 else
                 {
                     eeprom->UpdateState = HAL_UPDATE_INIT;
                 }
             }
-            //! д��ʧ��
+            //! 写入失败
             else if (state == 2)
             {
                 eeprom->UpdateState = HAL_VEEPROM_HW_ERROR;
@@ -997,7 +997,7 @@ void HAL_Veeprom_Update(void *param)
             
             if (state == 0)
             {
-                //! У��ɹ�
+                //! 校验成功
                 if (veeprom_get_flag(HAL_VEEPROM_VERIFY_FLAG, eeprom->Addr, wrData) == 0)
                 {
                     eeprom->Addr += HAL_VEEPROM_ALIGNMENT;
@@ -1012,13 +1012,13 @@ void HAL_Veeprom_Update(void *param)
                         eeprom->UpdateState = HAL_VEEPROM_WRITE;
                     }
                 }
-                //! У��ʧ��
+                //! 校验失败
                 else
                 {
                     eeprom->UpdateState = HAL_FLASH_WRITE;
                 }
             }
-            //! д��ʧ��
+            //! 写入失败
             else if (state == 2)
             {
                 eeprom->UpdateState = HAL_VEEPROM_HW_ERROR;

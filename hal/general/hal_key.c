@@ -24,12 +24,12 @@
  *                 GCC                                                         *
  *******************************************************************************
  * @note                                                                       *
- * 1. 2015-06-15 �����ļ� ԭ����bsp_key.c�� ʵ�ְ����ļ�⴦����ͨ��FSMʵ��      *
- * 2. 2015-08-25 ͨ����������ʵ�ֵײ��״̬Ǩ�ƣ��ӿ�ִ���ٶ�                  *
- * 3. 2016-03-02 ���������������                                              *
- * 4. 2017-02-23 �޸��ļ���Ϊ��fw_signal.c��,�ع������ʹ�ÿ��APIʵ��           *
- * 5. 2018-05-16 �޸��ļ���Ϊ��HAL_key.c��,�ع������ʹ��HAL��APIʵ��            *
- * 6. 2018-06-28 �޸��ļ���Ϊ��hal_key.c��,ͳһHAL��ܹ�                         *
+ * 1. 2015-06-15 创建文件 原名“bsp_key.c” 实现按键的检测处理，通过FSM实现      *
+ * 2. 2015-08-25 通过函数数组实现底层的状态迁移，加快执行速度                  *
+ * 3. 2016-03-02 增加面向对象特性                                              *
+ * 4. 2017-02-23 修改文件名为“fw_signal.c”,重构组件，使用框架API实现           *
+ * 5. 2018-05-16 修改文件名为“HAL_key.c”,重构组件，使用HAL层API实现            *
+ * 6. 2018-06-28 修改文件名为“hal_key.c”,统一HAL层架构                         *
  *******************************************************************************
  */
 
@@ -42,10 +42,10 @@
 #include "hal_device.h"
 
 /* Private define ------------------------------------------------------------*/
-//! ����״̬Ǩ��
+//! 按键状态迁移
 #define KEY_STATE_TRNASFER(now_key, new_state) _st((now_key)->State = (new_state);)
 
-//! ������Ϣ���ͺ���
+//! 按键消息发送函数
 #define KEY_MSG_Send(msg, dev) _st((msg).MsgType  = HAL_DEVICE_KEY_MSG; \
                                    (msg).KeyState = (dev)->State; \
                                    (msg).KeyTick  = (dev)->Tick; \
@@ -89,7 +89,7 @@ void HAL_Key_Scan(void *param)
     
     uint8_t change = 0;
 
-    //! 1. ������ƽ���
+    //! 1. 按键电平检测
     if (nowValue != key->FilterValue)
     {
         key->FilterValue = nowValue;
@@ -98,31 +98,31 @@ void HAL_Key_Scan(void *param)
         change = 1;
     }
 
-    //! 2. ���°���ʱ��
+    //! 2. 更新按键时钟
     if (key->FilterTick < 0xFFFF)
     {
         key->FilterTick ++;
     }
     
-    //! 3. ����״̬������
+    //! 3. 按键状态机处理
     switch (key->State)
     {
         case KEY_RELEASE_STATE:
             if (change)
             {
-                //! ����״̬Ǩ��
-                //! Ǩ�������²����˲�״̬
+                //! 按键状态迁移
+                //! 迁移至按下操作滤波状态
                 KEY_STATE_TRNASFER(key, KEY_RELEASE_FILTER_STATE);
             }
             break;
         case KEY_RELEASE_FILTER_STATE:
             if (change)
             {
-                //! ����״̬Ǩ��
-                //! Ǩ���������ɿ�״̬
+                //! 按键状态迁移
+                //! 迁移至按键松开状态
                 KEY_STATE_TRNASFER(key, KEY_RELEASE_STATE);
                 
-                //! ȷ��Ϊ��������
+                //! 确认为按键抖动
                 if (key->Value == key->FilterValue)
                 {
                     KEY_STATE_TRNASFER(key, KEY_RELEASE_STATE);
@@ -130,26 +130,26 @@ void HAL_Key_Scan(void *param)
             }
             else
             {   
-                //! �˲���ʱ
+                //! 滤波超时
                 if (key->FilterTick >= HAL_KEY_FILTER_TICK)
                 {
-                    //! ����tick
+                    //! 更新tick
                     key->Tick = key->FilterTick;
                     
-                    //! ���¼�ֵ
+                    //! 更新键值
                     key->Value = key->FilterValue;
                     
-                    //! ����״̬Ǩ��
-                    //! Ǩ�����������±���״̬
+                    //! 按键状态迁移
+                    //! 迁移至按键按下边沿状态
                     KEY_STATE_TRNASFER(key, KEY_PRESS_EDGE_STATE);
                     
-                    //! ����״̬Ǩ��
-                    //! Ǩ����������ס״̬
-                    //! ���������Ϣ���¼�
+                    //! 按键状态迁移
+                    //! 迁移至按键按住状态
+                    //! 发送相关消息或事件
                     KEY_MSG_Send(msg, key);
                     
-                    //! ����״̬Ǩ��
-                    //! Ǩ����������ס״̬
+                    //! 按键状态迁移
+                    //! 迁移至按键按住状态
                     KEY_STATE_TRNASFER(key, KEY_PRESS_STATE);
                 }
             }
@@ -157,22 +157,22 @@ void HAL_Key_Scan(void *param)
         case KEY_PRESS_STATE:
             if (change)
             {
-                //! ����״̬Ǩ��
-                //! Ǩ���������ɿ��˲�״̬
+                //! 按键状态迁移
+                //! 迁移至按键松开滤波状态
                 KEY_STATE_TRNASFER(key, KEY_PRESS_FILTER_STATE);
             }
             else
             {   
                 key->Tick = key->FilterTick;
                 
-                //! ʹ���˳������
+                //! 使能了长按检测
                 if (HAL_Flag_Get(key->Flag, HAL_KEY_LONG_SCAN))
                 {
-                    //! ÿ�뷢��һ����Ϣ
+                    //! 每秒发送一个消息
                     if ((key->Tick % HAL_KEY_SECOND_TICK) == 0)
                     {
-                        //! ����״̬Ǩ��
-                        //! ���������Ϣ���¼�
+                        //! 按键状态迁移
+                        //! 发送相关消息或事件
                         KEY_MSG_Send(msg, key);
                     }
                 }
@@ -181,11 +181,11 @@ void HAL_Key_Scan(void *param)
         case KEY_PRESS_FILTER_STATE:
             if (change)
             {
-                //! ����״̬Ǩ��
-                //! Ǩ�����������±�����Ӧ״̬
+                //! 按键状态迁移
+                //! 迁移至按键按下边沿响应状态
                 key->FilterTick = key->Tick;
                 
-                //! ȷ��Ϊ��������
+                //! 确认为按键抖动
                 if (key->Value == key->FilterValue)
                 {
                     KEY_STATE_TRNASFER(key, KEY_PRESS_STATE);
@@ -193,33 +193,33 @@ void HAL_Key_Scan(void *param)
             }
             else
             {   
-                //! �˲���ʱ
+                //! 滤波超时
                 if (key->FilterTick >= HAL_KEY_FILTER_TICK)
                 {
-                    //! ����״̬Ǩ��
-                    //! Ǩ���������ɿ�����״̬
+                    //! 按键状态迁移
+                    //! 迁移至按键松开边沿状态
                     KEY_STATE_TRNASFER(key, KEY_RELEASE_EDGE_STATE);
                 
-                    //! ���������Ϣ���¼�
+                    //! 发送相关消息或事件
                     KEY_MSG_Send(msg, key);
                     
-                    //! ��ռ���ֵ
+                    //! 清空计数值
                     key->Tick = 0;
 
-                    //! ���¼�ֵ
+                    //! 更新键值
                     key->Value = key->FilterValue;
                     
-                    //! Ǩ�����������±���״̬
+                    //! 迁移至按键按下边沿状态
                     if (key->Value == HAL_KEY_VALUE_NOP)
                     {
-                        //! ����״̬Ǩ��
-                        //! Ǩ���������ɿ�״̬
+                        //! 按键状态迁移
+                        //! 迁移至按键松开状态
                         KEY_STATE_TRNASFER(key, KEY_RELEASE_STATE);
                     }
                     else
                     {
-                        //! ����״̬Ǩ��
-                        //! Ǩ���������ɿ�״̬
+                        //! 按键状态迁移
+                        //! 迁移至按键松开状态
                         KEY_STATE_TRNASFER(key, KEY_RELEASE_FILTER_STATE);
                     }
                 }

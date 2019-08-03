@@ -64,7 +64,7 @@ int FwTimer_Component_Init(void)
 { 
     memset((void *)&FwTimer, 0, sizeof(FwTimer));
     
-    FwList_Init((FwList_t *)&FwTimer.List);
+    FwListInit((FwList_t *)&FwTimer.List);
 
     return 0;
 }
@@ -99,7 +99,7 @@ FwList_t *FwTimer_List_Root(void)
 __INLINE
 void Fw_Timer_Init(FwTimer_t *timer, char *name, FwTimerCallback callback, void *param, uint32_t tick, uint8_t flag)
 {
-    FwList_Init(&timer->List);
+    FwListInit(&timer->List);
 
     timer->Callback = callback;
     timer->Param    = param;
@@ -170,7 +170,7 @@ void Fw_Timer_Start(FwTimer_t *timer)
 #endif
 
     //! 删除列表
-    FwList_Remove(&timer->List);
+    FwListRemove(&timer->List);
 
     //! 更新时钟
     timer->Tick = Fw_Tick_Get() + timer->Timeout;
@@ -186,7 +186,7 @@ void Fw_Timer_Start(FwTimer_t *timer)
         }
     }
 
-    FwList_InsertBefore(p, &timer->List);
+    FwListInsertBefore(p, &timer->List);
 
     timer->State  = FW_TIM_DOING;
 
@@ -287,7 +287,7 @@ void Fw_Timer_Stop(FwTimer_t *timer)
     timer->Timeout = 0;
     timer->State = FW_TIM_SLEEP;
 
-    FwList_Remove(&timer->List);
+    FwListRemove(&timer->List);
     
     Fw_Exit_Critical();
 }
@@ -382,7 +382,7 @@ void FwTimer_Component_Handle(void)
             p = p->Next;
             
             //! 移除当前节点
-            FwList_Remove(&t->List);
+            FwListRemove(&t->List);
 
             Fw_Exit_Critical();
             

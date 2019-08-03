@@ -39,92 +39,9 @@ extern "C"
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-#include "hal_device.h"
+#include "hal_def.h"
 
 /* Exported macro ------------------------------------------------------------*/
-/**
- *******************************************************************************
- * @brief        HAL SPI PORT
- *******************************************************************************
- */
-enum HAL_SPI_PORT
-{
-    HAL_SPI_0 = 0,
-    HAL_SPI_1,
-    HAL_SPI_2,
-    HAL_SPI_3,
-    HAL_SPI_4,
-    HAL_SPI_5,
-    
-    HAL_SPI_END,
-};
-
-/**
- *******************************************************************************
- * @brief      定义 SPI 模式
- *******************************************************************************
- */
-//! CPOL = 0, CPHA = 0
-#define HAL_SPI_MODE_0        0
-//! CPOL = 0, CPHA = 1
-#define HAL_SPI_MODE_1        1
-//! CPOL = 1, CPHA = 0
-#define HAL_SPI_MODE_2        2
-//! CPOL = 1, CPHA = 1
-#define HAL_SPI_MODE_3        3
-
-/**
- *******************************************************************************
- * @brief      定义 SPI 数据长度
- *******************************************************************************
- */
-#define HAL_SPI_DATA_LEN_8    8
-#define HAL_SPI_DATA_LEN_16  16
-#define HAL_SPI_DATA_LEN_32  32
-
-/**
- *******************************************************************************
- * @brief      定义 SPI 传输速度
- *******************************************************************************
- */
-#define HAL_SPI_SPEED_10K     10000UL
-#define HAL_SPI_SPEED_20K     20000UL
-#define HAL_SPI_SPEED_50K     50000UL
-#define HAL_SPI_SPEED_100K    100000UL
-#define HAL_SPI_SPEED_200K    200000UL
-#define HAL_SPI_SPEED_500K    500000UL
-#define HAL_SPI_SPEED_1M      1000000UL
-#define HAL_SPI_SPEED_2M      2000000UL
-#define HAL_SPI_SPEED_5M      5000000UL
-#define HAL_SPI_SPEED_10M     10000000UL
-#define HAL_SPI_SPEED_20M     20000000UL
-
-/**
- *******************************************************************************
- * @brief      SPI 配置选项
- *******************************************************************************
- */
-#define HAL_SPI_EN_TX                 0x0001
-#define HAL_SPI_EN_TX_ISR             0x0002
-#define HAL_SPI_EN_TX_DMA             0x0004
-#define HAL_SPI_EN_TX_FIFO            0x0008
-#define HAL_SPI_EN_TX_MSG             0x0010
-#define HAL_SPI_EN_TX_CALLBACK        0x0020
-
-#define HAL_SPI_EN_RX                 0x0100
-#define HAL_SPI_EN_RX_ISR             0x0200
-#define HAL_SPI_EN_RX_DMA             0x0400
-#define HAL_SPI_EN_RX_FIFO            0x0800
-#define HAL_SPI_EN_RX_MSG             0x1000
-#define HAL_SPI_EN_RX_CALLBACK        0x2000
-
-/**
- *******************************************************************************
- * @brief      SPI 标识定义
- *******************************************************************************
- */
-#define HAL_SPI_TAKE_FLAG             0x0001
-
 /* Exported types ------------------------------------------------------------*/
 /**
  *******************************************************************************

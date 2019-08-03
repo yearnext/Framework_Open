@@ -24,8 +24,8 @@
  *                 GCC                                                         *
  *******************************************************************************
  * @note                                                                       *
- * 1. 20171027    ´´½¨ÎÄ¼ş"veeprom.h"                                          *
- * 2. 20180829    ¼ò»¯veeprom×é¼ş£¬¸üÃûÎª"hal_flash.h"                         *
+ * 1. 20171027    åˆ›å»ºæ–‡ä»¶"veeprom.h"                                          *
+ * 2. 20180829    ç®€åŒ–veepromç»„ä»¶ï¼Œæ›´åä¸º"hal_flash.h"                         *
  *******************************************************************************
  */
 
@@ -40,6 +40,8 @@ extern "C"
 #endif
 
 /* Includes ------------------------------------------------------------------*/
+#include "hal_def.h"
+
 /* Exported macro ------------------------------------------------------------*/
 //! define flash state
 enum __HAL_FLASH_STATE
@@ -58,14 +60,14 @@ enum __HAL_FLASH_STATE
 //! flash driver event
 #define HAL_FLASH_UPDATE_EVENT                                               (0)
 
-//! flash driver ±êÊ¶
+//! flash driver æ ‡è¯†
 #define HAL_FLASH_LOCK_FLAG                                             (0x0001)
 #define HAL_FLASH_VERIFY_FLAG                                           (0x0002)
 #define HAL_FLASH_ERASE_FLAG                                            (0x0004)
 #define HAL_FLASH_WRITE_FLAG                                            (0x0008)
 
 /* Exported types ------------------------------------------------------------*/
-//! Veeprom Ó²¼ş²Ù×÷½Ó¿Ú
+//! Veeprom ç¡¬ä»¶æ“ä½œæ¥å£
 typedef struct 
 {
     uint32_t (*ReadWord)(uint32_t addr);
@@ -78,10 +80,10 @@ typedef struct
 
 typedef struct
 {
-    //! Ò³ÎïÀíµØÖ·
+    //! é¡µç‰©ç†åœ°å€
     size_t PageBase;
     size_t PageEnd;
-    //! ÎïÀíÒ³´óĞ¡
+    //! ç‰©ç†é¡µå¤§å°
     size_t PageSize;
 }HAL_FlashInfo_t;
 
@@ -89,10 +91,10 @@ typedef struct
 {
     HAL_FlashInfo_t Atrribute;
     
-    //! RAM»º³åÇø
+    //! RAMç¼“å†²åŒº
     volatile uint8_t *Buffer;
     
-    //! EEPROM¿Õ¼ä
+    //! EEPROMç©ºé—´
     uint16_t BufferLen;
 }HAL_Flash_Config_t;
 
@@ -101,22 +103,22 @@ typedef struct
     HAL_Atrribute_t Atrribute;
     HAL_FlashInfo_t PhyInfo;
     
-    //! Ğ´ÈëµØÖ·
+    //! å†™å…¥åœ°å€
     size_t   Addr;
     
-    //! Éè±¸¾ä±ú
+    //! è®¾å¤‡å¥æŸ„
     HAL_Device_t *Dev;
     
-    //! RAM»º³åÇø
+    //! RAMç¼“å†²åŒº
     volatile uint8_t *Buffer;
     
-    //! Flash¿Õ¼ä
+    //! Flashç©ºé—´
     uint16_t BufferLen;
     
-    //! ¿éÊıÁ¿
+    //! å—æ•°é‡
     uint16_t BlockNum;
 
-    //! Ò³×´Ì¬
+    //! é¡µçŠ¶æ€
     uint8_t PageState;
 }HAL_Flash_t;
 

@@ -24,7 +24,7 @@
  *                 GCC                                                         *
  *******************************************************************************
  * @note                                                                       *
- * 1.20170110    ´´½¨ÎÄ¼şfw_sm.c         		                               *
+ * 1.20170110    åˆ›å»ºæ–‡ä»¶fw_sm.c         		                               *
  *******************************************************************************
  */
 
@@ -34,28 +34,45 @@
  */
 
 /* Includes ------------------------------------------------------------------*/
-#include "fwsm_nano.h"
+#include "fw_sm.h"
+#include "fw_core.h"
 
 /* Exported macro ------------------------------------------------------------*/
+#define FwSm_Get_Obj(id) (&FwSm[id])
+#define FwSm_Read_Msg(evt) if (FwBufRead(&FwSmMgr.Queue, ((uint8_t *)evt), sizeof(FwSmMsg_t)) != sizeof(FwSmMsg_t)) \
+                               {FwTask_Clr_Evt(FRAMEWORK_MSG_EVENT); return 0;}                                     \
+                           else{if (FwBufUsed(&FwSmMgr.Queue) == 0){FwTask_Clr_Evt(FRAMEWORK_MSG_EVENT);}}
+
 /* Exported types ------------------------------------------------------------*/
+typedef struct
+{
+	uint8_t Id;
+	
+	FwBuf_t Queue;
+	FwSmMsg_t Buf[FRAMEWORK_SM_QUEUE_SIZE];
+}FwSmMgr_t;
+
 /* Private variables ---------------------------------------------------------*/
+FwSmMgr_t FwSmMgr;
+
 /* Exported variables --------------------------------------------------------*/
+FwSm_t FwSm[FW_SM_MAX];
+
 /* Private functions ---------------------------------------------------------*/
 __STATIC_INLINE
-uint8_t Fw_Sm_Tran_Handle(FwSm_t *me)
+uint8_t FwSm_Tran_Handle(FwSm_t *me)
 {
     uint8_t ret;
-    FwSmEvt_t evt;
+    FwSmMsg_t msg;
     
-    //! ÍË³öµ±Ç°×´Ì¬
-    evt.Sig = FRAMEWORK_EXIT_EVENT;
-    evt.Ptr = NULL;
+    //! é€€å‡ºå½“å‰çŠ¶æ€
+    msg.Sig = FRAMEWORK_EXIT_EVENT;
 
-    me->State(me, &evt);
+    me->State(me, &msg);
 
-    //! ½øÈëĞÂ×´Ì¬
-    evt.Sig = FRAMEWORK_ENTRY_EVENT;
-    ret = me->Temp(me, &evt);
+    //! è¿›å…¥æ–°çŠ¶æ€
+    msg.Sig = FRAMEWORK_ENTRY_EVENT;
+    ret = me->Temp(me, &msg);
 
     me->State = me->Temp;
     
@@ -63,36 +80,34 @@ uint8_t Fw_Sm_Tran_Handle(FwSm_t *me)
 }
 
 __STATIC_INLINE
-uint8_t Fw_Sm_Back_Handle(FwSm_t *me)
+uint8_t FwSm_Back_Handle(FwSm_t *me)
 {
     uint8_t ret;
-    FwSmEvt_t evt;
+    FwSmMsg_t msg;
     
-    //! ÍË³öµ±Ç°×´Ì¬
-    evt.Sig = FRAMEWORK_EXIT_EVENT;
-    evt.Ptr = NULL;
+    //! é€€å‡ºå½“å‰çŠ¶æ€
+    msg.Sig = FRAMEWORK_EXIT_EVENT;
 
-    me->State(me, &evt);
+    ret = me->State(me, &msg);
     me->State = me->Temp;
     
     return ret;
 }
 
 __STATIC_INLINE
-uint8_t Fw_Sm_ExitSub_Handle(FwSm_t *me, SmStateHandle now, SmStateHandle page)
+uint8_t FwSm_ExitSub_Handle(FwSm_t *me, SmStateHandle now, SmStateHandle page)
 {
     uint8_t ret;
-    FwSmEvt_t evt;
+    FwSmMsg_t msg;
     
     SmStateHandle temp = page;
     
     while(1)
     {
-        //! ÍË³öµ±Ç°×´Ì¬
-        evt.Sig = FRAMEWORK_EXIT_EVENT;
-        evt.Ptr = NULL;
-        
-        ret = temp(me, &evt);
+        //! é€€å‡ºå½“å‰çŠ¶æ€
+        msg.Sig = FRAMEWORK_EXIT_EVENT;
+
+        ret = temp(me, &msg);
         
         if (me->Temp == now)
         {
@@ -105,61 +120,71 @@ uint8_t Fw_Sm_ExitSub_Handle(FwSm_t *me, SmStateHandle now, SmStateHandle page)
     return ret;
 }
 
-uint8_t Fw_Sm_Evt_Handle(FwSm_t *me, FwSmEvt_t *evt)
+__STATIC_INLINE
+uint8_t FwSm_Evt_Handle(FwSm_t *me, FwSmMsg_t *evt)
 {
-    uint8_t status;
+    uint8_t status = 0;
     
+    if (IS_PTR_NULL(me))
+    {
+        me = FwSm_Get_Obj(evt->Id);
+        
+        if (IS_PTR_NULL(me))
+        {
+#ifdef PUT_FW_SM_INFO
+            Fw_Console_Put("[%d][Fw SM][Error]Get Sm Handle Failed\r\n", Fw_Tick_Get());
+#endif
+            return 1;
+        }
+	}
+
     FwSmState_t ret;
     
     void *ptr = (void *)me->State;
-    
-#ifdef FW_SM_EVENT_TABLE_ENABLE
-	evt->Sig = Fm_SmTable_Filter(me, evt->Sig);
-#endif
 
     while (1)
     {
         ret = me->State(me, evt);
 
 __SM_RET_HANDLE:
-        //! ×´Ì¬×ªÒÆ´¦Àí
+        //! çŠ¶æ€è½¬ç§»å¤„ç†
         if (ret == FW_SM_RET_TRAN)
         {
-            ret = Fw_Sm_Tran_Handle(me);
+            ret = FwSm_Tran_Handle(me);
             
             ptr = (void *)me->State;
             
             goto __SM_RET_HANDLE;
         }
-        //! µÈ´ı´¦Àí
+        //! ç­‰å¾…å¤„ç†
         else if (ret == FW_SM_RET_WAIT)
         {
             status = 0;
             break;
         }
-        //! ¸¸×´Ì¬´¦Àí
+        //! çˆ¶çŠ¶æ€å¤„ç†
         else if (ret == FW_SM_RET_SUPER)
         {
-            me->State = me->Temp;
+            me = FwSm_Get_Obj(me->SuperId);
         }
-        //! ×Ó×´Ì¬·µ»Ø´¦Àí
+        //! å­çŠ¶æ€è¿”å›å¤„ç†
         else if (ret == FW_SM_RET_BACK)
         {
-            ret = Fw_Sm_Back_Handle(me);
+            ret = FwSm_Back_Handle(me);
             
             ptr = (void *)me->State;
             
             goto __SM_RET_HANDLE;
         }
-        //! ×Ó×´Ì¬ÍË³ö
+        //! å­çŠ¶æ€é€€å‡º
         else if (ret == FW_SM_RET_EXIT_SUB)
         {
-            Fw_Sm_ExitSub_Handle(me, me->State, (SmStateHandle)ptr);
+            FwSm_ExitSub_Handle(me, me->State, (SmStateHandle)ptr);
             ptr = (void *)me->State;
             
             break;
         }
-        //! ÆäËû×´Ì¬´¦Àí
+        //! å…¶ä»–çŠ¶æ€å¤„ç†
         else
         {
             status = 1;
@@ -172,139 +197,141 @@ __SM_RET_HANDLE:
     return status;
 }
 
-void Fw_Sm_Timer_Handle(void *param)
+void FwSm_Timer_Handle(void *param)
 {
     FwSm_t *me = (FwSm_t *)param;
-    FwSmEvt_t evt; 
+//    FwSmMsg_t msg; 
 
-    //! Æô¶¯SMµ÷¶ÈÆ÷
-    evt.Sig = FRAMEWORK_TIMEOUT_EVENT;
-    evt.Ptr = NULL;
-    Fw_Sm_Evt_Handle(me, &evt);
+//    //! å¯åŠ¨SMè°ƒåº¦å™¨
+//    msg.Sig = FRAMEWORK_TIMEOUT_EVENT;
+//    msg.Id = me->SmId;
+//    FwSm_Evt_Handle(me, &msg);
     
-    Fw_Task_Evt_Set(me->Task, FRAMEWORK_MSG_EVENT);
-    Fw_Task_Ready(me->Task);
+    FwSm_Post_Msg(me->SmId, FRAMEWORK_TIMEOUT_EVENT);
 }
 
 /* Exported functions --------------------------------------------------------*/
-void Fw_Sm_Init(FwSm_t *me, void *buf, uint16_t size)
+void FwSm_Task_Init(uint8_t taskId)
 {
-    //! ³õÊ¼»¯ÏûÏ¢¶ÓÁĞ
-    RingBufferInit(&me->Queue, buf, size);
+	memset(&FwSmMgr, 0, sizeof(FwSmMgr));
+	
+	FwBufInit(&FwSmMgr.Queue, &FwSmMgr.Buf[0], sizeof(FwSmMgr.Buf));
+	
+	FwSmMgr.Id = taskId;
 }
 
-uint16_t Fw_Sm_Dispatch(void *param)
+uint16_t FwSm_Task_Handle(uint8_t taskid, uint16_t evt)
 {
-	FwSm_t *me = (FwSm_t *)param;
-	FwSmEvt_t evt;
+	FwSmMsg_t msg;
 
-	while (1)
+	_unused(taskid);
+	if (Fw_Evt_Get(evt, FRAMEWORK_MSG_EVENT))
 	{
-		//! ÏûÏ¢Ô¤´¦Àí
-		if (RingBufferReadMirror(&me->Queue, (uint8_t *)&evt, sizeof(evt)) != sizeof(evt))
-		{
-			Fw_Task_Evt_Rst(me->Task);
-			break;
-		}
-
-		if (Fw_Sm_Evt_Handle(me, &evt) == 0)
-		{
-			Fw_Task_Yeild(me->Task);
-			break;
-		}
-
-		//! ÒÆ³ıÏûÏ¢
-		RingBufferRead(&me->Queue, (uint8_t *)&evt, sizeof(evt));
+		FwSm_Read_Msg(&msg);
+		
+		FwSm_Evt_Handle(NULL, &msg);
 	}
-
+	
 	return 0;
 }
 
-void Fw_SmTable_Init(FwSm_t *me, const FwSmTab_t *tab, uint16_t len, uint16_t init)
+void Fw_Sm_Init(uint8_t smId, uint8_t timerId, SmStateHandle init)
 {
-#ifdef FW_SM_EVENT_TABLE_ENABLE
-	me->Table      = tab;
-	me->TableLen   = len;
-	me->TableState = init;
-#endif
-}
+    FwSmMsg_t msg;
 
-uint16_t Fm_SmTable_Filter(FwSm_t *sm, uint16_t event)
-{
-#ifdef FW_SM_EVENT_TABLE_ENABLE
-	uint16_t i;
-    uint16_t outState;
+	FwSm_t *me = &FwSm[smId];
 
-	const FwSmTab_t *table;
+	me->StateCode = 0;
+	me->SuperId = FW_SM_NULL;
+	me->SmId    = smId;
+	me->TimerId = timerId;
 
-	if (!IS_PTR_NULL(sm->Table))
-	{
-		for (i = 0, table = &sm->Table[0]; i < sm->TableLen; i++)
-		{
-			if (((sm->TableState & table->NowLevel) == table->NowState) && (event == table->InputEvent || table->InputEvent == 0))
-			{
-				outState = (sm->TableState & ~table->NextLevel) | table->NextState;
-
-#ifdef PUT_SM_TABLE_INFO
-                printf("[SM]NowState:%p, TrigEvent:%d, SwitchState:%p, OutEvent:%d \r\n", (void *)sm->TableState, event, (void *)outState, table->OutEvent);
-#endif
-
-                sm->TableState = outState;
-                event = table->OutEvent;
-				break;
-			}
-            
-            table ++;
-		}
-	}
-#endif
-
-	return event;
-}
-
-void Fw_Sm_Start(FwSm_t *me, uint8_t id, SmStateHandle init)
-{
-    FwSmEvt_t evt;
-
-    //! ¸üĞÂÈÎÎñID
-    me->Task = id;
+    //! åˆå§‹åŒ–å®šæ—¶å™¨
+    Fw_Timer_Init(me->TimerId, FwSm_Timer_Handle, (void *)me);
     
-    //! ³õÊ¼»¯¶¨Ê±Æ÷
-    Fw_Timer_Init(me->Task, Fw_Sm_Timer_Handle, (void *)me);
-    
-    //! ³õÊ¼»¯×´Ì¬»ú
+    //! åˆå§‹åŒ–çŠ¶æ€æœº
     me->Temp  = init;
 
-    evt.Sig = FRAMEWORK_ENTRY_EVENT;    
-    me->Temp(me, &evt);
+    msg.Sig = FRAMEWORK_INIT_EVENT;    
+    me->Temp(me, &msg);
     
     me->State = me->Temp;
 }
 
 __INLINE
-uint16_t Fw_SmEvt_Post(FwSm_t *me, FwSmEvt_t *evt)
+uint16_t FwSm_Release_Wait(FwSm_t *me)  
 {
-    uint16_t len = RingBufferWrite(&me->Queue, (void *)evt, sizeof(FwSmEvt_t));
+    uint16_t sig = me->Wait;
     
-    Fw_Task_Evt_Set(me->Task, FRAMEWORK_MSG_EVENT);
-
-    return len;
-}
-
-void Fw_SmTimer_Start(FwSm_t *me, uint32_t tick)
-{
-    Fw_Timer_Init(me->Task, Fw_Sm_Timer_Handle, (void *)me);
-    Fw_Timer_Start(me->Task, tick, 0);
-}
-
-void Fw_SmTimer_Stop(FwSm_t *me)
-{
-    Fw_Timer_Stop(me->Task);
+    if (me->Wait)
+    {
+        me->Wait = 0;
+    }
+    
+    return sig;
 }
 
 __INLINE
-void *Fw_Sm_State(FwSm_t *me)
+void FwSm_Clear_Wait(FwSm_t *me)  
 {
+    me->Wait = 0;
+}
+
+void FwSm_Post_Msg(uint16_t sm, uint16_t sig)
+{
+	FwSmMsg_t msg;
+	
+	msg.Id = (uint8_t)sm;
+	msg.Sig = sig;
+
+	if (FwBufWrite(&FwSmMgr.Queue, (uint8_t *)&msg, sizeof(msg)) != sizeof(msg))
+    {
+#ifdef PUT_FW_SM_INFO
+        Fw_Console_Put("[%d][Fw SM][Error]Write SM Queue Failed, Because Queue Is Full\r\n", Fw_Tick_Get());
+#endif
+    }
+	
+	FwTask_Set_Evt(FwSmMgr.Id, FRAMEWORK_MSG_EVENT);
+}
+
+void FwSm_Timer_Start(FwSm_t *me, FwTick_t tick)
+{
+    if (tick == 0)
+    {
+        FwSm_Post_Msg(me->SmId, FRAMEWORK_TIMEOUT_EVENT);
+    }
+    else
+    {
+        Fw_Timer_Init(me->TimerId, FwSm_Timer_Handle, (void *)me);
+        Fw_Timer_Start(me->TimerId, tick, 0);
+    }
+}
+
+void FwSm_Timer_Stop(FwSm_t *me)
+{
+    Fw_Timer_Stop(me->TimerId);
+}
+
+uint32_t FwSm_Timer_Tick(FwSm_t *me)
+{
+    return Fw_Timer_Tick(me->TimerId);
+}
+
+uint16_t Fw_Sm_Code(FwSm_t *me)
+{
+    return me->StateCode;
+}
+
+void Fw_Sm_SetCode(FwSm_t *me, uint16_t sCode)
+{
+    me->StateCode = sCode;
+}
+
+__INLINE
+void *Fw_Sm_State(uint16_t smId)
+{
+    FwSm_t *me = &FwSm[smId];
+
     return (void *)me->State;
 }
 

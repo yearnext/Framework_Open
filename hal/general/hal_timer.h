@@ -41,52 +41,6 @@ extern "C"
 #include "hal_def.h"
 
 /* Exported macro ------------------------------------------------------------*/
-/**
- *******************************************************************************
- * @brief        HAL TIMER PORT
- *******************************************************************************
- */
-enum HAL_TIMER_PORT
-{
-    HAL_TIMER_0,  HAL_TIMER_1,  HAL_TIMER_2,  HAL_TIMER_3,  HAL_TIMER_4,
-    HAL_TIMER_5,  HAL_TIMER_6,  HAL_TIMER_7,  HAL_TIMER_8,  HAL_TIMER_9,
-    HAL_TIMER_10, HAL_TIMER_11, HAL_TIMER_12, HAL_TIMER_13, HAL_TIMER_14,
-    HAL_TIMER_15, HAL_TIMER_16, HAL_TIMER_17, HAL_TIMER_18, HAL_TIMER_19,
-    HAL_TIMER_20, HAL_TIMER_21, HAL_TIMER_22, HAL_TIMER_23, HAL_TIMER_24,
-    HAL_TIMER_25, HAL_TIMER_26, HAL_TIMER_27, HAL_TIMER_28, HAL_TIMER_29,
-    HAL_TIMER_30, HAL_TIMER_31, HAL_TIMER_32, HAL_TIMER_33, HAL_TIMER_34,
-    HAL_TIMER_35, HAL_TIMER_36, HAL_TIMER_37, HAL_TIMER_38, HAL_TIMER_39,
-    HAL_TIMER_40, HAL_TIMER_41, HAL_TIMER_42, HAL_TIMER_43, HAL_TIMER_44,
-    HAL_TIMER_45, HAL_TIMER_46, HAL_TIMER_47, HAL_TIMER_48, HAL_TIMER_49,
-    HAL_TIMER_MAX,
-};
-
-/**
- *******************************************************************************
- * @brief        HAL TIMER RUN MODE
- *******************************************************************************
- */
-#define HAL_TIMER_ONE_SHOT_MODE                                                0
-#define HAL_TIMER_PERIOD_MODE                                                  1
-
-/**
- *******************************************************************************
- * @brief        HAL TIMER TICK MODE
- *******************************************************************************
- */
-#define HAL_TIMER_CNT_UP                                                       0
-#define HAL_TIMER_CNT_DOWN                                                     1
-
-/**
- *******************************************************************************
- * @brief        HAL TIMER TICK UNIT
- *******************************************************************************
- */
-#define HAL_TIMER_UNIT_US                                                      0
-#define HAL_TIMER_UNIT_MS                                                      1
-#define HAL_TIMER_UNIT_100MS                                                   2
-#define HAL_TIMER_UNIT_SEC                                                     3
-     
 /* Exported types ------------------------------------------------------------*/
 /**
  *******************************************************************************
@@ -132,12 +86,12 @@ typedef struct
 {
     HAL_Atrribute_t Attribute;
 
-    //! ÷ÿº”‘ÿTick÷µ
+    //! ÈáçÂä†ËΩΩTickÂÄº
     uint32_t Tick;
 
-    //! µ◊≤„≤Ÿ◊˜æ‰±˙
+    //! Â∫ïÂ±ÇÊìç‰ΩúÂè•ÊüÑ
     void *Param;
-    //! …Ë±∏≤Ÿ◊˜æ‰±˙
+    //! ËÆæÂ§áÊìç‰ΩúÂè•ÊüÑ
     HAL_Device_t *Dev;
 }HAL_Timer_t;
 

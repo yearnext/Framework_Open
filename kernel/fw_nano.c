@@ -38,6 +38,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "fw_core.h"
+#include "fw_sm.h"
 #include <string.h>
 
 /* Exported macro ------------------------------------------------------------*/
@@ -54,7 +55,7 @@
  * @brief        定时器数量定义
  *******************************************************************************
  */
-#define FRAMEWORK_TIMER_MAX                                   FRAMEWORK_TASK_MAX
+#define FRAMEWORK_TIMER_MAX                                    (_dimof(FwTimer))
 
 /**
  *******************************************************************************
@@ -101,9 +102,20 @@ __CONST uint8_t FwNanoMap[] = {255, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0}
  *******************************************************************************
  */
 #ifdef USE_KEIL_C51_COMPILER
-__DATA FwHandle_t FwCore;
+__DATA FwCore_t FwCore;
 #else
-FwHandle_t FwCore;
+FwCore_t FwCore;
+#endif
+
+/**
+ *******************************************************************************
+ * @brief        定时器句柄
+ *******************************************************************************
+ */
+#ifdef USE_KEIL_C51_COMPILER
+__DATA FwTimer_t FwTimer[FW_TIMER_MAX];
+#else
+FwTimer_t FwTimer[FW_TIMER_MAX];
 #endif
 
 /**
@@ -135,56 +147,6 @@ FwQueue_Mgr_t __DATA FwMsgMgr[FRAMEWORK_TASK_MAX];
 uint8_t __DATA FwMsgMemFlag[(FRAMEWORK_MSG_QUEUE_MAX % 8) ? (FRAMEWORK_MSG_QUEUE_MAX/8 + 1) : (FRAMEWORK_MSG_QUEUE_MAX/8)];
 
 /* Private functions ---------------------------------------------------------*/
-#ifdef FRAMEWORK_NANO_EXPAND
-/**
- *******************************************************************************
- * @brief       进入临界点函数
- * @param       [in/out]  void
- * @return      [in/out]  void
- * @note        由用户调用
- *******************************************************************************
- */
-__INLINE
-void Fw_Enter_Critical(void)
-{
-    Fw_IRQ_Disable();
-    
-    if (FwCore.IsrLock == 0)
-    {
-        FwCore.IsrLock++;
-    }
-    else 
-    {
-        if (FwCore.IsrLock < 0xFFFFFFFF)
-        {
-            FwCore.IsrLock++;
-        }
-    }
-}
-
-/**
- *******************************************************************************
- * @brief       退出临界点函数
- * @param       [in/out]  void
- * @return      [in/out]  void
- * @note        由用户调用
- *******************************************************************************
- */
-__INLINE
-void Fw_Exit_Critical(void)
-{
-    if (FwCore.IsrLock)
-    {
-        FwCore.IsrLock --;
-        
-        if (FwCore.IsrLock == 0)
-        {
-            Fw_IRQ_Enable();
-        }
-    }
-}
-#endif
-
 /**
  *******************************************************************************
  * @brief       消息队列初始化函数
@@ -511,7 +473,7 @@ void Fw_Task_Init(void)
     {
         FwTaskInitList[FwCore.CurTask](FwCore.CurTask);
 
-#ifdef FRAMEWORK_NANO_EXPAND
+#ifdef ENABLE_FRAMEWORK_NANO_EXPAND
         FwTask[FwCore.CurTask].State = FW_TASK_READY;
 #endif
     }
@@ -519,7 +481,7 @@ void Fw_Task_Init(void)
     FwCore.CurTask = 0;
 }
 
-#ifdef FRAMEWORK_NANO_EXPAND
+#ifdef ENABLE_FRAMEWORK_NANO_EXPAND
 /**
  *******************************************************************************
  * @brief       任务就绪
@@ -573,81 +535,9 @@ void Fw_Task_Yeild(uint8_t id)
 __INLINE
 uint8_t Fw_Task_State(uint8_t id)
 {
-    return  FwTask[id].State;
+    return FwTask[id].State;
 }
 #endif
-
-/**
- *******************************************************************************
- * @brief       初始化定时器
- * @param       [in/out]  id       定时器ID
- * @param       [in/out]  callback 定时器回调
- * @param       [in/out]  param    回调参数
- * @return      [in/out]  void
- * @note        None
- *******************************************************************************
- */
-void Fw_Timer_Init(uint8_t id, void *callback, void *param)
-{
-    FwTimer_t *timer = &FwTask[id].Timer;
-    
-    timer->Tick = 0;
-
-#ifdef FRAMEWORK_NANO_EXPAND
-    timer->Reload = 0;
-
-    timer->Handle.Ptr = callback;
-    timer->param      = param;
-#else
-    _unused(callback);
-    _unused(param);
-#endif
-}
-
-/**
- *******************************************************************************
- * @brief       启动定时器
- * @param       [in/out]  id       定时器ID
- * @param       [in/out]  tick     定时器时间
- * @param       [in/out]  flag     定时器参数
- * @return      [in/out]  void
- * @note        None
- *******************************************************************************
- */
-void Fw_Timer_Start(uint8_t id, FwTick_t tick, uint16_t flag)
-{
-    FwTask[id].Timer.Tick = tick;
-
-#ifdef FRAMEWORK_NANO_EXPAND
-    if (flag)
-    {
-        FwTask[id].Timer.Reload = tick;
-    }
-    else
-    {
-        FwTask[id].Timer.Reload = 0;
-    }
-#else
-    _unused(flag);
-#endif
-}
-
-/**
- *******************************************************************************
- * @brief       停止定时器
- * @param       [in/out]  id       定时器ID
- * @return      [in/out]  void
- * @note        None
- *******************************************************************************
- */
-void Fw_Timer_Stop(uint8_t id)
-{
-    FwTask[id].Timer.Tick = 0;
-
-#ifdef FRAMEWORK_NANO_EXPAND
-    FwTask[id].Timer.Reload = 0;
-#endif
-}
 
 /**
  *******************************************************************************
@@ -664,15 +554,70 @@ uint16_t Fw_Task_Num(void)
 
 /**
  *******************************************************************************
+ * @brief       初始化定时器
+ * @param       [in/out]  id       定时器ID
+ * @param       [in/out]  callback 定时器回调
+ * @param       [in/out]  param    回调参数
+ * @return      [in/out]  void
+ * @note        None
+ *******************************************************************************
+ */
+void Fw_TaskTimer_Init(uint8_t id, void *callback, void *param)
+{
+    FwTimer_t *timer = &FwTask[id].Timer;
+    
+    timer->Tick = 0;
+
+#ifdef ENABLE_FRAMEWORK_NANO_EXPAND
+    timer->Reload = 0;
+
+    timer->Func  = callback;
+    timer->Param = param;
+#else
+    _unused(callback);
+    _unused(param);
+#endif
+}
+
+/**
+ *******************************************************************************
+ * @brief       启动定时器
+ * @param       [in/out]  id       定时器ID
+ * @param       [in/out]  tick     定时器时间
+ * @param       [in/out]  flag     定时器参数
+ * @return      [in/out]  void
+ * @note        None
+ *******************************************************************************
+ */
+void Fw_TaskTimer_Start(uint8_t id, FwTick_t tick, uint16_t flag)
+{
+    FwTask[id].Timer.Tick = tick;
+
+#ifdef ENABLE_FRAMEWORK_NANO_EXPAND
+    if (flag)
+    {
+        FwTask[id].Timer.Reload = tick;
+    }
+    else
+    {
+        FwTask[id].Timer.Reload = 0;
+    }
+#else
+    _unused(flag);
+#endif
+}
+
+/**
+ *******************************************************************************
  * @brief       计算Timer数量
  * @param       [in/out]  void
  * @return      [in/out]  num    Timer数量
  * @note        None
  *******************************************************************************
  */
-uint16_t Fw_Timer_Num(void)
+uint16_t Fw_TaskTimer_Num(void)
 {
-	return FRAMEWORK_TIMER_MAX;
+	return FRAMEWORK_TASK_MAX;
 }
 
 /**
@@ -722,26 +667,22 @@ void Fw_Tick_Handle(void)
         {
             if (past >= timer->Tick)
             {
-#ifdef FRAMEWORK_NANO_EXPAND
-                if (!IS_PTR_NULL(timer->Handle.Callback))
+#ifdef ENABLE_FRAMEWORK_NANO_EXPAND
+                if (!IS_PTR_NULL(timer->Callback))
                 {
-                    timer->Handle.Callback(timer->param);
+                    timer->Callback(timer->Param);
                 }
                 else
                 {
-                    Fw_Task_Evt_Set(i, FRAMEWORK_TICK_EVENT);
+                    FwTask_Set_Evt(i, FRAMEWORK_TICK_EVENT);
                 }
-                
-                if (timer->Reload)
-                {
-                    timer->Tick = timer->Reload;
-                }
+
+                timer->Tick = timer->Reload;
 #else
-                Fw_Task_Evt_Set(i, FRAMEWORK_TICK_EVENT);
-                
+                FwTask_Set_Evt(i, FRAMEWORK_TICK_EVENT);
                 timer->Tick = 0;
 #endif
-                
+
 #ifdef FW_PUT_TICK_HANDLE_INFO
 				Fw_Core_Log("Task：%d Timer Timeout \r\n", i);
 #endif
@@ -752,9 +693,170 @@ void Fw_Tick_Handle(void)
             }
         }
     }
+
+#ifdef ENABLE_FRAMEWORK_TIMER_COMPONENT
+    //! 刷新定时时钟
+    past = Fw_Tick_Past(tick);
     
+    for (i=0; i<FRAMEWORK_TIMER_MAX; i++)
+    {
+        timer = &FwTimer[i];
+        
+        if (timer->Tick)
+        {
+            if (past >= timer->Tick)
+            {
+                timer->Tick = timer->Reload;
+                
+                if (!IS_PTR_NULL(timer->Callback))
+                {
+                    timer->Callback(timer->Param);
+                }
+
+#ifdef ENABLE_FRAMEWORK_SM_COMPONENT 
+                else if (timer->SmId)
+                {
+                    FwSm_Post_Msg(timer->SmId, timer->Sig);
+                }
+#endif
+
+#ifdef FW_PUT_TICK_HANDLE_INFO
+                Fw_Core_Log("Timer:%d Timer Timeout \r\n", i);
+#endif
+            }
+            else
+            {
+                timer->Tick -= past;
+            }
+        }
+    }
+#endif
+
     tick = Fw_Tick_Get();
 }
+
+#ifdef ENABLE_FRAMEWORK_TIMER_COMPONENT
+/**
+ *******************************************************************************
+ * @brief       初始化定时器
+ * @param       [in/out]  id       定时器ID
+ * @param       [in/out]  callback 定时器回调
+ * @param       [in/out]  param    回调参数
+ * @return      [in/out]  void
+ * @note        None
+ *******************************************************************************
+ */
+void Fw_Timer_Init(uint8_t id, void *callback, void *param)
+{
+    FwTimer_t *timer = &FwTimer[id];
+    
+    timer->Tick = 0;
+    timer->Reload = 0;
+
+    timer->Func  = callback;
+    timer->Param = param;
+}
+
+/**
+ *******************************************************************************
+ * @brief       设置定时器回调函数
+ * @param       [in/out]  id           定时器ID
+ * @param       [in/out]  callback     回调函数
+ * @param       [in/out]  param        回调参数
+ * @return      [in/out]  void
+ * @note        None
+ *******************************************************************************
+ */
+void Fw_Timer_SetCallback(uint8_t id, void *callback, void *param)
+{
+    FwTimer_t *timer = &FwTimer[id];
+    
+    timer->Tick = 0;
+    timer->Reload = 0;
+
+    timer->Func  = callback;
+    timer->Param = param;
+}
+
+/**
+ *******************************************************************************
+ * @brief       设置定时器信号发射器
+ * @param       [in/out]  id       定时器ID
+ * @param       [in/out]  smId     状态机ID
+ * @param       [in/out]  sig      触发信号
+ * @return      [in/out]  void
+ * @note        None
+ *******************************************************************************
+ */
+void Fw_Timer_SetSmSig(uint8_t id, uint16_t smId, uint16_t sig)
+{
+    FwTimer_t *timer = &FwTimer[id];
+    
+    timer->Func = NULL;
+    timer->Param = 0;
+
+    timer->SmId = smId;
+    timer->Sig  = sig;
+}
+
+/**
+ *******************************************************************************
+ * @brief       启动定时器
+ * @param       [in/out]  id       定时器ID
+ * @param       [in/out]  tick     定时器时间
+ * @param       [in/out]  flag     定时器参数
+ * @return      [in/out]  void
+ * @note        None
+ *******************************************************************************
+ */
+void Fw_Timer_Start(uint8_t id, FwTick_t tick, uint16_t flag)
+{
+    FwTimer_t *timer = &FwTimer[id];
+
+    timer->Tick = tick;
+
+    if (flag)
+    {
+        timer->Reload = tick;
+    }
+    else
+    {
+        timer->Reload = 0;
+    }
+}
+
+/**
+ *******************************************************************************
+ * @brief       获取定时器当前时间
+ * @param       [in/out]  id       定时器ID
+ * @return      [in/out]  tick     定时器当前Tick
+ * @note        None
+ *******************************************************************************
+ */
+FwTick_t Fw_Timer_Tick(uint8_t id)
+{
+    FwTimer_t *timer = &FwTimer[id];
+
+    return timer->Tick;
+}
+
+/**
+ *******************************************************************************
+ * @brief       停止定时器
+ * @param       [in/out]  id       定时器ID
+ * @return      [in/out]  void
+ * @note        None
+ *******************************************************************************
+ */
+void Fw_Timer_Stop(uint8_t id)
+{
+    FwTimer_t *timer = &FwTimer[id];
+
+    timer->Tick = 0;
+    timer->Reload = 0;
+}
+
+#endif
 
 /**
  *******************************************************************************
@@ -766,13 +868,25 @@ void Fw_Tick_Handle(void)
  */
 void Fw_Core_Init(void)
 {
-    uint8_t isr = 0;
-    
     //! 初始化系统唤醒变量
     memset((void *)&FwCore,    0, sizeof(FwCore));
     memset((void *)&FwTask[0], 0, sizeof(FwTask));
+
+#ifdef ENABLE_FRAMEWORK_TIMER_COMPONENT
+    memset((void *)&FwTimer[0], 0, sizeof(FwTimer));
+#endif
     
-    Fw_Atom_Begin(isr);
+    //! 系统服务初始化
+#ifdef ENABLE_FRAMEWORK_SERVER
+    Fw_Server_Init();
+#endif
+
+#ifdef ENABLE_FRAMEWORK_CONSOLE
+    Fw_Console_Init();
+#endif
+    
+    //! 关闭全局中断
+    Fw_IRQ_Disable();
 
     //! 消息队列初始化
     Fw_Msg_Init();
@@ -783,11 +897,68 @@ void Fw_Core_Init(void)
     
     //! 任务组件初始化
     Fw_Task_Init();
-    
-    Fw_Atom_End(isr);
-    
+
     //! 开启全局中断
     Fw_IRQ_Enable();
+}
+
+/**
+ *******************************************************************************
+ * @brief       系统内核调度函数
+ * @param       [in/out]  void
+ * @return      [in/out]  void
+ * @note        由用户调用
+ *******************************************************************************
+ */
+void Fw_Core_Dispatch(void)
+{
+#ifdef ENABLE_FRAMEWORK_EXPORT
+	uint8_t isr = 0;
+	uint16_t task = 0;
+
+	Fw_Atom_Begin(isr);
+
+	//! 时钟任务处理
+#ifndef ENABLE_FRAMEWORK_TIMER_REAL
+	if (Fw_Evt_Get(FwCore.Event, FRAMEWORK_TICK_EVENT))
+	{
+		Fw_Tick_Handle();
+		Fw_Evt_Clr(FwCore.Event, FRAMEWORK_TICK_EVENT);
+	}
+#endif
+
+	//! 任务调度
+	FwCore.CurTask = 0;
+
+	do
+	{
+#ifdef ENABLE_FRAMEWORK_NANO_EXPAND
+		if (FwTask[FwCore.CurTask].Event && FwTask[FwCore.CurTask].State == FW_TASK_READY)
+#else
+		if (FwTask[FwCore.CurTask].Event)
+#endif
+		{
+			break;
+		}
+	} while (++FwCore.CurTask < FRAMEWORK_TASK_MAX);
+
+	task = FwCore.CurTask;
+
+	Fw_Atom_End(isr);
+
+	if (task < FRAMEWORK_TASK_MAX)
+	{
+		//            Fw_Atom_Begin(isr);
+		FwTaskList[task](task, FwTask[task].Event);
+		//            Fw_Atom_End(isr);
+	}
+	else
+	{
+		Fw_Sleep_Handle();
+	}
+
+	Fw_Hardware_Poll();
+#endif
 }
 
 /**
@@ -821,7 +992,7 @@ void Fw_Core_Startup(void)
         
         do
         {
-#ifdef FRAMEWORK_NANO_EXPAND
+#ifdef ENABLE_FRAMEWORK_NANO_EXPAND
             if (FwTask[FwCore.CurTask].Event && FwTask[FwCore.CurTask].State == FW_TASK_READY)
 #else
             if (FwTask[FwCore.CurTask].Event)
